@@ -14,6 +14,11 @@
   --accent-gold: #f3b03a;
   --font-display: 'Fraunces', serif;
   --font-body: 'Inter Tight', system-ui, sans-serif;
+
+  /* atmospheric shadow system — one source of truth, used everywhere */
+  --shadow-soft: 0 1px 1px rgba(0,0,0,.28), 0 6px 24px rgba(0,0,0,.32);
+  --shadow-fine: 0 1px 1px rgba(0,0,0,.30), 0 2px 10px rgba(0,0,0,.30);
+  --shadow-glow-warm: 0 0 32px rgba(243, 176, 58, .18);
 }
 
 html, body {
@@ -46,7 +51,7 @@ body { overflow-x: hidden; }
   font-size: clamp(60px, 10vw, 140px);
   letter-spacing: -0.04em;
   color: var(--text-on-dark);
-  text-shadow: 0 0 60px rgba(243, 176, 58, .35);
+  text-shadow: 0 0 28px rgba(243, 176, 58, .14);
 }
 .loader-sub {
   font-size: 11px;
@@ -119,6 +124,7 @@ body { overflow-x: hidden; }
   padding: 0 5vw;
   z-index: 5;
   overflow: hidden;
+  will-change: opacity;
 }
 .hero-standalone::before {
   content: '';
@@ -156,6 +162,8 @@ body { overflow-x: hidden; }
   margin-bottom: 28px;
   position: relative;
   z-index: 2;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  will-change: transform, opacity;
 }
 
 .hero-heading {
@@ -166,11 +174,12 @@ body { overflow-x: hidden; }
   line-height: 1.05;
   letter-spacing: -0.04em;
   color: var(--text-on-dark);
-  text-shadow: 0 0 80px rgba(0,0,0,.25);
+  text-shadow: 0 2px 1px rgba(0,0,0,.18), 0 10px 50px rgba(0,0,0,.18);
   position: relative;
   z-index: 2;
   max-width: 90vw;
   padding-bottom: 0.3em;
+  will-change: transform, opacity;
 }
 .hero-heading .word {
   display: inline-block;
@@ -184,6 +193,8 @@ body { overflow-x: hidden; }
   opacity: .85;
   position: relative;
   z-index: 2;
+  text-shadow: 0 1px 1px rgba(0,0,0,.25);
+  will-change: transform, opacity;
 }
 
 .scroll-indicator {
@@ -199,6 +210,8 @@ body { overflow-x: hidden; }
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  will-change: opacity;
+  text-shadow: 0 1px 1px rgba(0,0,0,.25);
 }
 .scroll-indicator .arrow {
   width: 1px; height: 36px;
@@ -227,6 +240,7 @@ body { overflow-x: hidden; }
   background: var(--bg-dark);
   clip-path: circle(0% at 50% 50%);
   pointer-events: none;
+  will-change: clip-path;
 }
 .video-wrap video,
 .video-wrap canvas {
@@ -250,10 +264,14 @@ body { overflow-x: hidden; }
 #dark-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(8, 5, 4, 0.92);
+  /* radial vignette feels less like a flat wall and lets the centre glow
+     of the muse breathe through into the stats */
+  background:
+    radial-gradient(ellipse at center, rgba(8,5,4,0.78) 0%, rgba(8,5,4,0.95) 70%);
   z-index: 3;
   opacity: 0;
   pointer-events: none;
+  will-change: opacity;
 }
 
 /* ── Marquee ──────────────────────────────── */
@@ -265,6 +283,7 @@ body { overflow-x: hidden; }
   opacity: 0;
   overflow: hidden;
   white-space: nowrap;
+  will-change: opacity;
 }
 .marquee-wrap.top { top: 18vh; }
 .marquee-wrap.bottom { bottom: 14vh; }
@@ -279,6 +298,7 @@ body { overflow-x: hidden; }
   color: var(--text-on-dark);
   white-space: nowrap;
   will-change: transform;
+  text-shadow: 0 2px 30px rgba(0,0,0,.30);
 }
 .marquee-text .sep {
   display: inline-block;
@@ -305,6 +325,10 @@ body { overflow-x: hidden; }
   align-items: center;
   z-index: 5;
   pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+  /* JS drives opacity in lockstep with scroll via cosine-eased ramp.
+     A CSS transition would double-lerp and create perceptible mush. */
 }
 .scroll-section.align-left {
   padding-left: 5vw;
@@ -335,18 +359,23 @@ body { overflow-x: hidden; }
   line-height: 1;
   letter-spacing: -0.025em;
   color: var(--text-on-dark);
-  text-shadow: 0 4px 30px rgba(0,0,0,.45);
+  text-shadow: var(--shadow-soft);
+  will-change: transform, opacity;
 }
 .section-heading em {
   font-style: italic;
   color: var(--accent-gold);
+  /* keep the gold inside its own subtle warm glow rather than the parent's
+     dark drop shadow — prevents the muddy halo around the italic letters */
+  text-shadow: 0 1px 1px rgba(40, 18, 6, .55), 0 0 24px rgba(243, 176, 58, .15);
 }
 .section-body {
   font-size: clamp(15px, 1.05vw, 18px);
   line-height: 1.55;
   max-width: 38ch;
   opacity: .88;
-  text-shadow: 0 2px 12px rgba(0,0,0,.4);
+  text-shadow: var(--shadow-fine);
+  will-change: transform, opacity;
 }
 .section-note {
   font-size: 11px;
@@ -354,6 +383,7 @@ body { overflow-x: hidden; }
   text-transform: uppercase;
   opacity: .55;
   margin-top: 8px;
+  will-change: transform, opacity;
 }
 
 /* ── Stats section ────────────────────────── */
@@ -385,7 +415,13 @@ body { overflow-x: hidden; }
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  will-change: transform, opacity;
 }
+/* The animated counter ("countdown"). Previously inherited / sat next to a
+   heavy 4px-offset black drop shadow which muddied the gold edges and made
+   each digit look stamped-on. Replace with a tight, on-brand treatment:
+   one tight contact shadow for legibility on light frames, plus a gentle
+   warm halo so the gold reads as light rather than ink. */
 .stat-number {
   font-family: var(--font-display);
   font-weight: 300;
@@ -393,6 +429,11 @@ body { overflow-x: hidden; }
   line-height: 1;
   letter-spacing: -0.03em;
   color: var(--accent-gold);
+  text-shadow:
+    0 1px 0 rgba(40, 18, 6, .65),
+    0 0 36px rgba(243, 176, 58, .22);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
 }
 .stat-suffix {
   font-family: var(--font-display);
@@ -400,6 +441,7 @@ body { overflow-x: hidden; }
   font-size: 18px;
   opacity: .8;
   margin-top: -6px;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 .stat-label {
   font-size: 11px;
@@ -408,6 +450,7 @@ body { overflow-x: hidden; }
   opacity: .65;
   max-width: 16ch;
   line-height: 1.4;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 
 /* ── CTA section ──────────────────────────── */
@@ -426,6 +469,7 @@ body { overflow-x: hidden; }
   letter-spacing: 0.32em;
   text-transform: uppercase;
   opacity: .65;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 .cta-heading {
   font-family: var(--font-display);
@@ -435,6 +479,12 @@ body { overflow-x: hidden; }
   line-height: 0.95;
   letter-spacing: -0.03em;
   text-align: center;
+  text-shadow: var(--shadow-soft);
+  will-change: transform, opacity;
+}
+.cta-heading em {
+  color: var(--accent-gold);
+  text-shadow: 0 1px 1px rgba(40, 18, 6, .55), 0 0 28px rgba(243, 176, 58, .18);
 }
 .cta-button {
   pointer-events: auto;
@@ -449,14 +499,20 @@ body { overflow-x: hidden; }
   border: none;
   border-radius: 999px;
   cursor: pointer;
-  transition: transform .4s ease, background .4s, box-shadow .4s;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), background .4s, box-shadow .5s cubic-bezier(.2,.8,.2,1);
   margin-top: 8px;
-  box-shadow: 0 20px 60px rgba(243, 176, 58, .25);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .35) inset,
+    0 8px 24px rgba(0, 0, 0, .35),
+    0 0 0 1px rgba(243, 176, 58, .08);
 }
 .cta-button:hover {
-  transform: scale(1.03);
+  transform: translateY(-2px) scale(1.02);
   background: #fff;
-  box-shadow: 0 30px 80px rgba(243, 176, 58, .4);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .5) inset,
+    0 18px 44px rgba(0, 0, 0, .4),
+    0 0 0 1px rgba(243, 176, 58, .18);
 }
 .cta-meta {
   display: flex; gap: 32px;
@@ -465,20 +521,24 @@ body { overflow-x: hidden; }
   text-transform: uppercase;
   opacity: .55;
   margin-top: 16px;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 
 /* ── Cursor ────────────────────────────────── */
 .cursor-lens {
   position: fixed;
+  top: 0; left: 0;
   width: 320px; height: 320px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 90;
-  background: radial-gradient(circle, rgba(255,220,170,.18), rgba(255,120,40,.05) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(255,220,170,.16), rgba(255,120,40,.04) 50%, transparent 75%);
   mix-blend-mode: screen;
   filter: blur(28px);
-  transform: translate(-50%, -50%);
-  transition: opacity .4s;
+  transform: translate3d(-9999px, -9999px, 0);
+  opacity: 0;
+  transition: opacity .5s ease;
+  will-change: transform, opacity;
 }
 
 /* ── Mobile ────────────────────────────────── */

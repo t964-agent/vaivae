@@ -227,13 +227,16 @@ function finishLoading() {
 }
 
 // ─── Scroll-driven frame selection ────────────────────────
+// Frames are mapped LINEARLY across most of the scroll so the muse keeps
+// evolving past the stats / linen sections rather than locking to its final
+// frame at ~62% (which previously made the video appear to stop). The last
+// frame settles just as the CTA fully takes over.
 const VIDEO_START = 0.02;
-const VIDEO_END   = 0.62;
+const VIDEO_END   = 0.92;
 
 function updateFrameForProgress(p) {
   const t = clamp01((p - VIDEO_START) / (VIDEO_END - VIDEO_START));
-  const eased = easeOutCubic(t);
-  const idx = Math.min(frames.length - 1, Math.floor(eased * frames.length));
+  const idx = Math.min(frames.length - 1, Math.floor(t * frames.length));
   if (idx !== currentFrame) {
     currentFrame = idx;
     requestAnimationFrame(() => drawFrame(currentFrame));
@@ -412,10 +415,14 @@ function updateMarquees(marquees, p) {
 }
 
 // ─── Dark overlay ─────────────────────────────────────────
+// Peak reduced from 0.92 to 0.72 so the stats moment doesn't kill the muse
+// underneath. Combined with the radial vignette in CSS, the effective darkness
+// is ~50% in the centre and ~60% at the edges — enough for the gold counters
+// to read crisply without dimming the whole page.
 const OVERLAY_ENTER = 0.560;
 const OVERLAY_LEAVE = 0.730;
 const OVERLAY_FADE  = 0.06;
-const OVERLAY_PEAK  = 0.92;
+const OVERLAY_PEAK  = 0.72;
 function updateDarkOverlay(p) {
   let o;
   if (p < OVERLAY_ENTER - OVERLAY_FADE)       o = 0;

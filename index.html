@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vaïvae — The Living Runway</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- 1. Loader -->
+<div id="loader">
+  <div class="loader-brand">vaïvae</div>
+  <div class="loader-sub">The Living Runway — loading</div>
+  <div id="loader-bar-wrap"><div id="loader-bar"></div></div>
+  <div id="loader-percent">0%</div>
+</div>
+
+<!-- 2. Site header -->
+<header class="site-header">
+  <div class="brand">vaïvae</div>
+  <nav>
+    <a href="#">Lookbook</a>
+    <a href="#">Atelier</a>
+    <a href="#">Stockists</a>
+    <a href="#">Bag</a>
+  </nav>
+</header>
+
+<!-- 3. Hero (standalone 100vh) -->
+<section class="hero-standalone" data-screen-label="Hero">
+  <span class="section-label">Drop 01 — May 2026</span>
+  <h1 class="hero-heading">
+    <span class="word">The</span>
+    <span class="word"><em>living</em></span>
+    <span class="word">runway.</span>
+  </h1>
+  <p class="hero-tagline">An AI muse emerges from the brand world itself — fabric, light and color resolving into a season. Scroll to enter.</p>
+  <div class="scroll-indicator">
+    Scroll
+    <span class="arrow"></span>
+  </div>
+</section>
+
+<!-- 4. Video stage (revealed via circle-wipe) -->
+<div class="video-wrap">
+  <video id="hero-video" src="hero-new.mp4" muted playsinline preload="auto" crossorigin="anonymous" style="opacity:0;"></video>
+  <canvas id="hero-canvas"></canvas>
+</div>
+
+<!-- 5. Dark overlay -->
+<div id="dark-overlay"></div>
+
+<!-- 6. Marquees -->
+<div class="marquee-wrap top" data-scroll-speed="-22" data-enter="0.30" data-leave="0.55">
+  <div class="marquee-text">Liquid form <span class="sep">·</span> Living cloth <span class="sep">·</span> A new house <span class="sep">·</span> Liquid form <span class="sep">·</span> Living cloth <span class="sep">·</span> A new house</div>
+</div>
+<div class="marquee-wrap bottom" data-scroll-speed="18" data-enter="0.62" data-leave="0.82">
+  <div class="marquee-text">Drop 01 <span class="sep">·</span> Terracotta <span class="sep">·</span> Glacial <span class="sep">·</span> Coral <span class="sep">·</span> Linen <span class="sep">·</span> Drop 01 <span class="sep">·</span> Terracotta</div>
+</div>
+
+<!-- 7. Cursor lens -->
+<div class="cursor-lens" id="cursor-lens"></div>
+
+<!-- 8. Scroll container -->
+<div id="scroll-container">
+
+  <section class="scroll-section align-left" data-enter="8" data-leave="22" data-animation="slide-left" data-screen-label="01 Formation">
+    <div class="section-inner">
+      <span class="section-label">001 / Formation</span>
+      <h2 class="section-heading">Out of the <em>gradient</em>, a figure forms.</h2>
+      <p class="section-body">No model placed on top of the brand. The muse emerges from inside the world — heat, hair, fabric, breath — resolving frame by frame as you move.</p>
+      <span class="section-note">Generated · Live · One-of-one</span>
+    </div>
+  </section>
+
+  <section class="scroll-section align-right" data-enter="22" data-leave="36" data-animation="slide-right" data-screen-label="02 Terracotta">
+    <div class="section-inner">
+      <span class="section-label">002 / Look 01</span>
+      <h2 class="section-heading"><em>Terracotta.</em><br/>Earth, set in motion.</h2>
+      <p class="section-body">A draped bias gown in hand-dyed silk. The first heat of the season — slow, low-burning, alive at the hem.</p>
+      <span class="section-note">From €1,180 · Made in Florence</span>
+    </div>
+  </section>
+
+  <section class="scroll-section align-left" data-enter="36" data-leave="50" data-animation="clip-reveal" data-screen-label="03 Glacial">
+    <div class="section-inner">
+      <span class="section-label">003 / Look 02</span>
+      <h2 class="section-heading"><em>Glacial.</em><br/>Cool intelligence.</h2>
+      <p class="section-body">A long-line jacket in raw silk twill. Cuts that hold air. Color that arrives quietly and refuses to leave.</p>
+      <span class="section-note">From €1,420 · Limited to 80 pieces</span>
+    </div>
+  </section>
+
+  <section class="scroll-section align-right" data-enter="50" data-leave="64" data-animation="fade-up" data-screen-label="04 Coral">
+    <div class="section-inner">
+      <span class="section-label">004 / Look 03</span>
+      <h2 class="section-heading"><em>Coral.</em><br/>Warmth without weight.</h2>
+      <p class="section-body">An open-weave knit dress, hand-finished. The exact temperature of late afternoon, made wearable.</p>
+      <span class="section-note">From €980 · Available May 12</span>
+    </div>
+  </section>
+
+  <section class="scroll-section section-stats" data-enter="64" data-leave="78" data-animation="stagger-up" data-screen-label="05 Stats">
+    <div class="section-inner">
+      <span class="stats-eyebrow">An atelier, in numbers</span>
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-number" data-value="04" data-decimals="0">0</span>
+          <span class="stat-suffix">looks</span>
+          <span class="stat-label">Drop 01 Capsule</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-value="240" data-decimals="0">0</span>
+          <span class="stat-suffix">hours</span>
+          <span class="stat-label">Per garment, average</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-value="80" data-decimals="0">0</span>
+          <span class="stat-suffix">pieces</span>
+          <span class="stat-label">Per look, edition limit</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-value="100" data-decimals="0">0</span>
+          <span class="stat-suffix">%</span>
+          <span class="stat-label">Made in Florence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section align-left" data-enter="78" data-leave="90" data-animation="rotate-in" data-screen-label="06 Linen">
+    <div class="section-inner">
+      <span class="section-label">005 / Look 04</span>
+      <h2 class="section-heading"><em>Linen.</em><br/>The last word.</h2>
+      <p class="section-body">A floor-length linen overcoat. The runway resolves into something you can actually wear into the rest of your life.</p>
+      <span class="section-note">From €1,620 · Pre-order opens today</span>
+    </div>
+  </section>
+
+  <section class="scroll-section section-cta" data-enter="90" data-leave="100" data-animation="scale-up" data-persist="true" data-screen-label="07 CTA">
+    <div class="section-inner">
+      <span class="cta-eyebrow">Drop 01 — Available now</span>
+      <h2 class="cta-heading">Enter the<br/><em>collection.</em></h2>
+      <button class="cta-button">Shop the Living Runway</button>
+      <div class="cta-meta">
+        <span>Worldwide shipping</span>
+        <span>·</span>
+        <span>Pre-order through May 24</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

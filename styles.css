@@ -305,33 +305,41 @@ body { overflow-x: hidden; }
   height: 900vh;
   z-index: 2;
 }
+/* Sections are 100vh tall absolute panels in the scroll container. JS sets
+   `top: (mid*100)%` and `margin-top:-50vh` shifts the section so its CENTRE
+   lands at that progress. We use margin-top instead of `transform:translateY`
+   here because a transform on the parent would break `position:fixed` on the
+   side-strip — the strip needs to anchor to the viewport, not the section. */
 .scroll-section {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  transform: translateY(-50%);
+  margin-top: -50vh;
   width: 100%;
   height: 100vh;
   z-index: 5;
   pointer-events: none;
   opacity: 0;
   will-change: opacity;
-  /* JS drives opacity in lockstep with scroll via cosine-eased ramp.
-     A CSS transition would double-lerp and create perceptible mush. */
 }
 
 /* Each section's detail copy (label → heading → body → note) collects into a
-   single bottom-anchored side strip. The big editorial layer is the marquee
-   above, so the section-heading here is intentionally subordinate — medium
-   display weight, sized to live in a flex column with the rest of the strip. */
+   bottom-anchored side strip. The strip is pinned to the VIEWPORT (not the
+   section) via position:fixed so it lands once and stays put — it doesn't
+   travel up with the section as the user scrolls past. The strip just fades
+   in when the section becomes active and fades out when the section exits.
+   The big editorial layer is the marquee above, so the section-heading here
+   is intentionally subordinate — medium display weight, sized to live in a
+   flex column with the rest of the strip. */
 .section-inner {
-  position: absolute;
+  position: fixed;
   bottom: 6vh;
   display: flex;
   flex-direction: column;
   gap: 14px;
   max-width: 38vw;
+  z-index: 6;
 }
 .scroll-section.align-left .section-inner {
   left: 5vw;

@@ -4,15 +4,16 @@
  *   0.000 – 0.020   Hero settled, video clip-path = circle(0%)
  *   0.020 – 0.080   Hero fades out + circle-wipe expands 0 → 82%   (synchronized)
  *   0.080 – 0.120   Pure video breath (no text)
- *   0.120 – 0.270   01 Formation
- *   0.270 – 0.420   02 Terracotta
- *   0.420 – 0.570   03 Glacial
- *   0.570 – 0.720   04 Coral
- *   0.720 – 0.890   05 Linen
- *   0.890 – 1.000   06 CTA           (data-persist, never exits)
+ *   0.100 – 0.920   Editorial marquee visible (slides horizontally)
+ *   0.120 – 0.270   01 Formation     (side-strip detail, bottom-left)
+ *   0.270 – 0.420   02 Terracotta    (side-strip detail, bottom-right)
+ *   0.420 – 0.570   03 Glacial       (bottom-left)
+ *   0.570 – 0.720   04 Coral         (bottom-right)
+ *   0.720 – 0.890   05 Linen         (bottom-left)
+ *   0.890 – 1.000   06 CTA           (centred stack, data-persist)
  *
- * No marquees, no stats counters, no dark overlay — sections are the
- * only typographic layer once the muse takes over from the hero.
+ * The marquee is the constant "very large editorial text in the middle".
+ * Per-section detail lives in a bottom side-strip on the alternating side.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 // ─── Lenis smooth scroll ──────────────────────────────────
@@ -270,14 +271,17 @@ function setupSectionAnimation(section) {
   ));
   if (!children.length) return;
 
+  // Every entrance includes a positive y so the side-strip detail rises into
+  // place from below — consistent "moving up" feel that matches the strip's
+  // anchor at the bottom of the section.
   const initial = {
-    "slide-left":  { x: -90, y: 0,  opacity: 0, scale: 1,    rotation: 0 },
-    "slide-right": { x: 90,  y: 0,  opacity: 0, scale: 1,    rotation: 0 },
+    "slide-left":  { x: -60, y: 40, opacity: 0, scale: 1,    rotation: 0 },
+    "slide-right": { x: 60,  y: 40, opacity: 0, scale: 1,    rotation: 0 },
     "fade-up":     { x: 0,   y: 60, opacity: 0, scale: 1,    rotation: 0 },
-    "scale-up":    { x: 0,   y: 0,  opacity: 0, scale: 0.88, rotation: 0 },
-    "rotate-in":   { x: 0,   y: 50, opacity: 0, scale: 1,    rotation: 3 },
+    "scale-up":    { x: 0,   y: 0,  opacity: 0, scale: 0.92, rotation: 0 },
+    "rotate-in":   { x: 0,   y: 50, opacity: 0, scale: 1,    rotation: 2 },
     "stagger-up":  { x: 0,   y: 70, opacity: 0, scale: 1,    rotation: 0 },
-    "clip-reveal": { x: 0,   y: 40, opacity: 0, scale: 1,    rotation: 0 },
+    "clip-reveal": { x: 0,   y: 50, opacity: 0, scale: 1,    rotation: 0 },
   }[type];
 
   // Paint initial state
@@ -346,6 +350,36 @@ function setupSectionAnimation(section) {
   return update;
 }
 
+// ─── Marquee (single "very large editorial text in the middle") ──
+function buildMarquees() {
+  const out = [];
+  document.querySelectorAll(".marquee-wrap").forEach(el => {
+    const speed = parseFloat(el.dataset.scrollSpeed) || -45;
+    const enter = parseFloat(el.dataset.enter || "0.10");
+    const leave = parseFloat(el.dataset.leave || "0.92");
+    const inner = el.querySelector(".marquee-text");
+    out.push({ el, inner, speed, enter, leave });
+  });
+  return out;
+}
+function updateMarquees(marquees, p) {
+  for (const m of marquees) {
+    // horizontal slide — text drifts left as the user scrolls. We slide across
+    // the whole 0–1 progress so the motion stays continuous even before/after
+    // the fade window.
+    m.inner.style.transform = `translate3d(${(m.speed * p).toFixed(2)}%, 0, 0)`;
+    // 6% cosine fade at each end of the visible window
+    const fade = 0.06;
+    let op;
+    if (p < m.enter - fade)            op = 0;
+    else if (p < m.enter)              op = ramp(p, m.enter - fade, m.enter);
+    else if (p < m.leave)              op = 1;
+    else if (p < m.leave + fade)       op = rampOut(p, m.leave, m.leave + fade);
+    else                               op = 0;
+    m.el.style.opacity = op.toFixed(3);
+  }
+}
+
 // ─── Hero exit + circle wipe (synchronized) ───────────────
 const HERO_EXIT_START  = 0.020;
 const HERO_EXIT_END    = 0.075;
@@ -410,6 +444,7 @@ function initScrollChoreography() {
   const sectionUpdaters = Array.from(document.querySelectorAll(".scroll-section"))
     .map(setupSectionAnimation)
     .filter(Boolean);
+  const marquees = buildMarquees();
 
   animateHeroIn();
   initCursor();
@@ -424,6 +459,7 @@ function initScrollChoreography() {
       const p = self.progress;
       updateHeroAndWipe(p);
       updateFrameForProgress(p);
+      updateMarquees(marquees, p);
       for (let i = 0; i < sectionUpdaters.length; i++) sectionUpdaters[i](p);
     }
   });

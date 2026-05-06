@@ -263,6 +263,41 @@ body { overflow-x: hidden; }
   pointer-events: none;
 }
 
+/* ── Editorial marquee ──────────────────────
+   The "very large text in the middle, little bit up" — fixed in the viewport
+   at top:28vh, scrolls horizontally as the user scrolls, present across the
+   whole content range so it's the constant editorial layer the side text
+   plays against. */
+.marquee-wrap {
+  position: fixed;
+  top: 28vh;
+  left: 0; right: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  will-change: opacity;
+}
+.marquee-text {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 12vw;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--text-on-dark);
+  white-space: nowrap;
+  will-change: transform;
+  text-shadow: 0 2px 30px rgba(0,0,0,.30);
+}
+.marquee-text .sep {
+  display: inline-block;
+  width: 0.6em;
+  color: var(--accent-orange);
+}
+
 /* ── Scroll container & sections ──────────── */
 #scroll-container {
   position: relative;
@@ -286,35 +321,43 @@ body { overflow-x: hidden; }
      A CSS transition would double-lerp and create perceptible mush. */
 }
 
-/* Each section is a positioned canvas — children placed into two clear lanes:
-     · the heading lives in the upper-middle band (centred, slightly above
-       viewport centre)
-     · the label / body / note collapse into a side strip at the bottom of
-       the section, anchored left or right per the section's alignment.
-   This keeps the giant editorial heading in one consistent place between
-   sections and keeps the small text out of its way during transitions. */
+/* Each section's detail copy (label → heading → body → note) collects into a
+   single bottom-anchored side strip. The big editorial layer is the marquee
+   above, so the section-heading here is intentionally subordinate — medium
+   display weight, sized to live in a flex column with the rest of the strip. */
 .section-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  bottom: 6vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 38vw;
+}
+.scroll-section.align-left .section-inner {
+  left: 5vw;
+  align-items: flex-start;
+  text-align: left;
+}
+.scroll-section.align-right .section-inner {
+  right: 5vw;
+  align-items: flex-end;
+  text-align: right;
 }
 
-/* Heading is anchored from the top so the GSAP transform string can drive the
-   reveal without fighting a CSS centring transform. With top:30% and a 1-2 line
-   heading at clamp(48px, 7vw, 120px), the visual centre of the text lands
-   between 38–44% of section height — i.e. the upper-middle band the brief
-   asks for ("middle, little bit up"). */
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: .75;
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  will-change: transform, opacity;
+}
 .section-heading {
-  position: absolute;
-  top: 30%;
-  left: 8vw;
-  right: 8vw;
-  text-align: center;
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(48px, 7vw, 120px);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  font-size: clamp(30px, 3.6vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   color: var(--text-on-dark);
   text-shadow: var(--shadow-soft);
   will-change: transform, opacity;
@@ -322,49 +365,26 @@ body { overflow-x: hidden; }
 .section-heading em {
   font-style: italic;
   color: var(--accent-gold);
-  text-shadow: 0 1px 1px rgba(40, 18, 6, .55), 0 0 24px rgba(243, 176, 58, .15);
-}
-
-.section-label,
-.section-body,
-.section-note {
-  position: absolute;
-  max-width: 36ch;
-  will-change: transform, opacity;
-}
-
-.section-label {
-  font-size: 11px;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  opacity: .7;
-  bottom: 22vh;
-  text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  text-shadow: 0 1px 1px rgba(40, 18, 6, .55), 0 0 22px rgba(243, 176, 58, .15);
 }
 .section-body {
   font-size: clamp(15px, 1.05vw, 18px);
   line-height: 1.5;
+  max-width: 42ch;
   opacity: .88;
-  bottom: 9.5vh;
   text-shadow: var(--shadow-fine);
+  will-change: transform, opacity;
 }
 .section-note {
   font-size: 11px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   opacity: .55;
-  bottom: 5.5vh;
   text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  will-change: transform, opacity;
 }
 
-.scroll-section.align-left  .section-label,
-.scroll-section.align-left  .section-body,
-.scroll-section.align-left  .section-note  { left: 5vw;  text-align: left;  }
-.scroll-section.align-right .section-label,
-.scroll-section.align-right .section-body,
-.scroll-section.align-right .section-note  { right: 5vw; text-align: right; }
-
-/* ── CTA section — centred stack rather than the two-lane layout ─── */
+/* ── CTA — centred stack at viewport centre, breaks out of the side strip ── */
 .section-cta {
   display: flex;
   align-items: center;
@@ -373,13 +393,17 @@ body { overflow-x: hidden; }
   padding: 0 5vw;
 }
 .section-cta .section-inner {
-  position: static;        /* opt out of the absolute-children mode */
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
   height: auto;
   width: auto;
   max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 32px;
 }
 .cta-eyebrow {
@@ -462,27 +486,17 @@ body { overflow-x: hidden; }
 /* ── Mobile ────────────────────────────────── */
 @media (max-width: 768px) {
   #scroll-container { height: 600vh; }
-  .section-heading {
-    top: 36%;
+  .marquee-wrap { top: 22vh; }
+  .marquee-text { font-size: 22vw; }
+  .scroll-section.align-left  .section-inner,
+  .scroll-section.align-right .section-inner {
     left: 6vw;
     right: 6vw;
-    font-size: clamp(40px, 11vw, 80px);
-    line-height: 1.05;
-  }
-  .scroll-section.align-left  .section-label,
-  .scroll-section.align-left  .section-body,
-  .scroll-section.align-left  .section-note,
-  .scroll-section.align-right .section-label,
-  .scroll-section.align-right .section-body,
-  .scroll-section.align-right .section-note {
-    left: 6vw;
-    right: 6vw;
+    align-items: flex-start;
     text-align: left;
     max-width: 88vw;
   }
-  .section-label { bottom: 24vh; }
-  .section-body  { bottom: 11vh; }
-  .section-note  { bottom: 6vh; }
-  .cursor-lens   { display: none; }
+  .section-heading { font-size: clamp(28px, 7vw, 48px); }
+  .cursor-lens     { display: none; }
   .site-header nav { display: none; }
 }

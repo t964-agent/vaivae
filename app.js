@@ -3,19 +3,16 @@
  * Master scroll envelope (0 → 1):
  *   0.000 – 0.020   Hero settled, video clip-path = circle(0%)
  *   0.020 – 0.080   Hero fades out + circle-wipe expands 0 → 82%   (synchronized)
- *   0.080 – 0.110   Pure video breath (no text)
- *   0.110 – 0.230   01 Formation     [enter 0.110-0.150 · hold · exit 0.205-0.230]
- *   0.230 – 0.350   02 Terracotta    [same envelope shape]
- *   0.350 – 0.470   03 Glacial
- *   0.470 – 0.590   04 Coral
- *   0.560 – 0.730   Dark overlay     (overlaps 05 Stats)
- *   0.590 – 0.720   05 Stats         (counters drive on enter)
- *   0.720 – 0.840   06 Linen
- *   0.840 – 1.000   07 CTA           (data-persist, never exits)
+ *   0.080 – 0.120   Pure video breath (no text)
+ *   0.120 – 0.270   01 Formation
+ *   0.270 – 0.420   02 Terracotta
+ *   0.420 – 0.570   03 Glacial
+ *   0.570 – 0.720   04 Coral
+ *   0.720 – 0.890   05 Linen
+ *   0.890 – 1.000   06 CTA           (data-persist, never exits)
  *
- * Marquees:
- *   top    visible 0.260 – 0.560   (Terracotta + Glacial)
- *   bottom visible 0.640 – 0.820   (Stats + Linen entry)
+ * No marquees, no stats counters, no dark overlay — sections are the
+ * only typographic layer once the muse takes over from the hero.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 // ─── Lenis smooth scroll ──────────────────────────────────
@@ -44,7 +41,6 @@ const heroSection     = document.querySelector('.hero-standalone');
 const scrollIndicator = document.querySelector('.scroll-indicator');
 const scrollContainer = document.getElementById('scroll-container');
 const cursorLens      = document.getElementById('cursor-lens');
-const darkOverlay     = document.getElementById('dark-overlay');
 
 // ─── Easing helpers ───────────────────────────────────────
 const PI = Math.PI;
@@ -270,8 +266,7 @@ function setupSectionAnimation(section) {
 
   const children = Array.from(section.querySelectorAll(
     ".section-label, .section-heading, .section-body, .section-note, " +
-    ".cta-eyebrow, .cta-heading, .cta-button, .cta-meta, " +
-    ".stats-eyebrow, .stat"
+    ".cta-eyebrow, .cta-heading, .cta-button, .cta-meta"
   ));
   if (!children.length) return;
 
@@ -351,88 +346,6 @@ function setupSectionAnimation(section) {
   return update;
 }
 
-// ─── Counters (driven by the master timeline, not GSAP scrollTrigger) ─
-function buildCounters() {
-  const counters = [];
-  document.querySelectorAll(".stat-number").forEach(el => {
-    const target   = parseFloat(el.dataset.value);
-    const decimals = parseInt(el.dataset.decimals || "0");
-    const section  = el.closest(".scroll-section");
-    const enter    = parseFloat(section.dataset.enter) / 100;
-    const leave    = parseFloat(section.dataset.leave) / 100;
-    const range    = leave - enter;
-    counters.push({
-      el, target, decimals,
-      start: enter + range * 0.05,
-      end:   enter + range * 0.55,
-      lastV: -1,
-    });
-  });
-  return counters;
-}
-function updateCounters(counters, p) {
-  for (const c of counters) {
-    const t = ramp(p, c.start, c.end);
-    const v = c.target * easeOutCubic(t);
-    if (Math.abs(v - c.lastV) < (c.target < 10 ? 0.05 : 0.5)) continue;
-    c.lastV = v;
-    if (c.target < 10 && c.decimals === 0) {
-      c.el.textContent = String(Math.round(v)).padStart(2, '0');
-    } else if (c.decimals === 0) {
-      c.el.textContent = Math.round(v).toLocaleString();
-    } else {
-      c.el.textContent = v.toFixed(c.decimals);
-    }
-  }
-}
-
-// ─── Marquees ─────────────────────────────────────────────
-function buildMarquees() {
-  const out = [];
-  document.querySelectorAll(".marquee-wrap").forEach(el => {
-    const speed = parseFloat(el.dataset.scrollSpeed) || -22;
-    const enter = parseFloat(el.dataset.enter || "0");
-    const leave = parseFloat(el.dataset.leave || "1");
-    const inner = el.querySelector(".marquee-text");
-    out.push({ el, inner, speed, enter, leave });
-  });
-  return out;
-}
-function updateMarquees(marquees, p) {
-  for (const m of marquees) {
-    // horizontal slide (across full scroll)
-    m.inner.style.transform = `translate3d(${(m.speed * p).toFixed(2)}%, 0, 0)`;
-    // smooth fade (8% windows, cosine)
-    const fade = 0.08;
-    let op;
-    if (p < m.enter - fade)            op = 0;
-    else if (p < m.enter)              op = ramp(p, m.enter - fade, m.enter);
-    else if (p < m.leave)              op = 1;
-    else if (p < m.leave + fade)       op = rampOut(p, m.leave, m.leave + fade);
-    else                               op = 0;
-    m.el.style.opacity = op.toFixed(3);
-  }
-}
-
-// ─── Dark overlay ─────────────────────────────────────────
-// Peak reduced from 0.92 to 0.72 so the stats moment doesn't kill the muse
-// underneath. Combined with the radial vignette in CSS, the effective darkness
-// is ~50% in the centre and ~60% at the edges — enough for the gold counters
-// to read crisply without dimming the whole page.
-const OVERLAY_ENTER = 0.560;
-const OVERLAY_LEAVE = 0.730;
-const OVERLAY_FADE  = 0.06;
-const OVERLAY_PEAK  = 0.72;
-function updateDarkOverlay(p) {
-  let o;
-  if (p < OVERLAY_ENTER - OVERLAY_FADE)       o = 0;
-  else if (p < OVERLAY_ENTER)                  o = OVERLAY_PEAK * ramp(p, OVERLAY_ENTER - OVERLAY_FADE, OVERLAY_ENTER);
-  else if (p < OVERLAY_LEAVE)                  o = OVERLAY_PEAK;
-  else if (p < OVERLAY_LEAVE + OVERLAY_FADE)   o = OVERLAY_PEAK * rampOut(p, OVERLAY_LEAVE, OVERLAY_LEAVE + OVERLAY_FADE);
-  else                                         o = 0;
-  darkOverlay.style.opacity = o.toFixed(3);
-}
-
 // ─── Hero exit + circle wipe (synchronized) ───────────────
 const HERO_EXIT_START  = 0.020;
 const HERO_EXIT_END    = 0.075;
@@ -497,8 +410,6 @@ function initScrollChoreography() {
   const sectionUpdaters = Array.from(document.querySelectorAll(".scroll-section"))
     .map(setupSectionAnimation)
     .filter(Boolean);
-  const counters  = buildCounters();
-  const marquees  = buildMarquees();
 
   animateHeroIn();
   initCursor();
@@ -513,9 +424,6 @@ function initScrollChoreography() {
       const p = self.progress;
       updateHeroAndWipe(p);
       updateFrameForProgress(p);
-      updateDarkOverlay(p);
-      updateMarquees(marquees, p);
-      updateCounters(counters, p);
       for (let i = 0; i < sectionUpdaters.length; i++) sectionUpdaters[i](p);
     }
   });

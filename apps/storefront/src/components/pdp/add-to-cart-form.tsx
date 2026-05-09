@@ -20,6 +20,7 @@ import {
   Input,
   Stack,
 } from "@/components/ui";
+import { dispatchCartUpdated } from "@/lib/cart-events";
 import { addLineItemAction } from "@/medusa/actions";
 import type { StoreProduct, StoreProductVariant } from "@/medusa/types";
 import { toast } from "@/lib/toast";
@@ -138,6 +139,7 @@ export function AddToCartForm({ colorSwatches, product }: AddToCartFormProps) {
       void addLineItemAction({ quantity: values.quantity, variantId: values.variantId }).then(
         (result) => {
           if (result.ok) {
+            dispatchCartUpdated(result.cart);
             markAdded(values.variantId);
             openCart();
             toast.success("Added to bag");

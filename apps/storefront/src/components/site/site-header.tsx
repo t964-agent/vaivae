@@ -10,6 +10,10 @@ import { SiteHeaderClient } from "./site-header-client";
 
 type SiteSettings = GlobalQueryResult["siteSettings"];
 
+type SiteHeaderProps = {
+  cartItemCount?: number | undefined;
+};
+
 function BrandMark({ siteSettings }: { siteSettings: SiteSettings }) {
   const siteName = siteSettings?.siteName?.trim() || "vaïvae";
   const logo = siteSettings?.logo;
@@ -38,12 +42,14 @@ function BrandMark({ siteSettings }: { siteSettings: SiteSettings }) {
   );
 }
 
-export async function SiteHeader() {
+export async function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
   const data = await getSiteChrome();
 
   return (
     <SiteHeaderClient
       brandMark={<BrandMark siteSettings={data.siteSettings} />}
+      cartItemCount={cartItemCount}
+      key={cartItemCount}
       navigation={data.navigation}
     />
   );

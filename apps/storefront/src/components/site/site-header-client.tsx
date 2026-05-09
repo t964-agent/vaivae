@@ -17,12 +17,15 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui";
+import { CART_UPDATED_EVENT, isCartUpdatedEvent } from "@/lib/cart-events";
+import { getCartItemCount } from "@/lib/cart-utils";
 import { cn } from "@/lib/utils";
 
 import { resolveChromeLink, SiteChromeLink, type ChromeLink } from "./site-link";
 
 type SiteHeaderClientProps = {
   brandMark: ReactNode;
+  cartItemCount?: number | undefined;
   navigation: GlobalQueryResult["navigation"];
 };
 
@@ -83,12 +86,21 @@ function HeaderNavLink({
   );
 }
 
-export function SiteHeaderClient({ brandMark, navigation }: SiteHeaderClientProps) {
+function formatCartCount(count: number): string {
+  return count > 99 ? "99+" : String(count);
+}
+
+export function SiteHeaderClient({
+  brandMark,
+  cartItemCount = 0,
+  navigation,
+}: SiteHeaderClientProps) {
   const pathname = usePathname();
   const openCart = useCartUiStore((store) => store.open);
   const reduceMotion = useReducedMotion() === true;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
+  const [visibleCartItemCount, setVisibleCartItemCount] = useState(cartItemCount);
   const isHome = pathname === "/";
   const isSolid = !isHome || pastHero;
   const headerLinks = getUsableLinks(navigation?.headerLinks);
@@ -96,6 +108,22 @@ export function SiteHeaderClient({ brandMark, navigation }: SiteHeaderClientProp
   const primaryLinks = headerLinks.length > 0 ? headerLinks : fallbackHeaderLinks;
   const promoEnabled =
     navigation?.promoBannerEnabled === true && Boolean(navigation.promoBannerText?.trim());
+
+  useEffect(() => {
+    function handleCartUpdated(event: Event): void {
+      if (!isCartUpdatedEvent(event)) {
+        return;
+      }
+
+      setVisibleCartItemCount(getCartItemCount(event.detail.cart));
+    }
+
+    window.addEventListener(CART_UPDATED_EVENT, handleCartUpdated);
+
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, handleCartUpdated);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isHome) {
@@ -179,12 +207,22 @@ export function SiteHeaderClient({ brandMark, navigation }: SiteHeaderClientProp
               <User aria-hidden className="size-4" strokeWidth={1.8} />
             </Link>
             <button
-              aria-label="Open cart"
-              className="inline-flex size-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
+              className="relative inline-flex size-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
               onClick={openCart}
               type="button"
             >
+              <span className="sr-only">
+                Open cart{visibleCartItemCount > 0 ? `, ${visibleCartItemCount} items` : ""}
+              </span>
               <ShoppingBag aria-hidden className="size-4" strokeWidth={1.8} />
+              {visibleCartItemCount > 0 ? (
+                <span
+                  aria-hidden
+                  className="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-accent-red px-1 font-body text-[0.58rem] leading-4 font-medium text-on-dark tabular-nums"
+                >
+                  {formatCartCount(visibleCartItemCount)}
+                </span>
+              ) : null}
             </button>
             <Drawer open={mobileOpen} onOpenChange={setMobileOpen}>
               <DrawerTrigger asChild>

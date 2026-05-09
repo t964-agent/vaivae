@@ -5,9 +5,13 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
+import { CartDrawer } from "@/components/cart/cart-drawer";
 import { CartUiProvider } from "@/components/providers/cart-ui-provider";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { getCartItemCount } from "@/lib/cart-utils";
+import { getCart } from "@/medusa/cart";
+import type { StoreCart } from "@/medusa/types";
 import { SanityLive } from "@/sanity/live";
 
 const fraunces = Fraunces({
@@ -30,7 +34,18 @@ type SiteLayoutProps = {
   children: ReactNode;
 };
 
-export default function SiteLayout({ children }: SiteLayoutProps) {
+async function getInitialCart(): Promise<StoreCart | null> {
+  try {
+    return await getCart();
+  } catch {
+    return null;
+  }
+}
+
+export default async function SiteLayout({ children }: SiteLayoutProps) {
+  const cart = await getInitialCart();
+  const cartItemCount = getCartItemCount(cart);
+
   return (
     <div
       className={`${fraunces.variable} ${interTight.variable} min-h-dvh bg-cream font-body text-on-light antialiased selection:bg-accent-gold selection:text-ink`}
@@ -38,16 +53,15 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
-      <SanityLive />
       <CartUiProvider>
         <NuqsAdapter>
-          <SiteHeader />
+          <SiteHeader cartItemCount={cartItemCount} />
           <main className="min-h-dvh" id="main-content">
             {children}
           </main>
           <SiteFooter />
         </NuqsAdapter>
+        <CartDrawer initialCart={cart} key={cart?.id ?? "empty-cart"} />
         <Toaster
           closeButton
           position="bottom-center"
@@ -71,6 +85,8 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
           }}
         />
       </CartUiProvider>
+      {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
+      <SanityLive />
       {/* PostHog will be wired in Agent 24 once Termly consent gating is in place per ADR-015 / §8.7.5. */}
       <SpeedInsights />
       <Analytics />

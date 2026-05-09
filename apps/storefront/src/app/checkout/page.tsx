@@ -2,11 +2,13 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 
 import { CheckoutPage } from "@/components/checkout/checkout-page";
+import type { CheckoutAddressData } from "@/components/checkout/types";
 import { Button } from "@/components/ui";
 import { getCart } from "@/medusa/cart";
 import { getMedusaClient } from "@/medusa/client";
+import { getCurrentCustomer } from "@/medusa/customer";
 import { getDefaultRegion } from "@/medusa/regions";
-import type { StoreCart, StoreCartShippingOption } from "@/medusa/types";
+import type { StoreCart, StoreCartShippingOption, StoreCustomerAddress } from "@/medusa/types";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -33,6 +35,63 @@ async function listInitialShippingOptions(cart: StoreCart): Promise<StoreCartShi
     return shipping_options;
   } catch {
     return [];
+  }
+}
+
+type InitialCheckoutCustomer = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+};
+
+function getInitialCheckoutAddress(
+  address: StoreCustomerAddress | undefined,
+  customer: InitialCheckoutCustomer | null,
+): CheckoutAddressData | null {
+  if (!address || address.country_code?.toUpperCase() !== "US") {
+    return null;
+  }
+
+  return {
+    address1: address.address_1 ?? "",
+    address2: address.address_2 ?? "",
+    city: address.city ?? "",
+    country: "US",
+    firstName: address.first_name ?? customer?.firstName ?? "",
+    lastName: address.last_name ?? customer?.lastName ?? "",
+    phone: address.phone ?? customer?.phone ?? "",
+    postalCode: address.postal_code ?? "",
+    state: (address.province ?? "").toUpperCase(),
+  };
+}
+
+async function getInitialCustomerCheckoutData(): Promise<{
+  initialAddress: CheckoutAddressData | null;
+  initialCustomer: InitialCheckoutCustomer | null;
+}> {
+  try {
+    const customer = await getCurrentCustomer();
+
+    if (!customer) {
+      return { initialAddress: null, initialCustomer: null };
+    }
+
+    const initialCustomer = {
+      email: customer.email,
+      firstName: customer.first_name ?? "",
+      lastName: customer.last_name ?? "",
+      phone: customer.phone ?? "",
+    };
+    const defaultShippingAddress =
+      customer.addresses?.find((address) => address.is_default_shipping) ?? customer.addresses?.[0];
+
+    return {
+      initialAddress: getInitialCheckoutAddress(defaultShippingAddress, initialCustomer),
+      initialCustomer,
+    };
+  } catch {
+    return { initialAddress: null, initialCustomer: null };
   }
 }
 
@@ -70,14 +129,17 @@ export default async function CheckoutRoute() {
     return <EmptyCheckoutState />;
   }
 
-  const [region, initialShippingOptions] = await Promise.all([
+  const [region, initialShippingOptions, customerCheckoutData] = await Promise.all([
     getDefaultRegion(),
     listInitialShippingOptions(cart),
+    getInitialCustomerCheckoutData(),
   ]);
 
   return (
     <CheckoutPage
       initialCart={cart}
+      initialAddress={customerCheckoutData.initialAddress}
+      initialCustomer={customerCheckoutData.initialCustomer}
       initialShippingOptions={initialShippingOptions}
       regionId={region.id}
       stripePublishableKey={process.env["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"] ?? ""}

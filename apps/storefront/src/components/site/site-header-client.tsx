@@ -1,10 +1,8 @@
 "use client";
 
 import type { GlobalQueryResult } from "@/sanity/types";
-import type { Route } from "next";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ShoppingBag, User } from "lucide-react";
+import { Menu, ShoppingBag } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -22,10 +20,12 @@ import { getCartItemCount } from "@/lib/cart-utils";
 import { cn } from "@/lib/utils";
 
 import { resolveChromeLink, SiteChromeLink, type ChromeLink } from "./site-link";
+import { UserMenu, type UserMenuCustomer } from "./user-menu";
 
 type SiteHeaderClientProps = {
   brandMark: ReactNode;
   cartItemCount?: number | undefined;
+  customer: UserMenuCustomer | null;
   navigation: GlobalQueryResult["navigation"];
 };
 
@@ -93,6 +93,7 @@ function formatCartCount(count: number): string {
 export function SiteHeaderClient({
   brandMark,
   cartItemCount = 0,
+  customer,
   navigation,
 }: SiteHeaderClientProps) {
   const pathname = usePathname();
@@ -199,13 +200,7 @@ export function SiteHeaderClient({
           </nav>
 
           <div className="flex items-center justify-end gap-1">
-            <Link
-              aria-label="Account"
-              className="hidden size-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold sm:inline-flex"
-              href={"/account" as Route}
-            >
-              <User aria-hidden className="size-4" strokeWidth={1.8} />
-            </Link>
+            <UserMenu className="hidden sm:inline-flex" customer={customer} />
             <button
               className="relative inline-flex size-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
               onClick={openCart}
@@ -260,6 +255,13 @@ export function SiteHeaderClient({
                       ))}
                     </div>
                   ) : null}
+                  <div className="mt-6 border-t border-on-light/10 pt-6">
+                    <UserMenu
+                      customer={customer}
+                      onNavigate={() => setMobileOpen(false)}
+                      variant="mobile"
+                    />
+                  </div>
                 </nav>
               </DrawerContent>
             </Drawer>

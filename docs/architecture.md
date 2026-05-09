@@ -2194,21 +2194,29 @@ Auth surfaces are minimized. We use each system's native auth where possible (Me
 
 #### 9.1.2 Password Policy
 
-- **Minimum 12 characters.** No complexity rules (per NIST SP 800-63B 2024 guidance — length matters more than character classes).
-- **Breach check** on signup and password change via HaveIBeenPwned `range` API (`k`-anonymity, no plaintext leaves the server).
+- **Minimum 12 characters** with minimal launch complexity: at least one uppercase letter, one lowercase letter, and one digit.
+- **Breach check** on signup and password change via HaveIBeenPwned `range` API (`k`-anonymity, no plaintext password leaves the browser).
 - **No forced rotation.** Users prompted to change only if a breach match is detected.
 - Passwords hashed by Medusa with argon2 (default).
 
 #### 9.1.3 Session Management
 
 - Medusa issues a JWT on successful auth.
-- Stored in **HttpOnly + Secure + SameSite=Lax cookie** `vaivae_session`.
-- **30-day sliding expiry** — refreshed on each authenticated request.
+- Stored in **HttpOnly + Secure-in-production + SameSite=Lax cookie** `_vaivae_auth`.
+- **30-day sliding expiry** — refreshed by authenticated Server Actions where response cookies can be mutated.
 - Re-authentication required for sensitive actions:
   - Password change
   - Email change
   - Address book updates above a threshold (later)
-- Logout clears the cookie and invalidates the JWT server-side (Medusa session revocation).
+- Logout clears the cookie; Medusa logout/revocation is called when supported by the SDK flow.
+
+#### 9.1.7 Storefront Implementation Notes
+
+- Auth Server Actions live in `apps/storefront/src/lib/medusa/auth-actions.ts`.
+- Storefront customer lookup lives in `apps/storefront/src/lib/medusa/customer.ts` and treats the Medusa token as opaque.
+- The browser-facing auth cookie is `_vaivae_auth` with `httpOnly`, `sameSite=lax`, `secure` in production, `path=/`, and a 30-day `maxAge`.
+- HaveIBeenPwned checks are client-side via the Web Crypto API and the Pwned Passwords k-anonymity range endpoint.
+- CSP `connect-src` must include `https://api.pwnedpasswords.com` for signup and password-reset forms.
 
 #### 9.1.4 Email Verification
 

@@ -29,10 +29,19 @@ import {
 import type { StoreCart, StoreCartAddress } from "@/medusa/types";
 
 type CheckoutPageProps = {
+  initialAddress?: CheckoutAddressData | null;
   initialCart: StoreCart;
+  initialCustomer?: InitialCheckoutCustomer | null;
   initialShippingOptions: CheckoutShippingOption[];
   regionId: string;
   stripePublishableKey: string;
+};
+
+type InitialCheckoutCustomer = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
 };
 
 type CheckoutStepSectionProps = {
@@ -75,10 +84,40 @@ function getAddressData(
   };
 }
 
-function getContactData(cart: StoreCart): CheckoutContactData {
+function getContactData(
+  cart: StoreCart,
+  initialCustomer: InitialCheckoutCustomer | null | undefined,
+): CheckoutContactData {
   return {
-    email: cart.email ?? "",
-    phone: cart.shipping_address?.phone ?? "",
+    email: cart.email ?? initialCustomer?.email ?? "",
+    phone: cart.shipping_address?.phone ?? initialCustomer?.phone ?? "",
+  };
+}
+
+function getInitialShippingAddressData({
+  cart,
+  contactPhone,
+  initialAddress,
+  initialCustomer,
+}: {
+  cart: StoreCart;
+  contactPhone: string;
+  initialAddress: CheckoutAddressData | null | undefined;
+  initialCustomer: InitialCheckoutCustomer | null | undefined;
+}): CheckoutAddressData {
+  if (cart.shipping_address?.address_1 || cart.shipping_address?.postal_code) {
+    return getAddressData(cart.shipping_address, cart.shipping_address.phone ?? contactPhone);
+  }
+
+  if (initialAddress?.address1 || initialAddress?.postalCode) {
+    return initialAddress;
+  }
+
+  return {
+    ...emptyAddress,
+    firstName: initialCustomer?.firstName ?? "",
+    lastName: initialCustomer?.lastName ?? "",
+    phone: contactPhone,
   };
 }
 
@@ -166,7 +205,9 @@ function CheckoutStepSection({
 }
 
 export function CheckoutPage({
+  initialAddress = null,
   initialCart,
+  initialCustomer = null,
   initialShippingOptions,
   regionId,
   stripePublishableKey,
@@ -175,10 +216,19 @@ export function CheckoutPage({
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(() =>
     getInitialCheckoutStep(initialCart),
   );
-  const [contact, setContact] = useState<CheckoutContactData>(() => getContactData(initialCart));
-  const [shippingAddress, setShippingAddress] = useState<CheckoutAddressData>(() =>
-    getAddressData(initialCart.shipping_address, initialCart.shipping_address?.phone ?? ""),
+  const [contact, setContact] = useState<CheckoutContactData>(() =>
+    getContactData(initialCart, initialCustomer),
   );
+  const [shippingAddress, setShippingAddress] = useState<CheckoutAddressData>(() => {
+    const initialContact = getContactData(initialCart, initialCustomer);
+
+    return getInitialShippingAddressData({
+      cart: initialCart,
+      contactPhone: initialContact.phone,
+      initialAddress,
+      initialCustomer,
+    });
+  });
   const [shippingOptions, setShippingOptions] =
     useState<CheckoutShippingOption[]>(initialShippingOptions);
   const [selectedShippingOptionId, setSelectedShippingOptionId] = useState<string | null>(() =>

@@ -3,10 +3,12 @@ import Link from "next/link";
 
 import { VaivaeImage } from "@/components/atoms/vaivae-image";
 import { cn } from "@/lib/utils";
+import { getCurrentCustomer } from "@/medusa/customer";
 import type { GlobalQueryResult } from "@/sanity/types";
 
 import { getSiteChrome } from "./site-chrome-data";
 import { SiteHeaderClient } from "./site-header-client";
+import type { UserMenuCustomer } from "./user-menu";
 
 type SiteSettings = GlobalQueryResult["siteSettings"];
 
@@ -42,13 +44,31 @@ function BrandMark({ siteSettings }: { siteSettings: SiteSettings }) {
   );
 }
 
+async function getHeaderCustomer(): Promise<UserMenuCustomer | null> {
+  try {
+    const customer = await getCurrentCustomer();
+
+    if (!customer) {
+      return null;
+    }
+
+    return {
+      firstName: customer.first_name ?? null,
+      lastName: customer.last_name ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function SiteHeader({ cartItemCount = 0 }: SiteHeaderProps) {
-  const data = await getSiteChrome();
+  const [data, customer] = await Promise.all([getSiteChrome(), getHeaderCustomer()]);
 
   return (
     <SiteHeaderClient
       brandMark={<BrandMark siteSettings={data.siteSettings} />}
       cartItemCount={cartItemCount}
+      customer={customer}
       key={cartItemCount}
       navigation={data.navigation}
     />

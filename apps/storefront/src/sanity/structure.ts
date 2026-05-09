@@ -2,16 +2,19 @@ import {
   BookIcon,
   CogIcon,
   ControlsIcon,
+  DocumentIcon,
   DocumentsIcon,
+  HomeIcon,
   MenuIcon,
   PackageIcon,
   StackCompactIcon,
 } from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 
-export const singletonTypes = ["siteSettings", "navigation", "footer"] as const;
+export const singletonTypes = ["siteSettings", "navigation", "footer", "homePage"] as const;
+export const createHiddenTypes = [...singletonTypes, "product"] as const;
 
-const singletonTypeSet = new Set<string>(singletonTypes);
+const explicitlyStructuredTypes = new Set<string>([...createHiddenTypes, "page"]);
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -45,7 +48,18 @@ export const structure: StructureResolver = (S) =>
         .id("pages")
         .icon(DocumentsIcon)
         .title("Pages")
-        .child(S.list().id("pagesList").title("Pages").items([])),
+        .child(
+          S.list()
+            .id("pagesList")
+            .title("Pages")
+            .items([
+              S.documentListItem({ id: "homePage", schemaType: "homePage" })
+                .icon(HomeIcon)
+                .schemaType("homePage")
+                .title("Home page"),
+              S.documentTypeListItem("page").icon(DocumentIcon).title("Other pages"),
+            ]),
+        ),
       S.listItem()
         .id("editorial")
         .icon(BookIcon)
@@ -55,11 +69,16 @@ export const structure: StructureResolver = (S) =>
         .id("catalog")
         .icon(PackageIcon)
         .title("Catalog")
-        .child(S.list().id("catalogList").title("Catalog").items([])),
+        .child(
+          S.list()
+            .id("catalogList")
+            .title("Catalog")
+            .items([S.documentTypeListItem("product").icon(PackageIcon).title("Products")]),
+        ),
       S.divider(),
       ...S.documentTypeListItems().filter((listItem) => {
         const id = listItem.getId();
 
-        return id ? !singletonTypeSet.has(id) : true;
+        return id ? !explicitlyStructuredTypes.has(id) : true;
       }),
     ]);

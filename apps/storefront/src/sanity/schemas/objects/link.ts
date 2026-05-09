@@ -1,7 +1,14 @@
 import { LinkIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-const INTERNAL_LINK_TYPES = [{ type: "siteSettings" }, { type: "navigation" }, { type: "footer" }];
+const INTERNAL_LINK_TYPES = [
+  { type: "siteSettings" },
+  { type: "navigation" },
+  { type: "footer" },
+  { type: "homePage" },
+  { type: "page" },
+  { type: "product" },
+];
 
 type LinkParent = {
   type?: string;
@@ -64,7 +71,7 @@ export const link = defineType({
           ),
     }),
     defineField({
-      description: "Agent 7/8 should expand this list as route-bearing documents are registered.",
+      description: "Choose an existing route-bearing document.",
       hidden: ({ parent }) => getLinkParent(parent)?.type === "external",
       name: "internal",
       options: {
@@ -112,12 +119,14 @@ export const link = defineType({
       href: "href",
       internalRef: "internal._ref",
       internalTitle: "internal.siteName",
+      internalTitleFallback: "internal.title",
       label: "label",
       targetBlank: "targetBlank",
       type: "type",
     },
-    prepare({ href, internalRef, internalTitle, label, targetBlank, type }) {
-      const target = type === "external" ? href : internalTitle || internalRef;
+    prepare({ href, internalRef, internalTitle, internalTitleFallback, label, targetBlank, type }) {
+      const target =
+        type === "external" ? href : internalTitle || internalTitleFallback || internalRef;
       const suffix = targetBlank ? " · new tab" : "";
 
       return {

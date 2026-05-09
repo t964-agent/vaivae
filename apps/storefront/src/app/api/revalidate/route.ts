@@ -20,7 +20,12 @@ type RevalidationDocument = {
 
 const tagsByDocumentType: Record<string, readonly string[]> = {
   footer: ["footer"],
+  homePage: ["home-page"],
+  journal: ["journal"],
+  lookbook: ["lookbook"],
   navigation: ["navigation"],
+  page: ["page"],
+  product: ["product"],
   siteSettings: ["site-settings"],
 };
 

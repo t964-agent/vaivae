@@ -15,6 +15,247 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: src/sanity/schema.json
+export type Media = {
+  sourceType?: "mux" | "directUrl" | "image";
+  muxPlaybackId?: string;
+  directUrl?: string;
+  posterImage?: VaivaeImage;
+};
+
+export type Marquee = {
+  enabled?: boolean;
+  text?: string;
+  separator?: string;
+  speed?: number;
+  direction?: "left" | "right";
+};
+
+export type TerminalCta = {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
+};
+
+export type Background = {
+  type?: "solidColor" | "image";
+  solidColor?: "cream" | "oxblood" | "ink" | "accent-red" | "accent-orange" | "accent-gold";
+  image?: VaivaeImage;
+};
+
+export type CtaSection = {
+  _type: "ctaSection";
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
+  background?: Background;
+  theme?: "light-text-on-dark" | "dark-text-on-light";
+};
+
+export type Quote = {
+  _type: "quote";
+  quote?: string;
+  attribution?: string;
+  source?: string;
+  style?: "pull" | "press";
+};
+
+export type ProductReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "product";
+};
+
+export type VideoChapter = {
+  _type: "videoChapter";
+  eyebrow?: string;
+  heading?: string;
+  muxPlaybackId?: string;
+  posterImage?: VaivaeImage;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  productHotspots?: Array<{
+    product?: ProductReference;
+    label?: string;
+    timestampSeconds?: number;
+    _type: "productHotspot";
+    _key: string;
+  }>;
+  theme?: "light-text-on-dark" | "dark-text-on-light";
+};
+
+export type ImagePair = {
+  _type: "imagePair";
+  eyebrow?: string;
+  heading?: string;
+  leftImage?: VaivaeImage;
+  leftCaption?: string;
+  rightImage?: VaivaeImage;
+  rightCaption?: string;
+  layout?: "balanced" | "left-emphasis" | "right-emphasis";
+  theme?: "light-text-on-dark" | "dark-text-on-light";
+  cta?: Cta;
+};
+
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type JournalRail = {
+  _type: "journalRail";
+  eyebrow?: string;
+  heading?: string;
+  mode?: "recent" | "curated";
+  entries?: Array<
+    {
+      _key: string;
+    } & PageReference
+  >;
+  limit?: number;
+  cta?: Cta;
+};
+
+export type LookbookGrid = {
+  _type: "lookbookGrid";
+  eyebrow?: string;
+  heading?: string;
+  lookbookEntry?: PageReference;
+  images?: Array<
+    {
+      _key: string;
+    } & VaivaeImage
+  >;
+  layout?: "grid" | "scroll";
+  cta?: Cta;
+};
+
+export type EditorialExcerpt = {
+  _type: "editorialExcerpt";
+  journalEntry?: PageReference;
+  eyebrow?: string;
+  customHeading?: string;
+  quote?: string;
+  cta?: Cta;
+};
+
+export type CapsuleRail = {
+  _type: "capsuleRail";
+  eyebrow?: string;
+  heading?: string;
+  capsules?: Array<
+    {
+      _key: string;
+    } & PageReference
+  >;
+  cta?: Cta;
+};
+
+export type ProductRail = {
+  _type: "productRail";
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  layout?: "carousel" | "grid";
+  columns?: number;
+  density?: "compact" | "standard" | "spacious";
+  products?: Array<
+    {
+      _key: string;
+    } & ProductReference
+  >;
+  cta?: Cta;
+};
+
+export type BrandPromise = {
+  _type: "brandPromise";
+  eyebrow?: string;
+  statement?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  width?: "narrow" | "wide" | "full";
+  alignment?: "left" | "center";
+  theme?: "light-text-on-dark" | "dark-text-on-light";
+  cta?: Cta;
+};
+
+export type HeroFilm = {
+  _type: "heroFilm";
+  eyebrow?: string;
+  heading?: string;
+  subhead?: string;
+  media?: Media;
+  cta?: Cta;
+  scrollIndicator?: boolean;
+  marquee?: Marquee;
+  chapters?: Array<{
+    eyebrow?: string;
+    heading?: string;
+    body?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    note?: string;
+    mediaPoster?: VaivaeImage;
+    align?: "left" | "right";
+    _type: "heroFilmChapter";
+    _key: string;
+  }>;
+  terminalCta?: TerminalCta;
+};
+
 export type Address = {
   _type: "address";
   line1?: string;
@@ -39,6 +280,23 @@ export type Cta = {
   style?: "primary" | "ghost" | "underline";
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type VaivaeImage = {
+  _type: "vaivaeImage";
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  caption?: string;
+};
+
 export type SiteSettingsReference = {
   _ref: string;
   _type: "reference";
@@ -60,30 +318,135 @@ export type FooterReference = {
   [internalGroqTypeReferenceTo]?: "footer";
 };
 
+export type HomePageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "homePage";
+};
+
 export type Link = {
   _type: "link";
   type?: "internal" | "external";
   label?: string;
-  internal?: SiteSettingsReference | NavigationReference | FooterReference;
+  internal?:
+    | SiteSettingsReference
+    | NavigationReference
+    | FooterReference
+    | HomePageReference
+    | PageReference
+    | ProductReference;
   href?: string;
   targetBlank?: boolean;
 };
 
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+export type Page = {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  seo?: Seo;
+  pageBuilder?: Array<
+    | ({
+        _key: string;
+      } & HeroFilm)
+    | ({
+        _key: string;
+      } & BrandPromise)
+    | ({
+        _key: string;
+      } & ProductRail)
+    | ({
+        _key: string;
+      } & CapsuleRail)
+    | ({
+        _key: string;
+      } & EditorialExcerpt)
+    | ({
+        _key: string;
+      } & LookbookGrid)
+    | ({
+        _key: string;
+      } & JournalRail)
+    | ({
+        _key: string;
+      } & ImagePair)
+    | ({
+        _key: string;
+      } & VideoChapter)
+    | ({
+        _key: string;
+      } & Quote)
+    | ({
+        _key: string;
+      } & CtaSection)
+  >;
 };
 
-export type VaivaeImage = {
-  _type: "vaivaeImage";
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-  caption?: string;
+export type Product = {
+  _id: string;
+  _type: "product";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  medusaProductId?: string;
+  title?: string;
+  handle?: Slug;
+  editorialReady?: boolean;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Seo = {
+  _type: "seo";
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  ogImage?: VaivaeImage;
+  keywords?: Array<string>;
+};
+
+export type HomePage = {
+  _id: string;
+  _type: "homePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  seo?: Seo;
+  pageBuilder?: Array<
+    | ({
+        _key: string;
+      } & HeroFilm)
+    | ({
+        _key: string;
+      } & CapsuleRail)
+    | ({
+        _key: string;
+      } & EditorialExcerpt)
+    | ({
+        _key: string;
+      } & BrandPromise)
+    | ({
+        _key: string;
+      } & ProductRail)
+    | ({
+        _key: string;
+      } & JournalRail)
+    | ({
+        _key: string;
+      } & CtaSection)
+    | ({
+        _key: string;
+      } & ImagePair)
+  >;
 };
 
 export type Footer = {
@@ -163,15 +526,6 @@ export type SiteSettings = {
       _key: string;
     } & SocialLink
   >;
-};
-
-export type Seo = {
-  _type: "seo";
-  title?: string;
-  description?: string;
-  noindex?: boolean;
-  ogImage?: VaivaeImage;
-  keywords?: Array<string>;
 };
 
 export type SanityImageCrop = {
@@ -295,26 +649,42 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type AllSanitySchemaTypes =
+  | Media
+  | Marquee
+  | TerminalCta
+  | Background
+  | CtaSection
+  | Quote
+  | ProductReference
+  | VideoChapter
+  | ImagePair
+  | PageReference
+  | JournalRail
+  | LookbookGrid
+  | EditorialExcerpt
+  | CapsuleRail
+  | ProductRail
+  | BrandPromise
+  | HeroFilm
   | Address
   | SocialLink
   | Cta
+  | SanityImageAssetReference
+  | VaivaeImage
   | SiteSettingsReference
   | NavigationReference
   | FooterReference
+  | HomePageReference
   | Link
-  | SanityImageAssetReference
-  | VaivaeImage
+  | Page
+  | Product
+  | Slug
+  | Seo
+  | HomePage
   | Footer
   | Navigation
   | SiteSettings
-  | Seo
   | SanityImageCrop
   | SanityImageHotspot
   | Code
@@ -325,8 +695,7 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
-  | Slug;
+  | Geopoint;
 
 // Source: src/sanity/queries.ts
 // Variable: siteSettingsQuery
@@ -465,8 +834,26 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
+          _type: "homePage";
+          title: string | null;
+          slug: null;
+        }
+      | {
+          _id: string;
           _type: "navigation";
           title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "product";
+          title: string | null;
           slug: null;
         }
       | {
@@ -498,8 +885,26 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
+          _type: "homePage";
+          title: string | null;
+          slug: null;
+        }
+      | {
+          _id: string;
           _type: "navigation";
           title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "product";
+          title: string | null;
           slug: null;
         }
       | {
@@ -531,8 +936,26 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
+          _type: "homePage";
+          title: string | null;
+          slug: null;
+        }
+      | {
+          _id: string;
           _type: "navigation";
           title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "product";
+          title: string | null;
           slug: null;
         }
       | {
@@ -565,8 +988,26 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
+          _type: "homePage";
+          title: string | null;
+          slug: null;
+        }
+      | {
+          _id: string;
           _type: "navigation";
           title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "product";
+          title: string | null;
           slug: null;
         }
       | {
@@ -613,8 +1054,26 @@ export type FooterQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -651,8 +1110,26 @@ export type FooterQueryResult = {
         }
       | {
           _id: string;
+          _type: "homePage";
+          title: string | null;
+          slug: null;
+        }
+      | {
+          _id: string;
           _type: "navigation";
           title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "product";
+          title: string | null;
           slug: null;
         }
       | {
@@ -668,6 +1145,1984 @@ export type FooterQueryResult = {
   copyrightText: string | null;
   paymentMethods: Array<
     "amex" | "applepay" | "googlepay" | "mastercard" | "paypal" | "visa"
+  > | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: homePageQuery
+// Query: *[_type == "homePage" && _id == "homePage"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
+export type HomePageQueryResult = {
+  _id: "homePage";
+  _type: "homePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  pageBuilder: Array<
+    | {
+        _key: string;
+        _type: "brandPromise";
+        eyebrow: string | null;
+        statement: string | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+        width: "full" | "narrow" | "wide" | null;
+        alignment: "center" | "left" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "capsuleRail";
+        eyebrow: string | null;
+        heading: string | null;
+        capsules: Array<{
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }> | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "ctaSection";
+        eyebrow: string | null;
+        heading: string | null;
+        body: string | null;
+        primaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        secondaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        background: {
+          type: "image" | "solidColor" | null;
+          solidColor:
+            | "accent-gold"
+            | "accent-orange"
+            | "accent-red"
+            | "cream"
+            | "ink"
+            | "oxblood"
+            | null;
+          image: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
+    | {
+        _key: string;
+        _type: "editorialExcerpt";
+        journalEntry: {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        } | null;
+        eyebrow: string | null;
+        customHeading: string | null;
+        quote: string | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "heroFilm";
+        eyebrow: string | null;
+        heading: string | null;
+        subhead: string | null;
+        media: {
+          sourceType: "directUrl" | "image" | "mux" | null;
+          muxPlaybackId: string | null;
+          directUrl: string | null;
+          posterImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        scrollIndicator: boolean | null;
+        marquee: {
+          enabled: boolean | null;
+          text: string | null;
+          separator: string | null;
+          speed: number | null;
+          direction: "left" | "right" | null;
+        } | null;
+        chapters: Array<{
+          _key: string;
+          _type: "heroFilmChapter";
+          eyebrow: string | null;
+          heading: string | null;
+          body: Array<{
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+            listItem?: never;
+            markDefs?: Array<{
+              href?: string;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }> | null;
+          note: string | null;
+          mediaPoster: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+          align: "left" | "right" | null;
+        }> | null;
+        terminalCta: {
+          eyebrow: string | null;
+          heading: string | null;
+          body: string | null;
+          primaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "footer";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "navigation";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+          secondaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "footer";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "navigation";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "imagePair";
+        eyebrow: string | null;
+        heading: string | null;
+        leftImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        leftCaption: string | null;
+        rightImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        rightCaption: string | null;
+        layout: "balanced" | "left-emphasis" | "right-emphasis" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "journalRail";
+        eyebrow: string | null;
+        heading: string | null;
+        mode: "curated" | "recent" | null;
+        entries: Array<{
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }> | null;
+        limit: number | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "productRail";
+        eyebrow: string | null;
+        heading: string | null;
+        intro: string | null;
+        layout: "carousel" | "grid" | null;
+        columns: number | null;
+        density: "compact" | "spacious" | "standard" | null;
+        products: Array<{
+          _id: string;
+          _type: "product";
+          medusaProductId: string | null;
+          title: string | null;
+          handle: string | null;
+          editorialReady: boolean | null;
+        }> | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+  > | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: pageBySlugQuery
+// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
+export type PageBySlugQueryResult = {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  pageBuilder: Array<
+    | {
+        _key: string;
+        _type: "brandPromise";
+        eyebrow: string | null;
+        statement: string | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+        width: "full" | "narrow" | "wide" | null;
+        alignment: "center" | "left" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "capsuleRail";
+        eyebrow: string | null;
+        heading: string | null;
+        capsules: Array<{
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }> | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "ctaSection";
+        eyebrow: string | null;
+        heading: string | null;
+        body: string | null;
+        primaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        secondaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        background: {
+          type: "image" | "solidColor" | null;
+          solidColor:
+            | "accent-gold"
+            | "accent-orange"
+            | "accent-red"
+            | "cream"
+            | "ink"
+            | "oxblood"
+            | null;
+          image: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
+    | {
+        _key: string;
+        _type: "editorialExcerpt";
+        journalEntry: {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        } | null;
+        eyebrow: string | null;
+        customHeading: string | null;
+        quote: string | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "heroFilm";
+        eyebrow: string | null;
+        heading: string | null;
+        subhead: string | null;
+        media: {
+          sourceType: "directUrl" | "image" | "mux" | null;
+          muxPlaybackId: string | null;
+          directUrl: string | null;
+          posterImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        scrollIndicator: boolean | null;
+        marquee: {
+          enabled: boolean | null;
+          text: string | null;
+          separator: string | null;
+          speed: number | null;
+          direction: "left" | "right" | null;
+        } | null;
+        chapters: Array<{
+          _key: string;
+          _type: "heroFilmChapter";
+          eyebrow: string | null;
+          heading: string | null;
+          body: Array<{
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+            listItem?: never;
+            markDefs?: Array<{
+              href?: string;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }> | null;
+          note: string | null;
+          mediaPoster: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+          align: "left" | "right" | null;
+        }> | null;
+        terminalCta: {
+          eyebrow: string | null;
+          heading: string | null;
+          body: string | null;
+          primaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "footer";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "navigation";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+          secondaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "footer";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "navigation";
+                    title: null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "imagePair";
+        eyebrow: string | null;
+        heading: string | null;
+        leftImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        leftCaption: string | null;
+        rightImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        rightCaption: string | null;
+        layout: "balanced" | "left-emphasis" | "right-emphasis" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "journalRail";
+        eyebrow: string | null;
+        heading: string | null;
+        mode: "curated" | "recent" | null;
+        entries: Array<{
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        }> | null;
+        limit: number | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "lookbookGrid";
+        eyebrow: string | null;
+        heading: string | null;
+        lookbookEntry: {
+          _id: string;
+          _type: "page";
+          title: string | null;
+          slug: string | null;
+        } | null;
+        images: Array<{
+          _key: string;
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        }> | null;
+        layout: "grid" | "scroll" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "productRail";
+        eyebrow: string | null;
+        heading: string | null;
+        intro: string | null;
+        layout: "carousel" | "grid" | null;
+        columns: number | null;
+        density: "compact" | "spacious" | "standard" | null;
+        products: Array<{
+          _id: string;
+          _type: "product";
+          medusaProductId: string | null;
+          title: string | null;
+          handle: string | null;
+          editorialReady: boolean | null;
+        }> | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "footer";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "navigation";
+                  title: null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "quote";
+        quote: string | null;
+        attribution: string | null;
+        source: string | null;
+        style: "press" | "pull" | null;
+      }
+    | {
+        _key: string;
+        _type: "videoChapter";
+        eyebrow: string | null;
+        heading: string | null;
+        muxPlaybackId: string | null;
+        posterImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+        productHotspots: Array<{
+          _key: string;
+          _type: "productHotspot";
+          label: string | null;
+          timestampSeconds: number | null;
+          product: {
+            _id: string;
+            _type: "product";
+            medusaProductId: string | null;
+            title: string | null;
+            handle: string | null;
+            editorialReady: boolean | null;
+          } | null;
+        }> | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
   > | null;
 } | null;
 
@@ -805,8 +3260,26 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -838,8 +3311,26 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -871,8 +3362,26 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -905,8 +3414,26 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -949,8 +3476,26 @@ export type GlobalQueryResult = {
             }
           | {
               _id: string;
+              _type: "homePage";
+              title: string | null;
+              slug: null;
+            }
+          | {
+              _id: string;
               _type: "navigation";
               title: null;
+              slug: null;
+            }
+          | {
+              _id: string;
+              _type: "page";
+              title: string | null;
+              slug: string | null;
+            }
+          | {
+              _id: string;
+              _type: "product";
+              title: string | null;
               slug: null;
             }
           | {
@@ -987,8 +3532,26 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
+            _type: "homePage";
+            title: string | null;
+            slug: null;
+          }
+        | {
+            _id: string;
             _type: "navigation";
             title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "page";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "product";
+            title: string | null;
             slug: null;
           }
         | {
@@ -1015,6 +3578,8 @@ declare module "@sanity/client" {
     '*[_type == "siteSettings" && _id == "siteSettings"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  siteName,\n  tagline,\n  logo{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  favicon{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  defaultSeo{\n    _type,\n    title,\n    description,\n    noindex,\n    ogImage{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    keywords\n  },\n  defaultRegion,\n  defaultCurrency,\n  contactEmail,\n  pressEmail,\n  wholesaleEmail,\n  address{\n    _type,\n    line1,\n    line2,\n    city,\n    region,\n    postalCode,\n    country\n  },\n  socialLinks[]{\n    _key,\n    _type,\n    platform,\n    handle,\n    url\n  }\n}': SiteSettingsQueryResult;
     '*[_type == "navigation" && _id == "navigation"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  headerLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  secondaryLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  mobileMenuExtras[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  promoBannerEnabled,\n  promoBannerText,\n  promoBannerLink{\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  }\n}': NavigationQueryResult;
     '*[_type == "footer" && _id == "footer"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  columns[]{\n    _key,\n    _type,\n    title,\n    links[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  newsletterEnabled,\n  newsletterHeading,\n  newsletterDescription,\n  newsletterCtaLabel,\n  legalLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  copyrightText,\n  paymentMethods\n}': FooterQueryResult;
+    '*[_type == "homePage" && _id == "homePage"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': HomePageQueryResult;
+    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': PageBySlugQueryResult;
     '{\n  "siteSettings": *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    siteName,\n    tagline,\n    logo{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    favicon{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    defaultSeo{\n      _type,\n      title,\n      description,\n      noindex,\n      ogImage{\n        _type,\n        asset->{\n          _id,\n          _type,\n          url,\n          metadata{\n            lqip,\n            dimensions{\n              width,\n              height,\n              aspectRatio\n            }\n          }\n        },\n        hotspot,\n        crop,\n        alt,\n        caption\n      },\n      keywords\n    },\n    defaultRegion,\n    defaultCurrency,\n    contactEmail,\n    pressEmail,\n    wholesaleEmail,\n    address{\n      _type,\n      line1,\n      line2,\n      city,\n      region,\n      postalCode,\n      country\n    },\n    socialLinks[]{\n      _key,\n      _type,\n      platform,\n      handle,\n      url\n    }\n  },\n  "navigation": *[_type == "navigation" && _id == "navigation"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    headerLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    secondaryLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    mobileMenuExtras[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    promoBannerEnabled,\n    promoBannerText,\n    promoBannerLink{\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  "footer": *[_type == "footer" && _id == "footer"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    columns[]{\n      _key,\n      _type,\n      title,\n      links[]{\n        _key,\n        _type,\n        type,\n        label,\n        internal{\n          _ref,\n          _type,\n          _weak\n        },\n        "internalTarget": internal->{\n          _id,\n          _type,\n          "title": coalesce(siteName, title, name),\n          "slug": slug.current\n        },\n        href,\n        targetBlank\n      }\n    },\n    newsletterEnabled,\n    newsletterHeading,\n    newsletterDescription,\n    newsletterCtaLabel,\n    legalLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    copyrightText,\n    paymentMethods\n  }\n}': GlobalQueryResult;
   }
 }

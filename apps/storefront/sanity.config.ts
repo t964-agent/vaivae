@@ -7,10 +7,13 @@ import { structureTool } from "sanity/structure";
 
 import { apiVersion, dataset, projectId, studioUrl } from "./src/sanity/api";
 import { schemaTypes } from "./src/sanity/schemas";
-import { singletonTypes, structure } from "./src/sanity/structure";
+import { createHiddenTypes, singletonTypes, structure } from "./src/sanity/structure";
 
 const singletonTypeSet = new Set<string>(singletonTypes);
 const blockedSingletonActions = new Set(["delete", "duplicate"]);
+const createHiddenTypeSet = new Set<string>(createHiddenTypes);
+const syncedDocumentTypeSet = new Set<string>(["product"]);
+const blockedSyncedDocumentActions = new Set(["delete", "duplicate", "unpublish"]);
 const studioHost = process.env["SANITY_STUDIO_HOSTNAME"];
 
 export default defineConfig({
@@ -18,6 +21,14 @@ export default defineConfig({
   dataset,
   document: {
     actions: (previousActions, context) => {
+      if (syncedDocumentTypeSet.has(context.schemaType)) {
+        return previousActions.filter((action) => {
+          const actionName = action.action;
+
+          return actionName ? !blockedSyncedDocumentActions.has(actionName) : true;
+        });
+      }
+
       if (!singletonTypeSet.has(context.schemaType)) {
         return previousActions;
       }
@@ -32,7 +43,7 @@ export default defineConfig({
       previousOptions.filter((templateItem) => {
         const templateId = templateItem.templateId;
 
-        return templateId ? !singletonTypeSet.has(templateId) : true;
+        return templateId ? !createHiddenTypeSet.has(templateId) : true;
       }),
   },
   name: "default",

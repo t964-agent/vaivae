@@ -872,7 +872,7 @@ Document types planned for Phase 1. Each schema is fully defined in code in `app
 | GDPR consent log               | Medusa custom module (`marketing-consent.ConsentRecord`)                                                                         | Versioned with timestamp, source, IP/UA where required                                                                                              |
 | Auth session                   | Medusa-issued JWT in HttpOnly cookie                                                                                             | See [§9](#9-authentication--authorization)                                                                                                          |
 
-Implementation note: `marketing-consent` stores `ConsentRecord` rows as an append-only forensic log. Current state is derived from the latest `consented_at` row for a customer, unsubscribe rows set `expires_at` for the 30-day suppression-retention window, and `POST /store/customers/me/marketing-consent` emits `marketing-consent.updated` for Klaviyo sync subscribers. The Medusa service token is `marketing_consent` because Medusa v2 module names must be alphanumeric/underscore; the folder, Store API path, and event name retain `marketing-consent`.
+Implementation note: `marketing-consent` stores `ConsentRecord` rows as an append-only forensic log. Current state is derived from the latest `consented_at` row for a customer, unsubscribe rows set `expires_at` for the 30-day suppression-retention window, and `POST /store/customers/me/marketing-consent` plus `POST /store/newsletter` emit `marketing-consent.updated` for Klaviyo sync subscribers. The Medusa service token is `marketing_consent` because Medusa v2 module names must be alphanumeric/underscore; the folder, Store API path, and event name retain `marketing-consent`.
 
 ### 4.3 Sync Strategy
 
@@ -891,6 +891,7 @@ Implementation note: `marketing-consent` stores `ConsentRecord` rows as an appen
 | Customer create/update    | Medusa → Klaviyo                      | Subscriber                         | Profile upsert with consent state                                                                                                          |
 | Order events              | Medusa → Klaviyo                      | Subscriber                         | `Placed Order`, `Order Shipped`, `Cancelled Order` events                                                                                  |
 | Cart updated (with email) | Medusa → Klaviyo                      | Subscriber                         | `Started Checkout` event triggers abandoned-cart flow                                                                                      |
+| Klaviyo suppression       | Klaviyo → Medusa                      | `POST /store/hooks/klaviyo`        | Appends unsubscribed `ConsentRecord` rows for unsubscribes, bounces, spam complaints, and manual suppressions                              |
 
 #### 4.3.2 ID Conventions
 
@@ -1379,12 +1380,14 @@ Build only if Cloud Emails proves insufficient for a specific template (e.g. nee
 - **Primary provider**: Klaviyo from launch ([ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)).
 - Free tier (250 profiles / 500 sends) covers initial signups; upgrade when list grows.
 - Triggers: Medusa subscribers push events to Klaviyo via `klaviyo-api` Node SDK:
-  - `customer.created` → `Customer Created` event + profile create
+  - `customer.created` / `customer.updated` → profile upsert
   - `marketing-consent.updated` → consent property + suppression state on profile
   - `cart.updated` (with email) → `Started Checkout` flow trigger
   - `order.placed` → `Placed Order` event with line items + revenue
   - `order.fulfillment_created` → `Order Shipped` event
   - `order.canceled` → `Cancelled Order` event
+- Newsletter signup flow: storefront `subscribeNewsletterAction` → Medusa `POST /store/newsletter` → append `ConsentRecord` → Klaviyo profile upsert + newsletter-list subscription.
+- Suppression sync: Klaviyo system webhook `POST /store/hooks/klaviyo` verifies `Klaviyo-Signature` with `KLAVIYO_WEBHOOK_SECRET` and appends unsubscribe/bounce/spam/manual suppression records back into `marketing-consent`.
 - Product feed: synced from Medusa via Klaviyo's catalog import.
 - Flows shipped at launch:
   - **Welcome series** (after newsletter signup with double opt-in)
@@ -1442,20 +1445,22 @@ Medusa v2 distinguishes **subscribers** (asynchronous, at-least-once side effect
 
 Located at `apps/medusa/src/subscribers/`.
 
-| Subscriber               | File                                        | Events                                                        | Action                                                                                                                                           |
-| ------------------------ | ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sanity product sync      | `sanity-sync-product-*.ts`                  | `product.created`, `product.updated`, `product.deleted`       | Create/patch/delete Sanity `product` docs; refetch product by id; idempotent via deterministic `_id === medusaProductId`                         |
-| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                                | Trigger Cloud Emails `order_placed` template; log to notification log                                                                            |
-| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                            | Cloud Emails `order_shipped` with tracking                                                                                                       |
-| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                            | Cloud Emails `order_refunded`                                                                                                                    |
-| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                         | Cloud Emails `password_reset`                                                                                                                    |
-| Welcome                  | `welcome-email.ts`                          | `customer.created`                                            | Cloud Emails `welcome`                                                                                                                           |
-| Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                                                        |
-| Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                                                      |
-| Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                                          |
-| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                                                     |
-| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                                          |
-| Shippo label purchase    | `shippo-create-label.ts`                    | `order.fulfillment_created`                                   | Calls Shippo via `shipping-shippo` service; stores label URL, tracking number, tracking URL, transaction ID, and rate ID on fulfillment metadata |
+| Subscriber               | File                                        | Events                                                  | Action                                                                                                                                           |
+| ------------------------ | ------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sanity product sync      | `sanity-sync-product-*.ts`                  | `product.created`, `product.updated`, `product.deleted` | Create/patch/delete Sanity `product` docs; refetch product by id; idempotent via deterministic `_id === medusaProductId`                         |
+| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                          | Trigger Cloud Emails `order_placed` template; log to notification log                                                                            |
+| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                      | Cloud Emails `order_shipped` with tracking                                                                                                       |
+| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                      | Cloud Emails `order_refunded`                                                                                                                    |
+| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                   | Cloud Emails `password_reset`                                                                                                                    |
+| Welcome                  | `welcome-email.ts`                          | `customer.created`                                      | Cloud Emails `welcome`                                                                                                                           |
+| Klaviyo profile sync     | `klaviyo-customer-upsert.ts`                | `customer.created`, `customer.updated`                  | Upsert Klaviyo profile with consent state                                                                                                        |
+| Klaviyo placed order     | `klaviyo-order-placed.ts`                   | `order.placed`                                          | Push `Placed Order` event with line items, revenue, and stable `unique_id`                                                                       |
+| Klaviyo shipped order    | `klaviyo-order-shipped.ts`                  | `order.fulfillment_created`                             | Push `Order Shipped` event with fulfillment/tracking metadata                                                                                    |
+| Klaviyo cancelled order  | `klaviyo-order-cancelled.ts`                | `order.canceled`                                        | Push `Cancelled Order` event                                                                                                                     |
+| Klaviyo cart sync        | `klaviyo-cart-started-checkout.ts`          | `cart.updated` (when email present)                     | Trigger Klaviyo `Started Checkout` flow, throttled by `cart.metadata.klaviyo_started_checkout_at`                                                |
+| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                             | Update Klaviyo profile consent + suppression                                                                                                     |
+| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                          | Server-side `purchase` event (resilient to ad-blockers)                                                                                          |
+| Shippo label purchase    | `shippo-create-label.ts`                    | `order.fulfillment_created`                             | Calls Shippo via `shipping-shippo` service; stores label URL, tracking number, tracking URL, transaction ID, and rate ID on fulfillment metadata |
 
 All subscribers are **idempotent**: they re-fetch authoritative state from Medusa, use upserts/notification-log keys, and tolerate replays.
 
@@ -1477,12 +1482,14 @@ Standard workflows we use **as-shipped**:
 
 #### 6.3.3 Custom API Routes
 
-| Route                                        | File                                                    | Purpose                                                                  |
-| -------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `GET /store/customers/me/marketing-consent`  | `src/api/store/customers/me/marketing-consent/route.ts` | Return latest authenticated customer consent state                       |
-| `POST /store/customers/me/marketing-consent` | `src/api/store/customers/me/marketing-consent/route.ts` | Append consent record; emit `marketing-consent.updated` for Klaviyo sync |
-| `POST /admin/sanity/resync`                  | `src/api/admin/sanity/resync/route.ts`                  | Trigger single-product resync workflow                                   |
-| `POST /admin/sanity/resync-all`              | `src/api/admin/sanity/resync-all/route.ts`              | Trigger batch resync workflow                                            |
+| Route                                        | File                                                    | Purpose                                                                            |
+| -------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `GET /store/customers/me/marketing-consent`  | `src/api/store/customers/me/marketing-consent/route.ts` | Return latest authenticated customer consent state                                 |
+| `POST /store/customers/me/marketing-consent` | `src/api/store/customers/me/marketing-consent/route.ts` | Append consent record; emit `marketing-consent.updated` for Klaviyo sync           |
+| `POST /store/newsletter`                     | `src/api/store/newsletter/route.ts`                     | Public newsletter signup; records consent, emits sync event, subscribes in Klaviyo |
+| `POST /store/hooks/klaviyo`                  | `src/api/store/hooks/klaviyo/route.ts`                  | Klaviyo suppression/unsubscribe webhook; HMAC verified with raw-body middleware    |
+| `POST /admin/sanity/resync`                  | `src/api/admin/sanity/resync/route.ts`                  | Trigger single-product resync workflow                                             |
+| `POST /admin/sanity/resync-all`              | `src/api/admin/sanity/resync-all/route.ts`              | Trigger batch resync workflow                                                      |
 
 > Storefront note: `/account/marketing-preferences` calls the authenticated custom Store API route and must include the customer bearer token plus publishable API key. Durable consent is stored only in Medusa.
 
@@ -1534,19 +1541,19 @@ featureFlags: []
 
 #### 6.5.2 Environment Variables
 
-| Category                   | Variables                                                                              | Notes                                                                                                                          |
-| -------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Cloud-managed**          | `DATABASE_URL`, `REDIS_URL`, `NODE_ENV`, `PORT`, `MEDUSA_WORKER_MODE`                  | Do not set manually on Medusa Cloud                                                                                            |
-| **Auth**                   | `JWT_SECRET`, `COOKIE_SECRET`                                                          | Strong random; rotate per environment                                                                                          |
-| **CORS / URLs**            | `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `MEDUSA_BACKEND_URL`, `MEDUSA_STOREFRONT_URL` | Per environment                                                                                                                |
-| **Stripe**                 | `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`                                              | Live in production, test in dev                                                                                                |
-| **Sanity**                 | `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_WRITE_TOKEN`, `SANITY_STUDIO_URL`       | Write token kept server-side only; API version pinned in code to `2026-03-01`                                                  |
-| **Cloud Emails**           | _Auto-configured by Medusa Cloud_                                                      | Verified sender domain set in Cloud dashboard                                                                                  |
-| **Klaviyo**                | `KLAVIYO_PRIVATE_API_KEY`, `KLAVIYO_PUBLIC_API_KEY`                                    | Private key server-only; public key for storefront onsite tracking                                                             |
-| **PostHog (server)**       | `POSTHOG_API_KEY`, `POSTHOG_HOST`                                                      | Used by `@medusajs/analytics-posthog`                                                                                          |
-| **Shippo**                 | `SHIPPO_API_KEY`, `SHIPPO_FROM_*`                                                      | Test token in dev; origin address can be overridden per environment                                                            |
-| **Resend (fallback only)** | `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`                               | Set only if custom Resend provider is enabled per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
-| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                          | Reserved for future order-placed label autopurchase; the fulfillment-created Shippo label subscriber is not gated              |
+| Category                   | Variables                                                                                           | Notes                                                                                                                                                    |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cloud-managed**          | `DATABASE_URL`, `REDIS_URL`, `NODE_ENV`, `PORT`, `MEDUSA_WORKER_MODE`                               | Do not set manually on Medusa Cloud                                                                                                                      |
+| **Auth**                   | `JWT_SECRET`, `COOKIE_SECRET`                                                                       | Strong random; rotate per environment                                                                                                                    |
+| **CORS / URLs**            | `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `MEDUSA_BACKEND_URL`, `MEDUSA_STOREFRONT_URL`              | Per environment                                                                                                                                          |
+| **Stripe**                 | `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`                                                           | Live in production, test in dev                                                                                                                          |
+| **Sanity**                 | `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_WRITE_TOKEN`, `SANITY_STUDIO_URL`                    | Write token kept server-side only; API version pinned in code to `2026-03-01`                                                                            |
+| **Cloud Emails**           | _Auto-configured by Medusa Cloud_                                                                   | Verified sender domain set in Cloud dashboard                                                                                                            |
+| **Klaviyo**                | `KLAVIYO_PRIVATE_KEY`, `KLAVIYO_NEWSLETTER_LIST_ID`, `KLAVIYO_WEBHOOK_SECRET`, `KLAVIYO_PUBLIC_KEY` | Private key server-only; newsletter list ID per environment; webhook secret verifies suppression callbacks; public key is for storefront onsite tracking |
+| **PostHog (server)**       | `POSTHOG_API_KEY`, `POSTHOG_HOST`                                                                   | Used by `@medusajs/analytics-posthog`                                                                                                                    |
+| **Shippo**                 | `SHIPPO_API_KEY`, `SHIPPO_FROM_*`                                                                   | Test token in dev; origin address can be overridden per environment                                                                                      |
+| **Resend (fallback only)** | `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`                                            | Set only if custom Resend provider is enabled per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)                           |
+| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                                       | Reserved for future order-placed label autopurchase; the fulfillment-created Shippo label subscriber is not gated                                        |
 
 Secrets live in Medusa Cloud's environment manager (per environment) and are never committed. Local development uses `apps/medusa/.env.local`, which is `.gitignore`d.
 
@@ -2097,24 +2104,30 @@ Sender identity:
 - Reply-To: `hello@vaivae.com`
 - Marketing-specific subdomain considered (`mail.vaivae.com`) to isolate marketing reputation from transactional.
 
+Implementation:
+
+- Medusa module token: `klaviyo`; files live in `apps/medusa/src/modules/klaviyo/`.
+- Storefront newsletter forms call `POST /store/newsletter`; the endpoint creates/fetches a Medusa customer, records consent in `marketing-consent`, emits `marketing-consent.updated`, and synchronously upserts/subscribes the profile in Klaviyo.
+- Klaviyo ecommerce subscribers send deterministic `unique_id` values for retry-safe events.
+
 #### 8.5.4 Bounce & Complaint Handling
 
-| Source       | Channel                                       | Action                                                                                                                   |
-| ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Cloud Emails | Medusa Cloud dashboard alerts on hard bounces | Mark customer `email_invalid` in Medusa metadata; future sends skip                                                      |
-| Klaviyo      | Built-in suppression list                     | Klaviyo handles automatically; webhook to Medusa appends an unsubscribed `ConsentRecord` for hard bounces and complaints |
+| Source       | Channel                                       | Action                                                                                                                                                                        |
+| ------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cloud Emails | Medusa Cloud dashboard alerts on hard bounces | Mark customer `email_invalid` in Medusa metadata; future sends skip                                                                                                           |
+| Klaviyo      | Built-in suppression list                     | Klaviyo handles automatically; `POST /store/hooks/klaviyo` appends unsubscribed `ConsentRecord` rows for unsubscribes, hard bounces, spam complaints, and manual suppressions |
 
 ### 8.6 Webhooks & Events
 
 #### 8.6.1 Webhook Inventory
 
-| Source                               | Destination | Path                                                             | Auth                                     |
-| ------------------------------------ | ----------- | ---------------------------------------------------------------- | ---------------------------------------- |
-| Stripe                               | Medusa      | `https://api.vaivae.com/hooks/payment/stripe_stripe`             | Stripe signature (`Stripe-Signature`)    |
-| Klaviyo (suppression / unsubscribes) | Medusa      | `https://api.vaivae.com/hooks/email/klaviyo` (custom)            | Shared secret                            |
-| Shippo (tracking updates)            | Medusa      | `https://api.vaivae.com/hooks/shipping/shippo` (custom, Phase 2) | Shippo signature                         |
-| Sanity                               | Vercel      | `https://vaivae.com/api/revalidate`                              | Sanity webhook signature + shared secret |
-| Medusa product events                | Vercel      | `https://vaivae.com/api/revalidate/medusa`                       | Shared secret in header                  |
+| Source                               | Destination | Path                                                             | Auth                                                    |
+| ------------------------------------ | ----------- | ---------------------------------------------------------------- | ------------------------------------------------------- |
+| Stripe                               | Medusa      | `https://api.vaivae.com/hooks/payment/stripe_stripe`             | Stripe signature (`Stripe-Signature`)                   |
+| Klaviyo (suppression / unsubscribes) | Medusa      | `https://api.vaivae.com/store/hooks/klaviyo` (custom)            | HMAC-SHA256 (`Klaviyo-Signature` + `Klaviyo-Timestamp`) |
+| Shippo (tracking updates)            | Medusa      | `https://api.vaivae.com/hooks/shipping/shippo` (custom, Phase 2) | Shippo signature                                        |
+| Sanity                               | Vercel      | `https://vaivae.com/api/revalidate`                              | Sanity webhook signature + shared secret                |
+| Medusa product events                | Vercel      | `https://vaivae.com/api/revalidate/medusa`                       | Shared secret in header                                 |
 
 > Bounce/complaint handling for transactional email is managed by Medusa Cloud's email dashboard — no custom webhook needed for Cloud Emails.
 
@@ -2492,6 +2505,7 @@ Process for handling DSRs (right to access, rectify, delete, port):
 
 - Double opt-in for newsletter signup.
 - Unsubscribe link in every marketing email; unsubscribes propagate to the `marketing-consent` module immediately.
+- Medusa remains the durable consent source for first-party signup and account settings; Klaviyo suppression webhooks append opt-out records back to Medusa for unsubscribes, hard bounces, spam complaints, and manual suppressions.
 - Transactional emails (order confirm, ship, refund) are **not** subject to marketing consent — they are operational.
 
 #### 10.2.5 Data Retention

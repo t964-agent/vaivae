@@ -162,6 +162,7 @@ async function emitConsentUpdatedEvent(
       consentRecordId: record.id,
       consentedAt: toIsoString(record.consented_at),
       customerId: record.customer_id,
+      email: record.email,
       source: record.source,
       subscribed: record.subscribed,
     },

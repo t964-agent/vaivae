@@ -62,54 +62,68 @@ const booleanFlag = z
   .default("false")
   .transform((value) => value === "true");
 
-const envSchema = z.object({
-  DATABASE_URL: requiredString("DATABASE_URL"),
-  REDIS_URL: z.preprocess(optionalString, z.string().optional()),
-  ENABLE_EXPLICIT_REDIS_MODULES: booleanFlag,
-  MEDUSA_WORKER_MODE: z.enum(["shared", "worker", "server"]).default("shared"),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
+const envSchema = z
+  .object({
+    DATABASE_URL: requiredString("DATABASE_URL"),
+    REDIS_URL: z.preprocess(optionalString, z.string().optional()),
+    ENABLE_EXPLICIT_REDIS_MODULES: booleanFlag,
+    MEDUSA_WORKER_MODE: z.enum(["shared", "worker", "server"]).default("shared"),
+    LOG_LEVEL: z
+      .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
+      .default("info"),
 
-  JWT_SECRET: requiredString("JWT_SECRET"),
-  COOKIE_SECRET: requiredString("COOKIE_SECRET"),
+    JWT_SECRET: requiredString("JWT_SECRET"),
+    COOKIE_SECRET: requiredString("COOKIE_SECRET"),
 
-  STORE_CORS: requiredString("STORE_CORS"),
-  ADMIN_CORS: requiredString("ADMIN_CORS"),
-  AUTH_CORS: requiredString("AUTH_CORS"),
-  MEDUSA_BACKEND_URL: requiredString("MEDUSA_BACKEND_URL"),
-  MEDUSA_STOREFRONT_URL: requiredString("MEDUSA_STOREFRONT_URL"),
+    STORE_CORS: requiredString("STORE_CORS"),
+    ADMIN_CORS: requiredString("ADMIN_CORS"),
+    AUTH_CORS: requiredString("AUTH_CORS"),
+    MEDUSA_BACKEND_URL: requiredString("MEDUSA_BACKEND_URL"),
+    MEDUSA_STOREFRONT_URL: requiredString("MEDUSA_STOREFRONT_URL"),
 
-  STRIPE_API_KEY: requiredString("STRIPE_API_KEY"),
-  STRIPE_WEBHOOK_SECRET: requiredString("STRIPE_WEBHOOK_SECRET"),
+    STRIPE_API_KEY: requiredString("STRIPE_API_KEY"),
+    STRIPE_WEBHOOK_SECRET: requiredString("STRIPE_WEBHOOK_SECRET"),
 
-  POSTHOG_API_KEY: requiredString("POSTHOG_API_KEY"),
-  POSTHOG_HOST: z.preprocess(optionalString, z.string().default("https://us.i.posthog.com")),
+    POSTHOG_API_KEY: requiredString("POSTHOG_API_KEY"),
+    POSTHOG_HOST: z.preprocess(optionalString, z.string().default("https://us.i.posthog.com")),
 
-  KLAVIYO_PRIVATE_API_KEY: z.preprocess(optionalString, z.string().optional()),
-  KLAVIYO_PUBLIC_API_KEY: z.preprocess(optionalString, z.string().optional()),
+    KLAVIYO_PRIVATE_KEY: z.preprocess(optionalString, z.string().optional()),
+    KLAVIYO_NEWSLETTER_LIST_ID: z.preprocess(optionalString, z.string().optional()),
+    KLAVIYO_WEBHOOK_SECRET: z.preprocess(optionalString, z.string().optional()),
+    KLAVIYO_PUBLIC_KEY: z.preprocess(optionalString, z.string().optional()),
 
-  SHIPPO_API_KEY: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_NAME: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_COMPANY: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_STREET1: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_STREET2: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_CITY: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_STATE: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_POSTAL_CODE: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_COUNTRY_CODE: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_PHONE: z.preprocess(optionalString, z.string().optional()),
-  SHIPPO_FROM_EMAIL: z.preprocess(optionalString, z.string().optional()),
-  SHIPPING_LABEL_AUTOPURCHASE: booleanFlag,
+    SHIPPO_API_KEY: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_NAME: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_COMPANY: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_STREET1: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_STREET2: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_CITY: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_STATE: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_POSTAL_CODE: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_COUNTRY_CODE: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_PHONE: z.preprocess(optionalString, z.string().optional()),
+    SHIPPO_FROM_EMAIL: z.preprocess(optionalString, z.string().optional()),
+    SHIPPING_LABEL_AUTOPURCHASE: booleanFlag,
 
-  MUX_TOKEN_ID: z.preprocess(optionalString, z.string().optional()),
-  MUX_TOKEN_SECRET: z.preprocess(optionalString, z.string().optional()),
+    MUX_TOKEN_ID: z.preprocess(optionalString, z.string().optional()),
+    MUX_TOKEN_SECRET: z.preprocess(optionalString, z.string().optional()),
 
-  SANITY_PROJECT_ID: requiredString("SANITY_PROJECT_ID"),
-  SANITY_DATASET: z.preprocess(optionalString, z.string().default("production")),
-  SANITY_WRITE_TOKEN: requiredString("SANITY_WRITE_TOKEN"),
-  SANITY_STUDIO_URL: z.preprocess(optionalString, z.string().optional()),
+    SANITY_PROJECT_ID: requiredString("SANITY_PROJECT_ID"),
+    SANITY_DATASET: z.preprocess(optionalString, z.string().default("production")),
+    SANITY_WRITE_TOKEN: requiredString("SANITY_WRITE_TOKEN"),
+    SANITY_STUDIO_URL: z.preprocess(optionalString, z.string().optional()),
 
-  MEDUSA_REVALIDATE_SECRET: z.preprocess(optionalString, z.string().optional()),
-});
+    MEDUSA_REVALIDATE_SECRET: z.preprocess(optionalString, z.string().optional()),
+  })
+  .superRefine((value, ctx) => {
+    if (value.KLAVIYO_PRIVATE_KEY && !value.KLAVIYO_NEWSLETTER_LIST_ID) {
+      ctx.addIssue({
+        code: "custom",
+        message: "KLAVIYO_NEWSLETTER_LIST_ID is required when KLAVIYO_PRIVATE_KEY is set",
+        path: ["KLAVIYO_NEWSLETTER_LIST_ID"],
+      });
+    }
+  });
 
 type InferSchema<TSchema extends { parse: (input: unknown) => unknown }> = ReturnType<
   TSchema["parse"]
@@ -139,8 +153,10 @@ const rawEnv = {
   POSTHOG_API_KEY: valueOrBuildDefault("POSTHOG_API_KEY"),
   POSTHOG_HOST: process.env["POSTHOG_HOST"],
 
-  KLAVIYO_PRIVATE_API_KEY: process.env["KLAVIYO_PRIVATE_API_KEY"],
-  KLAVIYO_PUBLIC_API_KEY: process.env["KLAVIYO_PUBLIC_API_KEY"],
+  KLAVIYO_PRIVATE_KEY: process.env["KLAVIYO_PRIVATE_KEY"],
+  KLAVIYO_NEWSLETTER_LIST_ID: process.env["KLAVIYO_NEWSLETTER_LIST_ID"],
+  KLAVIYO_WEBHOOK_SECRET: process.env["KLAVIYO_WEBHOOK_SECRET"],
+  KLAVIYO_PUBLIC_KEY: process.env["KLAVIYO_PUBLIC_KEY"],
 
   SHIPPO_API_KEY: process.env["SHIPPO_API_KEY"],
   SHIPPO_FROM_NAME: process.env["SHIPPO_FROM_NAME"],
@@ -179,8 +195,10 @@ if (!parsedEnv.success) {
 const env = parsedEnv.data;
 
 const optionalRuntimeWarnings = [
-  { key: "KLAVIYO_PRIVATE_API_KEY", consumer: "Agent 23 Klaviyo subscribers" },
-  { key: "KLAVIYO_PUBLIC_API_KEY", consumer: "Agent 23 Klaviyo subscribers" },
+  { key: "KLAVIYO_PRIVATE_KEY", consumer: "Klaviyo subscribers and Store API sync" },
+  { key: "KLAVIYO_NEWSLETTER_LIST_ID", consumer: "Klaviyo newsletter list sync" },
+  { key: "KLAVIYO_WEBHOOK_SECRET", consumer: "Klaviyo suppression webhook" },
+  { key: "KLAVIYO_PUBLIC_KEY", consumer: "future Klaviyo onsite tracking" },
   { key: "SHIPPO_API_KEY", consumer: "Shippo label subscriber" },
   { key: "MUX_TOKEN_ID", consumer: "future Mux video operations" },
   { key: "MUX_TOKEN_SECRET", consumer: "future Mux video operations" },

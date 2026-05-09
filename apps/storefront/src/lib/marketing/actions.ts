@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
+import { getPublicEnv } from "@/lib/env";
 
 const newsletterActionSchema = z.object({
   consent: z.literal(true, { error: "Please confirm you want to receive the editorial." }),
@@ -12,6 +13,32 @@ export type NewsletterActionResult = { ok: true } | { error: string; ok: false }
 
 function getValidationMessage(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Check your email and consent.";
+}
+
+function getMedusaBaseUrl(): string {
+  return getPublicEnv().NEXT_PUBLIC_MEDUSA_BACKEND_URL.replace(/\/+$/, "");
+}
+
+async function postNewsletterSubscription(input: { email: string; consent: true }): Promise<void> {
+  const { NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY } = getPublicEnv();
+  const response = await fetch(`${getMedusaBaseUrl()}/store/newsletter`, {
+    body: JSON.stringify({
+      consent: input.consent,
+      email: input.email,
+      source: "site-footer",
+    }),
+    cache: "no-store",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "x-publishable-api-key": NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Newsletter subscription request failed.");
+  }
 }
 
 export async function subscribeNewsletterAction(input: unknown): Promise<NewsletterActionResult> {
@@ -32,7 +59,8 @@ export async function subscribeNewsletterAction(input: unknown): Promise<Newslet
       message: "Newsletter subscription intent captured.",
     });
 
-    // Klaviyo wiring and durable consent storage are intentionally deferred to Agent 23.
+    await postNewsletterSubscription(parsed.data);
+
     return { ok: true };
   } catch {
     return { error: "Unable to receive your request. Try again in a moment.", ok: false };

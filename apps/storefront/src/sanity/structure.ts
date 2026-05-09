@@ -2,9 +2,12 @@ import {
   BookIcon,
   CogIcon,
   ControlsIcon,
+  ColorWheelIcon,
   DocumentIcon,
   DocumentsIcon,
+  EarthGlobeIcon,
   HomeIcon,
+  ImagesIcon,
   MenuIcon,
   PackageIcon,
   StackCompactIcon,
@@ -14,7 +17,14 @@ import type { StructureResolver } from "sanity/structure";
 export const singletonTypes = ["siteSettings", "navigation", "footer", "homePage"] as const;
 export const createHiddenTypes = [...singletonTypes, "product"] as const;
 
-const explicitlyStructuredTypes = new Set<string>([...createHiddenTypes, "page"]);
+const editorialTypes = ["lookbook", "journal", "capsule", "legal"] as const;
+const catalogTypes = ["product", "material", "colorSwatch", "sizeGuide"] as const;
+const explicitlyStructuredTypes = new Set<string>([
+  ...createHiddenTypes,
+  ...editorialTypes,
+  ...catalogTypes,
+  "page",
+]);
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -64,7 +74,18 @@ export const structure: StructureResolver = (S) =>
         .id("editorial")
         .icon(BookIcon)
         .title("Editorial")
-        .child(S.list().id("editorialList").title("Editorial").items([])),
+        .child(
+          S.list()
+            .id("editorialList")
+            .title("Editorial")
+            .items([
+              S.documentTypeListItem("lookbook").icon(ImagesIcon).title("Lookbooks"),
+              S.documentTypeListItem("journal").icon(BookIcon).title("Journal"),
+              S.documentTypeListItem("capsule").icon(PackageIcon).title("Capsules"),
+              S.divider(),
+              S.documentTypeListItem("legal").icon(DocumentIcon).title("Legal"),
+            ]),
+        ),
       S.listItem()
         .id("catalog")
         .icon(PackageIcon)
@@ -73,7 +94,12 @@ export const structure: StructureResolver = (S) =>
           S.list()
             .id("catalogList")
             .title("Catalog")
-            .items([S.documentTypeListItem("product").icon(PackageIcon).title("Products")]),
+            .items([
+              S.documentTypeListItem("product").icon(PackageIcon).title("Products"),
+              S.documentTypeListItem("material").icon(EarthGlobeIcon).title("Materials"),
+              S.documentTypeListItem("colorSwatch").icon(ColorWheelIcon).title("Color swatches"),
+              S.documentTypeListItem("sizeGuide").icon(ControlsIcon).title("Size guides"),
+            ]),
         ),
       S.divider(),
       ...S.documentTypeListItems().filter((listItem) => {

@@ -3,11 +3,13 @@ import { defineField, defineType } from "sanity";
 
 const INTERNAL_LINK_TYPES = [
   { type: "siteSettings" },
-  { type: "navigation" },
-  { type: "footer" },
   { type: "homePage" },
-  { type: "page" },
   { type: "product" },
+  { type: "page" },
+  { type: "lookbook" },
+  { type: "journal" },
+  { type: "capsule" },
+  { type: "legal" },
 ];
 
 type LinkParent = {

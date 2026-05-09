@@ -27,7 +27,7 @@ export const journalRail = defineType({
       of: [
         defineArrayMember({
           options: { disableNew: true },
-          to: [{ type: "page" }],
+          to: [{ type: "journal" }],
           type: "reference",
           weak: true,
         }),

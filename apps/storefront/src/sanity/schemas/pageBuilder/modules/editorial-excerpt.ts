@@ -4,11 +4,11 @@ import { defineField, defineType } from "sanity";
 export const editorialExcerpt = defineType({
   fields: [
     defineField({
-      description: "Agent 8 will retarget this to the journal document type.",
+      description: "Journal entry to feature in this excerpt.",
       name: "journalEntry",
       options: { disableNew: true },
       title: "Journal entry",
-      to: [{ type: "page" }],
+      to: [{ type: "journal" }],
       type: "reference",
       validation: (rule) => rule.required(),
       weak: true,

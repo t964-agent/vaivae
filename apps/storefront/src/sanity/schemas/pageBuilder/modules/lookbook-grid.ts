@@ -6,17 +6,16 @@ export const lookbookGrid = defineType({
     defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
     defineField({ name: "heading", title: "Heading", type: "string" }),
     defineField({
-      description: "Agent 8 will retarget this to the lookbook document type.",
+      description: "Lookbook to feature in this grid.",
       name: "lookbookEntry",
       options: { disableNew: true },
       title: "Lookbook",
-      to: [{ type: "page" }],
+      to: [{ type: "lookbook" }],
       type: "reference",
       weak: true,
     }),
     defineField({
-      description:
-        "Curated visual override for this grid. Agent 8 will add full lookbook editorial fields.",
+      description: "Curated visual override for this grid.",
       name: "images",
       of: [defineArrayMember({ type: "vaivaeImage" })],
       options: { layout: "grid" },

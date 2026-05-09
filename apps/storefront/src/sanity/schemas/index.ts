@@ -1,5 +1,12 @@
+import { capsule } from "./documents/capsule";
+import { colorSwatch } from "./documents/color-swatch";
+import { journal } from "./documents/journal";
+import { legal } from "./documents/legal";
+import { lookbook } from "./documents/lookbook";
+import { material } from "./documents/material";
 import { page } from "./documents/page";
 import { product } from "./documents/product";
+import { sizeGuide } from "./documents/size-guide";
 import { address } from "./objects/address";
 import { cta } from "./objects/cta";
 import { vaivaeImage } from "./objects/image";
@@ -44,6 +51,13 @@ export const schemaTypes = [
   videoChapter,
   quote,
   ctaSection,
-  product,
   page,
+  lookbook,
+  journal,
+  capsule,
+  legal,
+  product,
+  material,
+  colorSwatch,
+  sizeGuide,
 ];

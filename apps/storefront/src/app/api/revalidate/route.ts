@@ -7,6 +7,7 @@ import { getServerEnv } from "@/lib/env";
 export const runtime = "nodejs";
 
 type SanityWebhookPayload = {
+  handle?: unknown;
   _id?: unknown;
   _type?: unknown;
   slug?: unknown;
@@ -16,17 +17,6 @@ type RevalidationDocument = {
   id?: string;
   slug?: string;
   type: string;
-};
-
-const tagsByDocumentType: Record<string, readonly string[]> = {
-  footer: ["footer"],
-  homePage: ["home-page"],
-  journal: ["journal"],
-  lookbook: ["lookbook"],
-  navigation: ["navigation"],
-  page: ["page"],
-  product: ["product"],
-  siteSettings: ["site-settings"],
 };
 
 function getString(value: unknown): string | undefined {
@@ -45,8 +35,39 @@ function getSlug(value: unknown): string | undefined {
   return undefined;
 }
 
-function getRevalidationTags(type: string): readonly string[] {
-  return tagsByDocumentType[type] ?? [];
+function withSlugTag(tag: string, slug?: string): readonly string[] {
+  return slug ? [tag, `${tag}:${slug}`] : [tag];
+}
+
+function getRevalidationTags(document: RevalidationDocument): readonly string[] {
+  switch (document.type) {
+    case "footer":
+      return ["footer"];
+    case "homePage":
+      return ["home-page"];
+    case "navigation":
+      return ["navigation"];
+    case "page":
+      return withSlugTag("page", document.slug);
+    case "siteSettings":
+      return ["site-settings"];
+    case "product":
+      return withSlugTag("product", document.slug);
+    case "lookbook":
+      return withSlugTag("lookbook", document.slug);
+    case "journal":
+      return withSlugTag("journal", document.slug);
+    case "capsule":
+      return withSlugTag("capsule", document.slug);
+    case "legal":
+      return withSlugTag("legal", document.slug);
+    case "material":
+    case "colorSwatch":
+    case "sizeGuide":
+      return ["product"];
+    default:
+      return [];
+  }
 }
 
 function getDocument(payload: SanityWebhookPayload): RevalidationDocument | undefined {
@@ -58,7 +79,7 @@ function getDocument(payload: SanityWebhookPayload): RevalidationDocument | unde
 
   const document: RevalidationDocument = { type };
   const id = getString(payload._id);
-  const slug = getSlug(payload.slug);
+  const slug = getSlug(payload.slug) ?? getSlug(payload.handle);
 
   if (id) {
     document.id = id;
@@ -104,7 +125,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tags = getRevalidationTags(document.type);
+    const tags = getRevalidationTags(document);
 
     for (const tag of tags) {
       revalidateTag(tag, { expire: 0 });

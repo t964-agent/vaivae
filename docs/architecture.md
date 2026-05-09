@@ -1857,6 +1857,10 @@ Optional editorial overrides per reference:
 | Webhook spoofing                        | Signature validation + shared secret + raw body                                                    |
 | TypeGen drift                           | TypeGen runs in CI; missing/changed types fail the build                                           |
 
+#### 7.4.6 Agent 8 Schema Alignment
+
+Agent 8 resolved the temporary forward references left by the initial page-builder pass: capsule rails now reference `capsule`, editorial excerpts and journal rails reference `journal`, and lookbook grids reference `lookbook`. The Sanity `product` document is created exclusively by the Medusa → Sanity sync subscriber (Agent 21) with deterministic product identity; Studio create/delete is disabled so editors only enrich existing product documents. Phase 1 text fields remain plain strings / Portable Text with localization-neutral names; if Phase 2 adds locales, refactor these fields to `sanity-plugin-internationalized-array` or document-level localization with a content migration.
+
 ---
 
 ## 8. Integration Architecture

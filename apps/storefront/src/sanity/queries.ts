@@ -54,12 +54,63 @@ ogImage{
 },
 keywords`;
 
+const portableTextFragment = `...,
+_type == "vaivaeImage" => {
+  _key,
+  ${imageFragment}
+}`;
+
+const materialFragment = `_id,
+_type,
+name,
+composition,
+origin,
+careInstructions,
+"slug": slug.current,
+description[]{
+  ${portableTextFragment}
+}`;
+
+const colorSwatchFragment = `_id,
+_type,
+name,
+"slug": slug.current,
+hex,
+image{
+  ${imageFragment}
+},
+fallbackTextColor`;
+
+const sizeGuideFragment = `_id,
+_type,
+name,
+"slug": slug.current,
+description,
+measurements[]{
+  _key,
+  _type,
+  size,
+  bust,
+  waist,
+  hips,
+  length,
+  note
+},
+unitSystem,
+tipsRichText[]{
+  ${portableTextFragment}
+}`;
+
 const productReferenceFragment = `_id,
 _type,
 "medusaProductId": medusaProductId,
 title,
 "handle": handle.current,
-editorialReady`;
+editorialReady,
+oneLineHook,
+heroImage{
+  ${imageFragment}
+}`;
 
 export const pageBuilderFragment = `_key,
 _type,
@@ -527,6 +578,296 @@ export const pageBySlugQuery = defineQuery(`*[_type == "page" && slug.current ==
   pageBuilder[]{
     ${pageBuilderFragment}
   }
+}`);
+
+export const productByHandleQuery =
+  defineQuery(`*[_type == "product" && handle.current == $handle][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  medusaProductId,
+  title,
+  "handle": handle.current,
+  mirrorMaterials,
+  editorialReady,
+  eyebrow,
+  oneLineHook,
+  narrative[]{
+    ${portableTextFragment}
+  },
+  pdpStorytelling[]{
+    ${pageBuilderFragment}
+  },
+  heroImage{
+    ${imageFragment}
+  },
+  gallery[]{
+    _key,
+    ${imageFragment}
+  },
+  lookbookFeature->{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    coverImage{
+      ${imageFragment}
+    }
+  },
+  modelSpecs{
+    height,
+    wearingSize,
+    notes
+  },
+  "materials": array::compact(materials[]->{
+    ${materialFragment}
+  }),
+  colorSwatches[]{
+    _key,
+    _type,
+    medusaVariantOptionValueId,
+    swatch->{
+      ${colorSwatchFragment}
+    }
+  },
+  sizeGuide->{
+    ${sizeGuideFragment}
+  },
+  careNotes[]{
+    ${portableTextFragment}
+  },
+  madeIn,
+  sustainabilityNotes[]{
+    ${portableTextFragment}
+  },
+  certifications,
+  seo{
+    ${seoFragment}
+  }
+}`);
+
+export const productListQuery = defineQuery(`*[_type == "product"] | order(title asc){
+  _id,
+  _type,
+  medusaProductId,
+  title,
+  "handle": handle.current,
+  editorialReady,
+  heroImage{
+    ${imageFragment}
+  },
+  oneLineHook
+}`);
+
+export const lookbookByHandleQuery =
+  defineQuery(`*[_type == "lookbook" && slug.current == $handle][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  title,
+  "slug": slug.current,
+  eyebrow,
+  coverImage{
+    ${imageFragment}
+  },
+  coverVideo{
+    muxAssetId
+  },
+  seasonOrDrop->{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    eyebrow,
+    coverImage{
+      ${imageFragment}
+    }
+  },
+  description[]{
+    ${portableTextFragment}
+  },
+  looks[]{
+    _key,
+    _type,
+    image{
+      ${imageFragment}
+    },
+    caption,
+    "products": array::compact(products[]->{
+      ${productReferenceFragment}
+    })
+  },
+  seo{
+    ${seoFragment}
+  },
+  publishedAt
+}`);
+
+export const lookbookListQuery = defineQuery(`*[_type == "lookbook"] | order(publishedAt desc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  eyebrow,
+  coverImage{
+    ${imageFragment}
+  },
+  publishedAt
+}`);
+
+export const journalEntryQuery = defineQuery(`*[_type == "journal" && slug.current == $slug][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  title,
+  "slug": slug.current,
+  subtitle,
+  eyebrow,
+  coverImage{
+    ${imageFragment}
+  },
+  excerpt,
+  body[]{
+    ${portableTextFragment}
+  },
+  tags,
+  "relatedProducts": array::compact(relatedProducts[]->{
+    ${productReferenceFragment}
+  }),
+  "relatedLookbooks": array::compact(relatedLookbooks[]->{
+    _id,
+    _type,
+    title,
+    "slug": slug.current,
+    coverImage{
+      ${imageFragment}
+    }
+  }),
+  author,
+  seo{
+    ${seoFragment}
+  },
+  publishedAt
+}`);
+
+export const journalListQuery = defineQuery(`*[_type == "journal"] | order(publishedAt desc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  subtitle,
+  eyebrow,
+  coverImage{
+    ${imageFragment}
+  },
+  excerpt,
+  tags,
+  author,
+  publishedAt
+}`);
+
+export const capsuleByHandleQuery =
+  defineQuery(`*[_type == "capsule" && slug.current == $handle][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  title,
+  "slug": slug.current,
+  eyebrow,
+  description[]{
+    ${portableTextFragment}
+  },
+  coverImage{
+    ${imageFragment}
+  },
+  coverVideo{
+    muxAssetId
+  },
+  pageBuilder[]{
+    ${pageBuilderFragment}
+  },
+  "products": array::compact(products[]->{
+    ${productReferenceFragment}
+  }),
+  seo{
+    ${seoFragment}
+  },
+  releaseDate,
+  endDate
+}`);
+
+export const capsuleListQuery =
+  defineQuery(`*[_type == "capsule"] | order(coalesce(releaseDate, _createdAt) desc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  eyebrow,
+  coverImage{
+    ${imageFragment}
+  },
+  releaseDate,
+  endDate
+}`);
+
+export const legalBySlugQuery = defineQuery(`*[_type == "legal" && slug.current == $slug][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  title,
+  "slug": slug.current,
+  kind,
+  body[]{
+    ${portableTextFragment}
+  },
+  lastUpdated,
+  seo{
+    ${seoFragment}
+  }
+}`);
+
+export const legalListQuery = defineQuery(`*[_type == "legal"] | order(title asc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  kind,
+  lastUpdated
+}`);
+
+export const sizeGuideByIdQuery = defineQuery(`*[_type == "sizeGuide" && _id == $id][0]{
+  ${sizeGuideFragment}
+}`);
+
+export const materialBySlugQuery = defineQuery(`*[_type == "material" && slug.current == $slug][0]{
+  ${materialFragment}
+}`);
+
+export const materialListQuery = defineQuery(`*[_type == "material"] | order(name asc){
+  ${materialFragment}
+}`);
+
+export const colorSwatchBySlugQuery =
+  defineQuery(`*[_type == "colorSwatch" && slug.current == $slug][0]{
+  ${colorSwatchFragment}
+}`);
+
+export const colorSwatchListQuery = defineQuery(`*[_type == "colorSwatch"] | order(name asc){
+  ${colorSwatchFragment}
+}`);
+
+export const sizeGuideListQuery = defineQuery(`*[_type == "sizeGuide"] | order(name asc){
+  ${sizeGuideFragment}
 }`);
 
 export const globalQuery = defineQuery(`{

@@ -8,13 +8,12 @@ export const capsuleRail = defineType({
     defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
     defineField({ name: "heading", title: "Heading", type: "string" }),
     defineField({
-      description:
-        "Curated capsule page references. Agent 8 will retarget this to the capsule document type.",
+      description: "Curated capsule references.",
       name: "capsules",
       of: [
         defineArrayMember({
           options: { disableNew: true },
-          to: [{ type: "page" }],
+          to: [{ type: "capsule" }],
           type: "reference",
           weak: true,
         }),

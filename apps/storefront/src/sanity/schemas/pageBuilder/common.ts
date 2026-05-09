@@ -37,21 +37,28 @@ export const editorialPortableTextBlock = defineArrayMember({
   type: "block",
 });
 
+export const editorialImageBlock = defineArrayMember({ type: "vaivaeImage" });
+
 export function defineEditorialBodyField({
   description,
+  group,
+  images = false,
   name = "body",
   required = false,
   title = "Body",
 }: {
   description?: string;
+  group?: string;
+  images?: boolean;
   name?: string;
   required?: boolean;
   title?: string;
 }) {
   return defineField({
     ...(description ? { description } : {}),
+    ...(group ? { group } : {}),
     name,
-    of: [editorialPortableTextBlock],
+    of: images ? [editorialPortableTextBlock, editorialImageBlock] : [editorialPortableTextBlock],
     title,
     type: "array",
     validation: (rule) => (required ? rule.required().min(1) : rule),

@@ -44,6 +44,43 @@ export type Background = {
   image?: VaivaeImage;
 };
 
+export type Material = {
+  _id: string;
+  _type: "material";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  composition?: string;
+  origin?: string;
+  careInstructions?: string;
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  slug?: Slug;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type CtaSection = {
   _type: "ctaSection";
   eyebrow?: string;
@@ -117,11 +154,11 @@ export type ImagePair = {
   cta?: Cta;
 };
 
-export type PageReference = {
+export type JournalReference = {
   _ref: string;
   _type: "reference";
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "page";
+  [internalGroqTypeReferenceTo]?: "journal";
 };
 
 export type JournalRail = {
@@ -132,17 +169,24 @@ export type JournalRail = {
   entries?: Array<
     {
       _key: string;
-    } & PageReference
+    } & JournalReference
   >;
   limit?: number;
   cta?: Cta;
+};
+
+export type LookbookReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "lookbook";
 };
 
 export type LookbookGrid = {
   _type: "lookbookGrid";
   eyebrow?: string;
   heading?: string;
-  lookbookEntry?: PageReference;
+  lookbookEntry?: LookbookReference;
   images?: Array<
     {
       _key: string;
@@ -154,11 +198,18 @@ export type LookbookGrid = {
 
 export type EditorialExcerpt = {
   _type: "editorialExcerpt";
-  journalEntry?: PageReference;
+  journalEntry?: JournalReference;
   eyebrow?: string;
   customHeading?: string;
   quote?: string;
   cta?: Cta;
+};
+
+export type CapsuleReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "capsule";
 };
 
 export type CapsuleRail = {
@@ -168,7 +219,7 @@ export type CapsuleRail = {
   capsules?: Array<
     {
       _key: string;
-    } & PageReference
+    } & CapsuleReference
   >;
   cta?: Cta;
 };
@@ -256,199 +307,6 @@ export type HeroFilm = {
   terminalCta?: TerminalCta;
 };
 
-export type Address = {
-  _type: "address";
-  line1?: string;
-  line2?: string;
-  city?: string;
-  region?: string;
-  postalCode?: string;
-  country?: string;
-};
-
-export type SocialLink = {
-  _type: "socialLink";
-  platform?: "instagram" | "tiktok" | "pinterest" | "youtube" | "linkedin" | "facebook" | "x";
-  handle?: string;
-  url?: string;
-};
-
-export type Cta = {
-  _type: "cta";
-  label?: string;
-  link?: Link;
-  style?: "primary" | "ghost" | "underline";
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type VaivaeImage = {
-  _type: "vaivaeImage";
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-  caption?: string;
-};
-
-export type SiteSettingsReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "siteSettings";
-};
-
-export type NavigationReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "navigation";
-};
-
-export type FooterReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "footer";
-};
-
-export type HomePageReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "homePage";
-};
-
-export type Link = {
-  _type: "link";
-  type?: "internal" | "external";
-  label?: string;
-  internal?:
-    | SiteSettingsReference
-    | NavigationReference
-    | FooterReference
-    | HomePageReference
-    | PageReference
-    | ProductReference;
-  href?: string;
-  targetBlank?: boolean;
-};
-
-export type Page = {
-  _id: string;
-  _type: "page";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  seo?: Seo;
-  pageBuilder?: Array<
-    | ({
-        _key: string;
-      } & HeroFilm)
-    | ({
-        _key: string;
-      } & BrandPromise)
-    | ({
-        _key: string;
-      } & ProductRail)
-    | ({
-        _key: string;
-      } & CapsuleRail)
-    | ({
-        _key: string;
-      } & EditorialExcerpt)
-    | ({
-        _key: string;
-      } & LookbookGrid)
-    | ({
-        _key: string;
-      } & JournalRail)
-    | ({
-        _key: string;
-      } & ImagePair)
-    | ({
-        _key: string;
-      } & VideoChapter)
-    | ({
-        _key: string;
-      } & Quote)
-    | ({
-        _key: string;
-      } & CtaSection)
-  >;
-};
-
-export type Product = {
-  _id: string;
-  _type: "product";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  medusaProductId?: string;
-  title?: string;
-  handle?: Slug;
-  editorialReady?: boolean;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
-export type Seo = {
-  _type: "seo";
-  title?: string;
-  description?: string;
-  noindex?: boolean;
-  ogImage?: VaivaeImage;
-  keywords?: Array<string>;
-};
-
-export type HomePage = {
-  _id: string;
-  _type: "homePage";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  seo?: Seo;
-  pageBuilder?: Array<
-    | ({
-        _key: string;
-      } & HeroFilm)
-    | ({
-        _key: string;
-      } & CapsuleRail)
-    | ({
-        _key: string;
-      } & EditorialExcerpt)
-    | ({
-        _key: string;
-      } & BrandPromise)
-    | ({
-        _key: string;
-      } & ProductRail)
-    | ({
-        _key: string;
-      } & JournalRail)
-    | ({
-        _key: string;
-      } & CtaSection)
-    | ({
-        _key: string;
-      } & ImagePair)
-  >;
-};
-
 export type Footer = {
   _id: string;
   _type: "footer";
@@ -502,6 +360,565 @@ export type Navigation = {
   promoBannerEnabled?: boolean;
   promoBannerText?: string;
   promoBannerLink?: Link;
+};
+
+export type SiteSettingsReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "siteSettings";
+};
+
+export type HomePageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "homePage";
+};
+
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type LegalReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "legal";
+};
+
+export type Link = {
+  _type: "link";
+  type?: "internal" | "external";
+  label?: string;
+  internal?:
+    | SiteSettingsReference
+    | HomePageReference
+    | ProductReference
+    | PageReference
+    | LookbookReference
+    | JournalReference
+    | CapsuleReference
+    | LegalReference;
+  href?: string;
+  targetBlank?: boolean;
+};
+
+export type Address = {
+  _type: "address";
+  line1?: string;
+  line2?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+};
+
+export type SocialLink = {
+  _type: "socialLink";
+  platform?: "instagram" | "tiktok" | "pinterest" | "youtube" | "linkedin" | "facebook" | "x";
+  handle?: string;
+  url?: string;
+};
+
+export type Cta = {
+  _type: "cta";
+  label?: string;
+  link?: Link;
+  style?: "primary" | "ghost" | "underline";
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type VaivaeImage = {
+  _type: "vaivaeImage";
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  caption?: string;
+};
+
+export type Legal = {
+  _id: string;
+  _type: "legal";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  kind?:
+    | "privacy"
+    | "terms"
+    | "returns"
+    | "shipping"
+    | "accessibility"
+    | "cookies"
+    | "wholesale"
+    | "imprint";
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  lastUpdated?: string;
+  seo?: Seo;
+};
+
+export type Seo = {
+  _type: "seo";
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  ogImage?: VaivaeImage;
+  keywords?: Array<string>;
+};
+
+export type Journal = {
+  _id: string;
+  _type: "journal";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  subtitle?: string;
+  eyebrow?: string;
+  coverImage?: VaivaeImage;
+  excerpt?: string;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+        listItem?: never;
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | ({
+        _key: string;
+      } & VaivaeImage)
+  >;
+  tags?: Array<string>;
+  relatedProducts?: Array<
+    {
+      _key: string;
+    } & ProductReference
+  >;
+  relatedLookbooks?: Array<
+    {
+      _key: string;
+    } & LookbookReference
+  >;
+  author?: string;
+  seo?: Seo;
+  publishedAt?: string;
+};
+
+export type Page = {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  seo?: Seo;
+  pageBuilder?: Array<
+    | ({
+        _key: string;
+      } & HeroFilm)
+    | ({
+        _key: string;
+      } & BrandPromise)
+    | ({
+        _key: string;
+      } & ProductRail)
+    | ({
+        _key: string;
+      } & CapsuleRail)
+    | ({
+        _key: string;
+      } & EditorialExcerpt)
+    | ({
+        _key: string;
+      } & LookbookGrid)
+    | ({
+        _key: string;
+      } & JournalRail)
+    | ({
+        _key: string;
+      } & ImagePair)
+    | ({
+        _key: string;
+      } & VideoChapter)
+    | ({
+        _key: string;
+      } & Quote)
+    | ({
+        _key: string;
+      } & CtaSection)
+  >;
+};
+
+export type MaterialReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "material";
+};
+
+export type ColorSwatchReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "colorSwatch";
+};
+
+export type SizeGuideReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sizeGuide";
+};
+
+export type Product = {
+  _id: string;
+  _type: "product";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  medusaProductId?: string;
+  title?: string;
+  handle?: Slug;
+  mirrorMaterials?: Array<string>;
+  editorialReady?: boolean;
+  eyebrow?: string;
+  oneLineHook?: string;
+  narrative?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  pdpStorytelling?: Array<
+    | ({
+        _key: string;
+      } & ImagePair)
+    | ({
+        _key: string;
+      } & VideoChapter)
+    | ({
+        _key: string;
+      } & Quote)
+  >;
+  heroImage?: VaivaeImage;
+  gallery?: Array<
+    {
+      _key: string;
+    } & VaivaeImage
+  >;
+  lookbookFeature?: LookbookReference;
+  modelSpecs?: {
+    height?: string;
+    wearingSize?: string;
+    notes?: string;
+  };
+  materials?: Array<
+    {
+      _key: string;
+    } & MaterialReference
+  >;
+  colorSwatches?: Array<{
+    swatch?: ColorSwatchReference;
+    medusaVariantOptionValueId?: string;
+    _type: "productColorSwatch";
+    _key: string;
+  }>;
+  sizeGuide?: SizeGuideReference;
+  careNotes?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  madeIn?: string;
+  sustainabilityNotes?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  certifications?: Array<"GOTS" | "GRS" | "OEKO-TEX" | "Fair Trade" | "BCI">;
+  seo?: Seo;
+};
+
+export type SizeGuide = {
+  _id: string;
+  _type: "sizeGuide";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  description?: string;
+  measurements?: Array<{
+    size?: string;
+    bust?: string;
+    waist?: string;
+    hips?: string;
+    length?: string;
+    note?: string;
+    _type: "measurement";
+    _key: string;
+  }>;
+  unitSystem?: "cm" | "in" | "both";
+  tipsRichText?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
+
+export type ColorSwatch = {
+  _id: string;
+  _type: "colorSwatch";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  hex?: string;
+  image?: VaivaeImage;
+  fallbackTextColor?: "light" | "dark";
+};
+
+export type Lookbook = {
+  _id: string;
+  _type: "lookbook";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  eyebrow?: string;
+  coverImage?: VaivaeImage;
+  coverVideo?: {
+    muxAssetId?: string;
+  };
+  seasonOrDrop?: CapsuleReference;
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  looks?: Array<{
+    image?: VaivaeImage;
+    caption?: string;
+    products?: Array<
+      {
+        _key: string;
+      } & ProductReference
+    >;
+    _type: "look";
+    _key: string;
+  }>;
+  seo?: Seo;
+  publishedAt?: string;
+};
+
+export type Capsule = {
+  _id: string;
+  _type: "capsule";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  eyebrow?: string;
+  description?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "blockquote" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  coverImage?: VaivaeImage;
+  coverVideo?: {
+    muxAssetId?: string;
+  };
+  pageBuilder?: Array<
+    | ({
+        _key: string;
+      } & HeroFilm)
+    | ({
+        _key: string;
+      } & ProductRail)
+    | ({
+        _key: string;
+      } & ImagePair)
+    | ({
+        _key: string;
+      } & LookbookGrid)
+    | ({
+        _key: string;
+      } & Quote)
+    | ({
+        _key: string;
+      } & EditorialExcerpt)
+    | ({
+        _key: string;
+      } & CtaSection)
+  >;
+  products?: Array<
+    {
+      _key: string;
+    } & ProductReference
+  >;
+  seo?: Seo;
+  releaseDate?: string;
+  endDate?: string;
+};
+
+export type HomePage = {
+  _id: string;
+  _type: "homePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  seo?: Seo;
+  pageBuilder?: Array<
+    | ({
+        _key: string;
+      } & HeroFilm)
+    | ({
+        _key: string;
+      } & CapsuleRail)
+    | ({
+        _key: string;
+      } & EditorialExcerpt)
+    | ({
+        _key: string;
+      } & BrandPromise)
+    | ({
+        _key: string;
+      } & ProductRail)
+    | ({
+        _key: string;
+      } & JournalRail)
+    | ({
+        _key: string;
+      } & CtaSection)
+    | ({
+        _key: string;
+      } & ImagePair)
+  >;
 };
 
 export type SiteSettings = {
@@ -654,36 +1071,48 @@ export type AllSanitySchemaTypes =
   | Marquee
   | TerminalCta
   | Background
+  | Material
+  | Slug
   | CtaSection
   | Quote
   | ProductReference
   | VideoChapter
   | ImagePair
-  | PageReference
+  | JournalReference
   | JournalRail
+  | LookbookReference
   | LookbookGrid
   | EditorialExcerpt
+  | CapsuleReference
   | CapsuleRail
   | ProductRail
   | BrandPromise
   | HeroFilm
+  | Footer
+  | Navigation
+  | SiteSettingsReference
+  | HomePageReference
+  | PageReference
+  | LegalReference
+  | Link
   | Address
   | SocialLink
   | Cta
   | SanityImageAssetReference
   | VaivaeImage
-  | SiteSettingsReference
-  | NavigationReference
-  | FooterReference
-  | HomePageReference
-  | Link
-  | Page
-  | Product
-  | Slug
+  | Legal
   | Seo
+  | Journal
+  | Page
+  | MaterialReference
+  | ColorSwatchReference
+  | SizeGuideReference
+  | Product
+  | SizeGuide
+  | ColorSwatch
+  | Lookbook
+  | Capsule
   | HomePage
-  | Footer
-  | Navigation
   | SiteSettings
   | SanityImageCrop
   | SanityImageHotspot
@@ -828,9 +1257,9 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
-          _type: "footer";
-          title: null;
-          slug: null;
+          _type: "capsule";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -840,9 +1269,21 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
-          _type: "navigation";
-          title: null;
-          slug: null;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "legal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -879,9 +1320,9 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
-          _type: "footer";
-          title: null;
-          slug: null;
+          _type: "capsule";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -891,9 +1332,21 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
-          _type: "navigation";
-          title: null;
-          slug: null;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "legal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -930,9 +1383,9 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
-          _type: "footer";
-          title: null;
-          slug: null;
+          _type: "capsule";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -942,9 +1395,21 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
-          _type: "navigation";
-          title: null;
-          slug: null;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "legal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -982,9 +1447,9 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
-          _type: "footer";
-          title: null;
-          slug: null;
+          _type: "capsule";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -994,9 +1459,21 @@ export type NavigationQueryResult = {
         }
       | {
           _id: string;
-          _type: "navigation";
-          title: null;
-          slug: null;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "legal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -1048,9 +1525,9 @@ export type FooterQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -1060,9 +1537,21 @@ export type FooterQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -1104,9 +1593,9 @@ export type FooterQueryResult = {
     internalTarget:
       | {
           _id: string;
-          _type: "footer";
-          title: null;
-          slug: null;
+          _type: "capsule";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -1116,9 +1605,21 @@ export type FooterQueryResult = {
         }
       | {
           _id: string;
-          _type: "navigation";
-          title: null;
-          slug: null;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "legal";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
         }
       | {
           _id: string;
@@ -1150,7 +1651,7 @@ export type FooterQueryResult = {
 
 // Source: src/sanity/queries.ts
 // Variable: homePageQuery
-// Query: *[_type == "homePage" && _id == "homePage"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
+// Query: *[_type == "homePage" && _id == "homePage"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
 export type HomePageQueryResult = {
   _id: "homePage";
   _type: "homePage";
@@ -1227,9 +1728,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1239,9 +1740,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1275,7 +1788,7 @@ export type HomePageQueryResult = {
         heading: string | null;
         capsules: Array<{
           _id: string;
-          _type: "page";
+          _type: "capsule";
           title: string | null;
           slug: string | null;
         }> | null;
@@ -1294,9 +1807,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1306,9 +1819,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1356,9 +1881,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1368,9 +1893,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1411,9 +1948,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1423,9 +1960,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1489,7 +2038,7 @@ export type HomePageQueryResult = {
         _type: "editorialExcerpt";
         journalEntry: {
           _id: string;
-          _type: "page";
+          _type: "journal";
           title: string | null;
           slug: string | null;
         } | null;
@@ -1511,9 +2060,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1523,9 +2072,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1598,9 +2159,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1610,9 +2171,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1711,9 +2284,9 @@ export type HomePageQueryResult = {
               internalTarget:
                 | {
                     _id: string;
-                    _type: "footer";
-                    title: null;
-                    slug: null;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -1723,9 +2296,21 @@ export type HomePageQueryResult = {
                   }
                 | {
                     _id: string;
-                    _type: "navigation";
-                    title: null;
-                    slug: null;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -1766,9 +2351,9 @@ export type HomePageQueryResult = {
               internalTarget:
                 | {
                     _id: string;
-                    _type: "footer";
-                    title: null;
-                    slug: null;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -1778,9 +2363,21 @@ export type HomePageQueryResult = {
                   }
                 | {
                     _id: string;
-                    _type: "navigation";
-                    title: null;
-                    slug: null;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -1872,9 +2469,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1884,9 +2481,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1921,7 +2530,7 @@ export type HomePageQueryResult = {
         mode: "curated" | "recent" | null;
         entries: Array<{
           _id: string;
-          _type: "page";
+          _type: "journal";
           title: string | null;
           slug: string | null;
         }> | null;
@@ -1941,9 +2550,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1953,9 +2562,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -1998,6 +2619,27 @@ export type HomePageQueryResult = {
           title: string | null;
           handle: string | null;
           editorialReady: boolean | null;
+          oneLineHook: string | null;
+          heroImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
         }> | null;
         cta: {
           _type: "cta";
@@ -2014,9 +2656,9 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2026,9 +2668,21 @@ export type HomePageQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2060,7 +2714,7 @@ export type HomePageQueryResult = {
 
 // Source: src/sanity/queries.ts
 // Variable: pageBySlugQuery
-// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
+// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  }}
 export type PageBySlugQueryResult = {
   _id: string;
   _type: "page";
@@ -2138,9 +2792,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2150,9 +2804,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2186,7 +2852,7 @@ export type PageBySlugQueryResult = {
         heading: string | null;
         capsules: Array<{
           _id: string;
-          _type: "page";
+          _type: "capsule";
           title: string | null;
           slug: string | null;
         }> | null;
@@ -2205,9 +2871,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2217,9 +2883,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2267,9 +2945,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2279,9 +2957,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2322,9 +3012,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2334,9 +3024,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2400,7 +3102,7 @@ export type PageBySlugQueryResult = {
         _type: "editorialExcerpt";
         journalEntry: {
           _id: string;
-          _type: "page";
+          _type: "journal";
           title: string | null;
           slug: string | null;
         } | null;
@@ -2422,9 +3124,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2434,9 +3136,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2509,9 +3223,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2521,9 +3235,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2622,9 +3348,9 @@ export type PageBySlugQueryResult = {
               internalTarget:
                 | {
                     _id: string;
-                    _type: "footer";
-                    title: null;
-                    slug: null;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -2634,9 +3360,21 @@ export type PageBySlugQueryResult = {
                   }
                 | {
                     _id: string;
-                    _type: "navigation";
-                    title: null;
-                    slug: null;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -2677,9 +3415,9 @@ export type PageBySlugQueryResult = {
               internalTarget:
                 | {
                     _id: string;
-                    _type: "footer";
-                    title: null;
-                    slug: null;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -2689,9 +3427,21 @@ export type PageBySlugQueryResult = {
                   }
                 | {
                     _id: string;
-                    _type: "navigation";
-                    title: null;
-                    slug: null;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
                   }
                 | {
                     _id: string;
@@ -2783,9 +3533,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2795,9 +3545,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2832,7 +3594,7 @@ export type PageBySlugQueryResult = {
         mode: "curated" | "recent" | null;
         entries: Array<{
           _id: string;
-          _type: "page";
+          _type: "journal";
           title: string | null;
           slug: string | null;
         }> | null;
@@ -2852,9 +3614,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2864,9 +3626,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2900,7 +3674,7 @@ export type PageBySlugQueryResult = {
         heading: string | null;
         lookbookEntry: {
           _id: string;
-          _type: "page";
+          _type: "lookbook";
           title: string | null;
           slug: string | null;
         } | null;
@@ -2941,9 +3715,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2953,9 +3727,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -2998,6 +3784,27 @@ export type PageBySlugQueryResult = {
           title: string | null;
           handle: string | null;
           editorialReady: boolean | null;
+          oneLineHook: string | null;
+          heroImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
         }> | null;
         cta: {
           _type: "cta";
@@ -3014,9 +3821,9 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
-                  _type: "footer";
-                  title: null;
-                  slug: null;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -3026,9 +3833,21 @@ export type PageBySlugQueryResult = {
                 }
               | {
                   _id: string;
-                  _type: "navigation";
-                  title: null;
-                  slug: null;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
                 }
               | {
                   _id: string;
@@ -3119,12 +3938,2259 @@ export type PageBySlugQueryResult = {
             title: string | null;
             handle: string | null;
             editorialReady: boolean | null;
+            oneLineHook: string | null;
+            heroImage: {
+              _type: "vaivaeImage";
+              asset: {
+                _id: string;
+                _type: "sanity.imageAsset";
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number | null;
+                    height: number | null;
+                    aspectRatio: number | null;
+                  } | null;
+                } | null;
+              } | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+              caption: string | null;
+            } | null;
           } | null;
         }> | null;
         theme: "dark-text-on-light" | "light-text-on-dark" | null;
       }
   > | null;
 } | null;
+
+// Source: src/sanity/queries.ts
+// Variable: productByHandleQuery
+// Query: *[_type == "product" && handle.current == $handle][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  medusaProductId,  title,  "handle": handle.current,  mirrorMaterials,  editorialReady,  eyebrow,  oneLineHook,  narrative[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  pdpStorytelling[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  },  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  gallery[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  lookbookFeature->{    _id,    _type,    title,    "slug": slug.current,    coverImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  modelSpecs{    height,    wearingSize,    notes  },  "materials": array::compact(materials[]->{    _id,_type,name,composition,origin,careInstructions,"slug": slug.current,description[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  }),  colorSwatches[]{    _key,    _type,    medusaVariantOptionValueId,    swatch->{      _id,_type,name,"slug": slug.current,hex,image{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},fallbackTextColor    }  },  sizeGuide->{    _id,_type,name,"slug": slug.current,description,measurements[]{  _key,  _type,  size,  bust,  waist,  hips,  length,  note},unitSystem,tipsRichText[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  },  careNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  madeIn,  sustainabilityNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  certifications,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  }}
+export type ProductByHandleQueryResult = {
+  _id: string;
+  _type: "product";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  medusaProductId: string | null;
+  title: string | null;
+  handle: string | null;
+  mirrorMaterials: Array<string> | null;
+  editorialReady: boolean | null;
+  eyebrow: string | null;
+  oneLineHook: string | null;
+  narrative: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  pdpStorytelling: Array<
+    | {
+        _key: string;
+        _type: "imagePair";
+        eyebrow: string | null;
+        heading: string | null;
+        leftImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        leftCaption: string | null;
+        rightImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        rightCaption: string | null;
+        layout: "balanced" | "left-emphasis" | "right-emphasis" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "quote";
+        quote: string | null;
+        attribution: string | null;
+        source: string | null;
+        style: "press" | "pull" | null;
+      }
+    | {
+        _key: string;
+        _type: "videoChapter";
+        eyebrow: string | null;
+        heading: string | null;
+        muxPlaybackId: string | null;
+        posterImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+        productHotspots: Array<{
+          _key: string;
+          _type: "productHotspot";
+          label: string | null;
+          timestampSeconds: number | null;
+          product: {
+            _id: string;
+            _type: "product";
+            medusaProductId: string | null;
+            title: string | null;
+            handle: string | null;
+            editorialReady: boolean | null;
+            oneLineHook: string | null;
+            heroImage: {
+              _type: "vaivaeImage";
+              asset: {
+                _id: string;
+                _type: "sanity.imageAsset";
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number | null;
+                    height: number | null;
+                    aspectRatio: number | null;
+                  } | null;
+                } | null;
+              } | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+              caption: string | null;
+            } | null;
+          } | null;
+        }> | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
+  > | null;
+  heroImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  gallery: Array<{
+    _key: string;
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  }> | null;
+  lookbookFeature: {
+    _id: string;
+    _type: "lookbook";
+    title: string | null;
+    slug: string | null;
+    coverImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  } | null;
+  modelSpecs: {
+    height: string | null;
+    wearingSize: string | null;
+    notes: string | null;
+  } | null;
+  materials: Array<{
+    _id: string;
+    _type: "material";
+    name: string | null;
+    composition: string | null;
+    origin: string | null;
+    careInstructions: string | null;
+    slug: string | null;
+    description: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  }> | null;
+  colorSwatches: Array<{
+    _key: string;
+    _type: "productColorSwatch";
+    medusaVariantOptionValueId: string | null;
+    swatch: {
+      _id: string;
+      _type: "colorSwatch";
+      name: string | null;
+      slug: string | null;
+      hex: string | null;
+      image: {
+        _type: "vaivaeImage";
+        asset: {
+          _id: string;
+          _type: "sanity.imageAsset";
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number | null;
+              height: number | null;
+              aspectRatio: number | null;
+            } | null;
+          } | null;
+        } | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        caption: string | null;
+      } | null;
+      fallbackTextColor: "dark" | "light" | null;
+    } | null;
+  }> | null;
+  sizeGuide: {
+    _id: string;
+    _type: "sizeGuide";
+    name: string | null;
+    slug: string | null;
+    description: string | null;
+    measurements: Array<{
+      _key: string;
+      _type: "measurement";
+      size: string | null;
+      bust: string | null;
+      waist: string | null;
+      hips: string | null;
+      length: string | null;
+      note: string | null;
+    }> | null;
+    unitSystem: "both" | "cm" | "in" | null;
+    tipsRichText: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  } | null;
+  careNotes: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  madeIn: string | null;
+  sustainabilityNotes: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  certifications: Array<"BCI" | "Fair Trade" | "GOTS" | "GRS" | "OEKO-TEX"> | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: productListQuery
+// Query: *[_type == "product"] | order(title asc){  _id,  _type,  medusaProductId,  title,  "handle": handle.current,  editorialReady,  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  oneLineHook}
+export type ProductListQueryResult = Array<{
+  _id: string;
+  _type: "product";
+  medusaProductId: string | null;
+  title: string | null;
+  handle: string | null;
+  editorialReady: boolean | null;
+  heroImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  oneLineHook: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: lookbookByHandleQuery
+// Query: *[_type == "lookbook" && slug.current == $handle][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  eyebrow,  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  coverVideo{    muxAssetId  },  seasonOrDrop->{    _id,    _type,    title,    "slug": slug.current,    eyebrow,    coverImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  description[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  looks[]{    _key,    _type,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    caption,    "products": array::compact(products[]->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    })  },  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  publishedAt}
+export type LookbookByHandleQueryResult = {
+  _id: string;
+  _type: "lookbook";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  eyebrow: string | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  coverVideo: {
+    muxAssetId: string | null;
+  } | null;
+  seasonOrDrop: {
+    _id: string;
+    _type: "capsule";
+    title: string | null;
+    slug: string | null;
+    eyebrow: string | null;
+    coverImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  } | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  looks: Array<{
+    _key: string;
+    _type: "look";
+    image: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    caption: string | null;
+    products: Array<{
+      _id: string;
+      _type: "product";
+      medusaProductId: string | null;
+      title: string | null;
+      handle: string | null;
+      editorialReady: boolean | null;
+      oneLineHook: string | null;
+      heroImage: {
+        _type: "vaivaeImage";
+        asset: {
+          _id: string;
+          _type: "sanity.imageAsset";
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number | null;
+              height: number | null;
+              aspectRatio: number | null;
+            } | null;
+          } | null;
+        } | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        caption: string | null;
+      } | null;
+    }> | null;
+  }> | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  publishedAt: string | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: lookbookListQuery
+// Query: *[_type == "lookbook"] | order(publishedAt desc){  _id,  _type,  title,  "slug": slug.current,  eyebrow,  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  publishedAt}
+export type LookbookListQueryResult = Array<{
+  _id: string;
+  _type: "lookbook";
+  title: string | null;
+  slug: string | null;
+  eyebrow: string | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  publishedAt: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: journalEntryQuery
+// Query: *[_type == "journal" && slug.current == $slug][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  subtitle,  eyebrow,  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  excerpt,  body[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  tags,  "relatedProducts": array::compact(relatedProducts[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  "relatedLookbooks": array::compact(relatedLookbooks[]->{    _id,    _type,    title,    "slug": slug.current,    coverImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  }),  author,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  publishedAt}
+export type JournalEntryQueryResult = {
+  _id: string;
+  _type: "journal";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  subtitle: string | null;
+  eyebrow: string | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  excerpt: string | null;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+        listItem?: never;
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "vaivaeImage";
+        asset: {
+          _id: string;
+          _type: "sanity.imageAsset";
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number | null;
+              height: number | null;
+              aspectRatio: number | null;
+            } | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        caption: string | null;
+      }
+  > | null;
+  tags: Array<string> | null;
+  relatedProducts: Array<{
+    _id: string;
+    _type: "product";
+    medusaProductId: string | null;
+    title: string | null;
+    handle: string | null;
+    editorialReady: boolean | null;
+    oneLineHook: string | null;
+    heroImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  }> | null;
+  relatedLookbooks: Array<{
+    _id: string;
+    _type: "lookbook";
+    title: string | null;
+    slug: string | null;
+    coverImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  }> | null;
+  author: string | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  publishedAt: string | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: journalListQuery
+// Query: *[_type == "journal"] | order(publishedAt desc){  _id,  _type,  title,  "slug": slug.current,  subtitle,  eyebrow,  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  excerpt,  tags,  author,  publishedAt}
+export type JournalListQueryResult = Array<{
+  _id: string;
+  _type: "journal";
+  title: string | null;
+  slug: string | null;
+  subtitle: string | null;
+  eyebrow: string | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  excerpt: string | null;
+  tags: Array<string> | null;
+  author: string | null;
+  publishedAt: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: capsuleByHandleQuery
+// Query: *[_type == "capsule" && slug.current == $handle][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  eyebrow,  description[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  coverVideo{    muxAssetId  },  pageBuilder[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  },  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  releaseDate,  endDate}
+export type CapsuleByHandleQueryResult = {
+  _id: string;
+  _type: "capsule";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  eyebrow: string | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  coverVideo: {
+    muxAssetId: string | null;
+  } | null;
+  pageBuilder: Array<
+    | {
+        _key: string;
+        _type: "ctaSection";
+        eyebrow: string | null;
+        heading: string | null;
+        body: string | null;
+        primaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        secondaryCta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        background: {
+          type: "image" | "solidColor" | null;
+          solidColor:
+            | "accent-gold"
+            | "accent-orange"
+            | "accent-red"
+            | "cream"
+            | "ink"
+            | "oxblood"
+            | null;
+          image: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
+    | {
+        _key: string;
+        _type: "editorialExcerpt";
+        journalEntry: {
+          _id: string;
+          _type: "journal";
+          title: string | null;
+          slug: string | null;
+        } | null;
+        eyebrow: string | null;
+        customHeading: string | null;
+        quote: string | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "heroFilm";
+        eyebrow: string | null;
+        heading: string | null;
+        subhead: string | null;
+        media: {
+          sourceType: "directUrl" | "image" | "mux" | null;
+          muxPlaybackId: string | null;
+          directUrl: string | null;
+          posterImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        } | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+        scrollIndicator: boolean | null;
+        marquee: {
+          enabled: boolean | null;
+          text: string | null;
+          separator: string | null;
+          speed: number | null;
+          direction: "left" | "right" | null;
+        } | null;
+        chapters: Array<{
+          _key: string;
+          _type: "heroFilmChapter";
+          eyebrow: string | null;
+          heading: string | null;
+          body: Array<{
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+            listItem?: never;
+            markDefs?: Array<{
+              href?: string;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }> | null;
+          note: string | null;
+          mediaPoster: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+          align: "left" | "right" | null;
+        }> | null;
+        terminalCta: {
+          eyebrow: string | null;
+          heading: string | null;
+          body: string | null;
+          primaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+          secondaryCta: {
+            _type: "cta";
+            label: string | null;
+            link: {
+              _type: "link";
+              type: "external" | "internal" | null;
+              label: string | null;
+              internal: {
+                _ref: string;
+                _type: "reference";
+                _weak: boolean | null;
+              } | null;
+              internalTarget:
+                | {
+                    _id: string;
+                    _type: "capsule";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "homePage";
+                    title: string | null;
+                    slug: null;
+                  }
+                | {
+                    _id: string;
+                    _type: "journal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "legal";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "lookbook";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "page";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "product";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
+                    _type: "siteSettings";
+                    title: string | null;
+                    slug: null;
+                  }
+                | null;
+              href: string | null;
+              targetBlank: boolean | null;
+            } | null;
+            style: "ghost" | "primary" | "underline" | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "imagePair";
+        eyebrow: string | null;
+        heading: string | null;
+        leftImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        leftCaption: string | null;
+        rightImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        rightCaption: string | null;
+        layout: "balanced" | "left-emphasis" | "right-emphasis" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "lookbookGrid";
+        eyebrow: string | null;
+        heading: string | null;
+        lookbookEntry: {
+          _id: string;
+          _type: "lookbook";
+          title: string | null;
+          slug: string | null;
+        } | null;
+        images: Array<{
+          _key: string;
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        }> | null;
+        layout: "grid" | "scroll" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "productRail";
+        eyebrow: string | null;
+        heading: string | null;
+        intro: string | null;
+        layout: "carousel" | "grid" | null;
+        columns: number | null;
+        density: "compact" | "spacious" | "standard" | null;
+        products: Array<{
+          _id: string;
+          _type: "product";
+          medusaProductId: string | null;
+          title: string | null;
+          handle: string | null;
+          editorialReady: boolean | null;
+          oneLineHook: string | null;
+          heroImage: {
+            _type: "vaivaeImage";
+            asset: {
+              _id: string;
+              _type: "sanity.imageAsset";
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number | null;
+                  height: number | null;
+                  aspectRatio: number | null;
+                } | null;
+              } | null;
+            } | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+            alt: string | null;
+            caption: string | null;
+          } | null;
+        }> | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "quote";
+        quote: string | null;
+        attribution: string | null;
+        source: string | null;
+        style: "press" | "pull" | null;
+      }
+  > | null;
+  products: Array<{
+    _id: string;
+    _type: "product";
+    medusaProductId: string | null;
+    title: string | null;
+    handle: string | null;
+    editorialReady: boolean | null;
+    oneLineHook: string | null;
+    heroImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  }> | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  releaseDate: string | null;
+  endDate: string | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: capsuleListQuery
+// Query: *[_type == "capsule"] | order(coalesce(releaseDate, _createdAt) desc){  _id,  _type,  title,  "slug": slug.current,  eyebrow,  coverImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  releaseDate,  endDate}
+export type CapsuleListQueryResult = Array<{
+  _id: string;
+  _type: "capsule";
+  title: string | null;
+  slug: string | null;
+  eyebrow: string | null;
+  coverImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  releaseDate: string | null;
+  endDate: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: legalBySlugQuery
+// Query: *[_type == "legal" && slug.current == $slug][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  kind,  body[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  lastUpdated,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  }}
+export type LegalBySlugQueryResult = {
+  _id: string;
+  _type: "legal";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  kind:
+    | "accessibility"
+    | "cookies"
+    | "imprint"
+    | "privacy"
+    | "returns"
+    | "shipping"
+    | "terms"
+    | "wholesale"
+    | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  lastUpdated: string | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: legalListQuery
+// Query: *[_type == "legal"] | order(title asc){  _id,  _type,  title,  "slug": slug.current,  kind,  lastUpdated}
+export type LegalListQueryResult = Array<{
+  _id: string;
+  _type: "legal";
+  title: string | null;
+  slug: string | null;
+  kind:
+    | "accessibility"
+    | "cookies"
+    | "imprint"
+    | "privacy"
+    | "returns"
+    | "shipping"
+    | "terms"
+    | "wholesale"
+    | null;
+  lastUpdated: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: sizeGuideByIdQuery
+// Query: *[_type == "sizeGuide" && _id == $id][0]{  _id,_type,name,"slug": slug.current,description,measurements[]{  _key,  _type,  size,  bust,  waist,  hips,  length,  note},unitSystem,tipsRichText[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}}
+export type SizeGuideByIdQueryResult = {
+  _id: string;
+  _type: "sizeGuide";
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  measurements: Array<{
+    _key: string;
+    _type: "measurement";
+    size: string | null;
+    bust: string | null;
+    waist: string | null;
+    hips: string | null;
+    length: string | null;
+    note: string | null;
+  }> | null;
+  unitSystem: "both" | "cm" | "in" | null;
+  tipsRichText: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: materialBySlugQuery
+// Query: *[_type == "material" && slug.current == $slug][0]{  _id,_type,name,composition,origin,careInstructions,"slug": slug.current,description[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}}
+export type MaterialBySlugQueryResult = {
+  _id: string;
+  _type: "material";
+  name: string | null;
+  composition: string | null;
+  origin: string | null;
+  careInstructions: string | null;
+  slug: string | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: materialListQuery
+// Query: *[_type == "material"] | order(name asc){  _id,_type,name,composition,origin,careInstructions,"slug": slug.current,description[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}}
+export type MaterialListQueryResult = Array<{
+  _id: string;
+  _type: "material";
+  name: string | null;
+  composition: string | null;
+  origin: string | null;
+  careInstructions: string | null;
+  slug: string | null;
+  description: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: colorSwatchBySlugQuery
+// Query: *[_type == "colorSwatch" && slug.current == $slug][0]{  _id,_type,name,"slug": slug.current,hex,image{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},fallbackTextColor}
+export type ColorSwatchBySlugQueryResult = {
+  _id: string;
+  _type: "colorSwatch";
+  name: string | null;
+  slug: string | null;
+  hex: string | null;
+  image: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  fallbackTextColor: "dark" | "light" | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: colorSwatchListQuery
+// Query: *[_type == "colorSwatch"] | order(name asc){  _id,_type,name,"slug": slug.current,hex,image{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},fallbackTextColor}
+export type ColorSwatchListQueryResult = Array<{
+  _id: string;
+  _type: "colorSwatch";
+  name: string | null;
+  slug: string | null;
+  hex: string | null;
+  image: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  fallbackTextColor: "dark" | "light" | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: sizeGuideListQuery
+// Query: *[_type == "sizeGuide"] | order(name asc){  _id,_type,name,"slug": slug.current,description,measurements[]{  _key,  _type,  size,  bust,  waist,  hips,  length,  note},unitSystem,tipsRichText[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}}
+export type SizeGuideListQueryResult = Array<{
+  _id: string;
+  _type: "sizeGuide";
+  name: string | null;
+  slug: string | null;
+  description: string | null;
+  measurements: Array<{
+    _key: string;
+    _type: "measurement";
+    size: string | null;
+    bust: string | null;
+    waist: string | null;
+    hips: string | null;
+    length: string | null;
+    note: string | null;
+  }> | null;
+  unitSystem: "both" | "cm" | "in" | null;
+  tipsRichText: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+}>;
 
 // Source: src/sanity/queries.ts
 // Variable: globalQuery
@@ -3254,9 +6320,9 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3266,9 +6332,21 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3305,9 +6383,9 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3317,9 +6395,21 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3356,9 +6446,9 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3368,9 +6458,21 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3408,9 +6510,9 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3420,9 +6522,21 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3470,9 +6584,9 @@ export type GlobalQueryResult = {
         internalTarget:
           | {
               _id: string;
-              _type: "footer";
-              title: null;
-              slug: null;
+              _type: "capsule";
+              title: string | null;
+              slug: string | null;
             }
           | {
               _id: string;
@@ -3482,9 +6596,21 @@ export type GlobalQueryResult = {
             }
           | {
               _id: string;
-              _type: "navigation";
-              title: null;
-              slug: null;
+              _type: "journal";
+              title: string | null;
+              slug: string | null;
+            }
+          | {
+              _id: string;
+              _type: "legal";
+              title: string | null;
+              slug: string | null;
+            }
+          | {
+              _id: string;
+              _type: "lookbook";
+              title: string | null;
+              slug: string | null;
             }
           | {
               _id: string;
@@ -3526,9 +6652,9 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
-            _type: "footer";
-            title: null;
-            slug: null;
+            _type: "capsule";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3538,9 +6664,21 @@ export type GlobalQueryResult = {
           }
         | {
             _id: string;
-            _type: "navigation";
-            title: null;
-            slug: null;
+            _type: "journal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "legal";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
+            _type: "lookbook";
+            title: string | null;
+            slug: string | null;
           }
         | {
             _id: string;
@@ -3578,8 +6716,24 @@ declare module "@sanity/client" {
     '*[_type == "siteSettings" && _id == "siteSettings"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  siteName,\n  tagline,\n  logo{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  favicon{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  defaultSeo{\n    _type,\n    title,\n    description,\n    noindex,\n    ogImage{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    keywords\n  },\n  defaultRegion,\n  defaultCurrency,\n  contactEmail,\n  pressEmail,\n  wholesaleEmail,\n  address{\n    _type,\n    line1,\n    line2,\n    city,\n    region,\n    postalCode,\n    country\n  },\n  socialLinks[]{\n    _key,\n    _type,\n    platform,\n    handle,\n    url\n  }\n}': SiteSettingsQueryResult;
     '*[_type == "navigation" && _id == "navigation"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  headerLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  secondaryLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  mobileMenuExtras[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  promoBannerEnabled,\n  promoBannerText,\n  promoBannerLink{\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  }\n}': NavigationQueryResult;
     '*[_type == "footer" && _id == "footer"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  columns[]{\n    _key,\n    _type,\n    title,\n    links[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  newsletterEnabled,\n  newsletterHeading,\n  newsletterDescription,\n  newsletterCtaLabel,\n  legalLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  copyrightText,\n  paymentMethods\n}': FooterQueryResult;
-    '*[_type == "homePage" && _id == "homePage"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': HomePageQueryResult;
-    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': PageBySlugQueryResult;
+    '*[_type == "homePage" && _id == "homePage"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': HomePageQueryResult;
+    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': PageBySlugQueryResult;
+    '*[_type == "product" && handle.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  mirrorMaterials,\n  editorialReady,\n  eyebrow,\n  oneLineHook,\n  narrative[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  pdpStorytelling[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  },\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  gallery[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  lookbookFeature->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  modelSpecs{\n    height,\n    wearingSize,\n    notes\n  },\n  "materials": array::compact(materials[]->{\n    _id,\n_type,\nname,\ncomposition,\norigin,\ncareInstructions,\n"slug": slug.current,\ndescription[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  }),\n  colorSwatches[]{\n    _key,\n    _type,\n    medusaVariantOptionValueId,\n    swatch->{\n      _id,\n_type,\nname,\n"slug": slug.current,\nhex,\nimage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nfallbackTextColor\n    }\n  },\n  sizeGuide->{\n    _id,\n_type,\nname,\n"slug": slug.current,\ndescription,\nmeasurements[]{\n  _key,\n  _type,\n  size,\n  bust,\n  waist,\n  hips,\n  length,\n  note\n},\nunitSystem,\ntipsRichText[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  },\n  careNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  madeIn,\n  sustainabilityNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  certifications,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  }\n}': ProductByHandleQueryResult;
+    '*[_type == "product"] | order(title asc){\n  _id,\n  _type,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  editorialReady,\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  oneLineHook\n}': ProductListQueryResult;
+    '*[_type == "lookbook" && slug.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  coverVideo{\n    muxAssetId\n  },\n  seasonOrDrop->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    eyebrow,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  description[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  looks[]{\n    _key,\n    _type,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    caption,\n    "products": array::compact(products[]->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    })\n  },\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': LookbookByHandleQueryResult;
+    '*[_type == "lookbook"] | order(publishedAt desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  publishedAt\n}': LookbookListQueryResult;
+    '*[_type == "journal" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  subtitle,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  excerpt,\n  body[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  tags,\n  "relatedProducts": array::compact(relatedProducts[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  "relatedLookbooks": array::compact(relatedLookbooks[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  }),\n  author,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': JournalEntryQueryResult;
+    '*[_type == "journal"] | order(publishedAt desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  subtitle,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  excerpt,\n  tags,\n  author,\n  publishedAt\n}': JournalListQueryResult;
+    '*[_type == "capsule" && slug.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  description[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  coverVideo{\n    muxAssetId\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  },\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  releaseDate,\n  endDate\n}': CapsuleByHandleQueryResult;
+    '*[_type == "capsule"] | order(coalesce(releaseDate, _createdAt) desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  releaseDate,\n  endDate\n}': CapsuleListQueryResult;
+    '*[_type == "legal" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  kind,\n  body[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  lastUpdated,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  }\n}': LegalBySlugQueryResult;
+    '*[_type == "legal"] | order(title asc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  kind,\n  lastUpdated\n}': LegalListQueryResult;
+    '*[_type == "sizeGuide" && _id == $id][0]{\n  _id,\n_type,\nname,\n"slug": slug.current,\ndescription,\nmeasurements[]{\n  _key,\n  _type,\n  size,\n  bust,\n  waist,\n  hips,\n  length,\n  note\n},\nunitSystem,\ntipsRichText[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n}': SizeGuideByIdQueryResult;
+    '*[_type == "material" && slug.current == $slug][0]{\n  _id,\n_type,\nname,\ncomposition,\norigin,\ncareInstructions,\n"slug": slug.current,\ndescription[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n}': MaterialBySlugQueryResult;
+    '*[_type == "material"] | order(name asc){\n  _id,\n_type,\nname,\ncomposition,\norigin,\ncareInstructions,\n"slug": slug.current,\ndescription[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n}': MaterialListQueryResult;
+    '*[_type == "colorSwatch" && slug.current == $slug][0]{\n  _id,\n_type,\nname,\n"slug": slug.current,\nhex,\nimage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nfallbackTextColor\n}': ColorSwatchBySlugQueryResult;
+    '*[_type == "colorSwatch"] | order(name asc){\n  _id,\n_type,\nname,\n"slug": slug.current,\nhex,\nimage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nfallbackTextColor\n}': ColorSwatchListQueryResult;
+    '*[_type == "sizeGuide"] | order(name asc){\n  _id,\n_type,\nname,\n"slug": slug.current,\ndescription,\nmeasurements[]{\n  _key,\n  _type,\n  size,\n  bust,\n  waist,\n  hips,\n  length,\n  note\n},\nunitSystem,\ntipsRichText[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n}': SizeGuideListQueryResult;
     '{\n  "siteSettings": *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    siteName,\n    tagline,\n    logo{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    favicon{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    defaultSeo{\n      _type,\n      title,\n      description,\n      noindex,\n      ogImage{\n        _type,\n        asset->{\n          _id,\n          _type,\n          url,\n          metadata{\n            lqip,\n            dimensions{\n              width,\n              height,\n              aspectRatio\n            }\n          }\n        },\n        hotspot,\n        crop,\n        alt,\n        caption\n      },\n      keywords\n    },\n    defaultRegion,\n    defaultCurrency,\n    contactEmail,\n    pressEmail,\n    wholesaleEmail,\n    address{\n      _type,\n      line1,\n      line2,\n      city,\n      region,\n      postalCode,\n      country\n    },\n    socialLinks[]{\n      _key,\n      _type,\n      platform,\n      handle,\n      url\n    }\n  },\n  "navigation": *[_type == "navigation" && _id == "navigation"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    headerLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    secondaryLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    mobileMenuExtras[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    promoBannerEnabled,\n    promoBannerText,\n    promoBannerLink{\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  "footer": *[_type == "footer" && _id == "footer"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    columns[]{\n      _key,\n      _type,\n      title,\n      links[]{\n        _key,\n        _type,\n        type,\n        label,\n        internal{\n          _ref,\n          _type,\n          _weak\n        },\n        "internalTarget": internal->{\n          _id,\n          _type,\n          "title": coalesce(siteName, title, name),\n          "slug": slug.current\n        },\n        href,\n        targetBlank\n      }\n    },\n    newsletterEnabled,\n    newsletterHeading,\n    newsletterDescription,\n    newsletterCtaLabel,\n    legalLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    copyrightText,\n    paymentMethods\n  }\n}': GlobalQueryResult;
   }
 }

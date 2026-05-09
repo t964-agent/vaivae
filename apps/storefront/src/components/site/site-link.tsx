@@ -54,7 +54,7 @@ function routeFromTarget(target: ChromeInternalTarget | null): string | null {
 
   switch (target._type) {
     case "capsule":
-      return `/capsules/${target.slug}`;
+      return `/capsule/${target.slug}`;
     case "journal":
       return `/journal/${target.slug}`;
     case "legal":

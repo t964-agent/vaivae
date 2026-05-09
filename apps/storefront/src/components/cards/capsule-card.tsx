@@ -79,7 +79,7 @@ export function CapsuleCard({ capsule }: CapsuleCardProps) {
   return (
     <Link
       className="block focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
-      href={`/capsules/${slug}` as Route}
+      href={`/capsule/${slug}` as Route}
     >
       {content}
     </Link>

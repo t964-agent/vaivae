@@ -1,6 +1,8 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Fraunces, Inter_Tight } from "next/font/google";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
@@ -43,7 +45,7 @@ async function getInitialCart(): Promise<StoreCart | null> {
 }
 
 export default async function SiteLayout({ children }: SiteLayoutProps) {
-  const cart = await getInitialCart();
+  const [cart, draft] = await Promise.all([getInitialCart(), draftMode()]);
   const cartItemCount = getCartItemCount(cart);
 
   return (
@@ -87,6 +89,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
       </CartUiProvider>
       {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
       <SanityLive />
+      {draft.isEnabled ? <VisualEditing /> : null}
       {/* PostHog will be wired in Agent 24 once Termly consent gating is in place per ADR-015 / §8.7.5. */}
       <SpeedInsights />
       <Analytics />

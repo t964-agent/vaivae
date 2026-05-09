@@ -2161,6 +2161,8 @@ Implementation:
 - Sample rates: traces 0.1, replay 0.0 at launch (replay is privacy-sensitive; revisit in Phase 2).
 - PII scrubbing: emails, addresses, payment data redacted before send.
 - Source maps uploaded in CI for storefront releases.
+- Storefront and Medusa both set `sendDefaultPii: false` and use `beforeSend` + `beforeBreadcrumb` scrubbing for email, phone, address, name, token, payment, card-shaped strings, and URL query strings.
+- Medusa initializes `@sentry/node` from `apps/medusa/instrumentation.ts` before app modules run; `SENTRY_DSN` is optional locally and required in managed environments by deployment policy.
 
 #### 8.7.2 GA4
 
@@ -2198,6 +2200,10 @@ Implementation:
 - Essential cookies (cart, session) explicitly excluded from consent gating.
 - Tag firing strategy: **opt-in globally** (GDPR-equivalent posture) per [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).
 - Google Consent Mode v2 enabled — tags load in "denied" state and only switch to "granted" after consent.
+- Runtime flow: Termly CMP → `useConsent()` → `AnalyticsProvider` → consent-gated PostHog, GTM/GA4, and Klaviyo onsite scripts.
+- PostHog initializes only after `analytics` consent with `autocapture` and automatic pageviews disabled; route changes emit explicit pageviews.
+- GTM loads only after `advertising` consent. Google Consent Mode v2 defaults are denied before GTM loads, then updated from `useConsent()`.
+- Klaviyo onsite loads only after `analytics` consent. `klaviyo.identify()` is allowed only after consent plus a real identification event; email is never sent by generic page tracking.
 
 #### 8.7.6 Loading Discipline
 
@@ -2205,6 +2211,7 @@ Implementation:
   - `lazyOnload` for Crisp, GTM after consent
   - `afterInteractive` for Sentry (must capture client errors)
 - **Zero** third-party scripts on `/checkout/*` and `/account/*` routes (consent banner aside).
+- Client ecommerce events on checkout/confirmation use the typed `track()` helper and only dispatch if consent and an already-initialized analytics client are present; these routes do not load analytics tag scripts directly.
 
 ---
 
@@ -2602,12 +2609,15 @@ Lightweight STRIDE-style enumeration of the most likely threats and mitigations.
 #### 10.4.2 Content Security Policy
 
 - Strict CSP enforced on storefront:
-  - `script-src` restricted to self + Stripe + GTM (consent-gated) + Sanity Studio domains
-  - `frame-src` restricted to Stripe + Mux + Sanity preview
-  - `connect-src` restricted to self + Medusa + Sanity + Stripe + analytics
-  - `img-src` permissive for Sanity CDN + Medusa CDN + data URIs for Stripe
+  - `script-src` restricted to self with per-request nonces plus consent-gated vendors: Stripe, Termly, GTM/GA, PostHog, Klaviyo.
+  - `style-src` restricted to self, Google Fonts, Termly, and temporary `'unsafe-inline'` for third-party widgets.
+  - `frame-src` restricted to self, Stripe, Termly, Mux player, and GTM preview/debug frames.
+  - `connect-src` restricted to self, Medusa, Sanity, Stripe, HIBP, Termly, Mux/Litix, GTM/GA, PostHog, Klaviyo, Vercel Insights, and Sentry ingest.
+  - `img-src` permits self, data/blob, Sanity CDN, Mux/Litix, Stripe beacons, GTM/GA beacons, PostHog, Klaviyo, Termly, and Vercel preview hosts.
+  - `font-src` permits self, Google Fonts, and data URIs.
+  - `frame-ancestors 'self'`, `object-src 'none'`, `script-src-attr 'none'`, `base-uri 'self'`, and `form-action 'self' https://hooks.stripe.com` are always present.
   - Inline scripts forbidden (CSP nonces only where unavoidable)
-- CSP report-only during initial dev, enforced from staging onwards.
+- CSP is emitted as `Content-Security-Policy-Report-Only` by default. Set `CSP_ENFORCE=true` after monitoring to emit the enforcing `Content-Security-Policy` header.
 
 ### 10.5 Backups & Disaster Recovery
 
@@ -3105,6 +3115,15 @@ Standardized event taxonomy across GA4 and PostHog:
 | `newsletter_signup`                | Email captured            | `source`                                          |
 
 `purchase` events fire **both** client-side (GA4 / PostHog via consent-gated SDK) **and** server-side from Medusa subscriber via GA4 Measurement Protocol (resilient to ad-blockers).
+
+Agent 24 launch wiring:
+
+- `view_item`: PDP mount, client-side via typed `track()`.
+- `add_to_cart`: successful add-to-cart action, client-side via typed `track()`.
+- `view_cart`: cart drawer opens with a non-empty cart, client-side via typed `track()`.
+- `begin_checkout`: checkout page mount, client-side via typed `track()` when consent/client state already exists.
+- `purchase`: confirmation page mount, client-side via typed `track()` when consent/client state already exists.
+- Web Vitals (`LCP`, `INP`, `CLS`) report to Sentry metrics on the client and to PostHog only after analytics consent.
 
 #### 13.3.3 PII
 

@@ -2,6 +2,7 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { TrackEventOnMount } from "@/components/analytics/track-event-on-mount";
 import { ClearCartCookie } from "@/components/checkout/clear-cart-cookie";
 import { Button, Separator } from "@/components/ui";
 import { formatPrice } from "@/lib/format";
@@ -89,6 +90,14 @@ function getDeliveryEstimate(order: StoreOrder): string {
   return "Estimated delivery: 3-5 business days after dispatch.";
 }
 
+function getAnalyticsValue(amount: number | null | undefined): number {
+  return typeof amount === "number" ? amount / 100 : 0;
+}
+
+function getAnalyticsCurrency(currencyCode: string | null | undefined): string {
+  return (currencyCode?.trim() || "usd").toUpperCase();
+}
+
 function OrderItems({ order }: { order: StoreOrder }) {
   const items = order.items ?? [];
 
@@ -156,6 +165,16 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
   return (
     <div className="min-h-dvh bg-cream px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
       <ClearCartCookie />
+      <TrackEventOnMount
+        event={{
+          name: "purchase",
+          props: {
+            currency: getAnalyticsCurrency(order.currency_code),
+            orderId: order.id,
+            value: getAnalyticsValue(order.total),
+          },
+        }}
+      />
       <article className="mx-auto grid max-w-5xl gap-10" aria-labelledby="confirmation-heading">
         <div className="grid gap-5 border-b border-on-light/10 pb-10">
           <p className="font-body text-[0.68rem] tracking-[0.24em] text-on-light/45 uppercase">

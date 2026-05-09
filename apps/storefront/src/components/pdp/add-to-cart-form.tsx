@@ -22,6 +22,7 @@ import {
   Stack,
 } from "@/components/ui";
 import { dispatchCartUpdated } from "@/lib/cart-events";
+import { track } from "@/lib/analytics/track";
 import { addLineItemAction } from "@/medusa/actions";
 import type { StoreProduct, StoreProductVariant } from "@/medusa/types";
 import { toast } from "@/lib/toast";
@@ -78,6 +79,16 @@ function formatPrice(variant: StoreProductVariant | null | undefined): string {
     currency: currencyCode.toUpperCase(),
     style: "currency",
   }).format(amount / 100);
+}
+
+function getAnalyticsPrice(variant: StoreProductVariant | null | undefined): number {
+  const amount = variant?.calculated_price?.calculated_amount;
+
+  return typeof amount === "number" ? amount / 100 : 0;
+}
+
+function getAnalyticsCurrency(variant: StoreProductVariant | null | undefined): string {
+  return (variant?.calculated_price?.currency_code?.trim() || "usd").toUpperCase();
 }
 
 function getMaxQuantity(variant: StoreProductVariant | null | undefined): number {
@@ -155,6 +166,15 @@ export function AddToCartForm({
       void addLineItemAction({ quantity: values.quantity, variantId: values.variantId }).then(
         (result) => {
           if (result.ok) {
+            track({
+              name: "add_to_cart",
+              props: {
+                currency: getAnalyticsCurrency(selectedVariant),
+                price: getAnalyticsPrice(selectedVariant),
+                quantity: values.quantity,
+                variantId: values.variantId,
+              },
+            });
             dispatchCartUpdated(result.cart);
             markAdded(values.variantId);
             openCart();

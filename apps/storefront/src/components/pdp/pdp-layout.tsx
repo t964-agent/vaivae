@@ -1,6 +1,7 @@
 import type { Route } from "next";
 import Link from "next/link";
 
+import { TrackEventOnMount } from "@/components/analytics/track-event-on-mount";
 import { RichText } from "@/components/atoms/rich-text";
 import { SectionBody, SectionEyebrow, SectionHeading } from "@/components/atoms/section-text";
 import { VaivaeImage } from "@/components/atoms/vaivae-image";
@@ -11,6 +12,7 @@ import type { PageBuilderModule, PageBuilderModuleOf } from "@/components/page-b
 import { asPortableText } from "@/components/page-builder/utils";
 import { Badge, Container, HStack, Stack } from "@/components/ui";
 import { listEditorialProducts, type EditorialProduct } from "@/lib/sanity/products";
+import type { AnalyticsEvent } from "@/lib/analytics/track";
 import type { StoreProduct } from "@/medusa/types";
 import type { ProductEditorialFragment } from "@/lib/sanity/products";
 import type { SanityImage } from "@/sanity/types";
@@ -83,6 +85,30 @@ function getEyebrow(product: StoreProduct, editorial: EditorialProduct): string 
   const collectionTitle = product.collection?.title?.trim();
 
   return editorialEyebrow || categoryName || collectionTitle || "Product";
+}
+
+function getPriceAmount(amount: number | null | undefined): number {
+  return typeof amount === "number" ? amount / 100 : 0;
+}
+
+function getCurrencyCode(currencyCode: string | null | undefined): string {
+  return (currencyCode?.trim() || "usd").toUpperCase();
+}
+
+function getViewItemEvent(product: StoreProduct): AnalyticsEvent {
+  const pricedVariant = product.variants?.find(
+    (variant) => typeof variant.calculated_price?.calculated_amount === "number",
+  );
+
+  return {
+    name: "view_item",
+    props: {
+      currency: getCurrencyCode(pricedVariant?.calculated_price?.currency_code),
+      price: getPriceAmount(pricedVariant?.calculated_price?.calculated_amount),
+      productId: product.id,
+      productName: product.title?.trim() || product.id,
+    },
+  };
 }
 
 function getRecommendationProductFragment(
@@ -187,6 +213,7 @@ export async function PdpLayout({
 
   return (
     <>
+      <TrackEventOnMount event={getViewItemEvent(product)} />
       <Container asChild variant="wide">
         <section className="pt-24 pb-16 md:pt-32 md:pb-24" aria-labelledby="product-heading">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:items-start xl:gap-16">

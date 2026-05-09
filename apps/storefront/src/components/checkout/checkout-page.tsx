@@ -2,7 +2,7 @@
 
 import type { Route } from "next";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { CheckoutAddressStep } from "@/components/checkout/checkout-address-step";
 import { CheckoutContactStep } from "@/components/checkout/checkout-contact-step";
@@ -17,6 +17,7 @@ import type {
   CheckoutStep,
 } from "@/components/checkout/types";
 import { Button } from "@/components/ui";
+import { track } from "@/lib/analytics/track";
 import { dispatchCartUpdated } from "@/lib/cart-events";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -144,6 +145,14 @@ function getShippingMethodSummary(cart: StoreCart): string {
   return cart.shipping_methods?.[0]?.name ?? "Delivery method selected";
 }
 
+function getCartValue(cart: StoreCart): number {
+  return typeof cart.total === "number" ? cart.total / 100 : 0;
+}
+
+function getCurrencyCode(currencyCode: string | null | undefined): string {
+  return (currencyCode?.trim() || "usd").toUpperCase();
+}
+
 function getInitialCheckoutStep(cart: StoreCart): CheckoutStep {
   if (!cart.email) {
     return "contact";
@@ -235,6 +244,23 @@ export function CheckoutPage({
     getShippingMethodId(initialCart),
   );
   const [paymentReady, setPaymentReady] = useState(false);
+  const hasTrackedBeginCheckoutRef = useRef(false);
+
+  useEffect(() => {
+    if (hasTrackedBeginCheckoutRef.current) {
+      return;
+    }
+
+    hasTrackedBeginCheckoutRef.current = true;
+    track({
+      name: "begin_checkout",
+      props: {
+        cartId: initialCart.id,
+        currency: getCurrencyCode(initialCart.currency_code),
+        value: getCartValue(initialCart),
+      },
+    });
+  }, [initialCart]);
 
   function commitCart(nextCart: StoreCart): void {
     setCart(nextCart);

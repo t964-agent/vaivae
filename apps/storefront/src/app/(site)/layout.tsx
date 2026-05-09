@@ -1,13 +1,14 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Fraunces, Inter_Tight } from "next/font/google";
-import { draftMode } from "next/headers";
+import { draftMode, headers } from "next/headers";
 import Script from "next/script";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { CartUiProvider } from "@/components/providers/cart-ui-provider";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -59,9 +60,14 @@ function getTermlyWebsiteUuid(): string | undefined {
 }
 
 export default async function SiteLayout({ children }: SiteLayoutProps) {
-  const [cart, draft] = await Promise.all([getInitialCart(), draftMode()]);
+  const [cart, draft, requestHeaders] = await Promise.all([
+    getInitialCart(),
+    draftMode(),
+    headers(),
+  ]);
   const cartItemCount = getCartItemCount(cart);
   const termlyWebsiteUuid = getTermlyWebsiteUuid();
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
 
   return (
     <div
@@ -69,6 +75,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
     >
       {termlyWebsiteUuid ? (
         <Script
+          nonce={nonce}
           src={`https://app.termly.io/embed.min.js?autoBlock=on&websiteUUID=${termlyWebsiteUuid}`}
           strategy="afterInteractive"
         />
@@ -76,42 +83,43 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <CartUiProvider>
-        <NuqsAdapter>
-          <SiteHeader cartItemCount={cartItemCount} />
-          <main className="min-h-dvh" id="main-content">
-            {children}
-          </main>
-          <SiteFooter />
-        </NuqsAdapter>
-        <CartDrawer initialCart={cart} key={cart?.id ?? "empty-cart"} />
-        <Toaster
-          closeButton
-          position="bottom-center"
-          richColors
-          theme="light"
-          toastOptions={{
-            closeButtonAriaLabel: "Dismiss toast",
-            classNames: {
-              actionButton: "bg-oxblood! text-on-dark!",
-              cancelButton: "bg-on-light/10! text-on-light!",
-              closeButton: "border-on-light/20! bg-cream! text-on-light!",
-              description: "font-body! text-on-light/65!",
-              error: "border-accent-red/45!",
-              info: "border-ink/20!",
-              success: "border-accent-gold/45!",
-              title: "font-body! font-medium! tracking-[-0.01em] text-on-light!",
-              toast: "border-on-light/10! bg-cream! text-on-light! shadow-fine!",
-              warning: "border-accent-orange/45!",
-            },
-            duration: 4500,
-          }}
-        />
-      </CartUiProvider>
+      <AnalyticsProvider nonce={nonce}>
+        <CartUiProvider>
+          <NuqsAdapter>
+            <SiteHeader cartItemCount={cartItemCount} />
+            <main className="min-h-dvh" id="main-content">
+              {children}
+            </main>
+            <SiteFooter />
+          </NuqsAdapter>
+          <CartDrawer initialCart={cart} key={cart?.id ?? "empty-cart"} />
+          <Toaster
+            closeButton
+            position="bottom-center"
+            richColors
+            theme="light"
+            toastOptions={{
+              closeButtonAriaLabel: "Dismiss toast",
+              classNames: {
+                actionButton: "bg-oxblood! text-on-dark!",
+                cancelButton: "bg-on-light/10! text-on-light!",
+                closeButton: "border-on-light/20! bg-cream! text-on-light!",
+                description: "font-body! text-on-light/65!",
+                error: "border-accent-red/45!",
+                info: "border-ink/20!",
+                success: "border-accent-gold/45!",
+                title: "font-body! font-medium! tracking-[-0.01em] text-on-light!",
+                toast: "border-on-light/10! bg-cream! text-on-light! shadow-fine!",
+                warning: "border-accent-orange/45!",
+              },
+              duration: 4500,
+            }}
+          />
+        </CartUiProvider>
+      </AnalyticsProvider>
       {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
       <SanityLive />
       {draft.isEnabled ? <VisualEditing /> : null}
-      {/* PostHog will be wired in Agent 24 once Termly consent gating is in place per ADR-015 / §8.7.5. */}
       <SpeedInsights />
       <Analytics />
     </div>

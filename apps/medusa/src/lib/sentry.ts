@@ -1,5 +1,10 @@
-import * as Sentry from "@sentry/nextjs";
-import type { Breadcrumb, Event } from "@sentry/nextjs";
+import type { Breadcrumb, Event } from "@sentry/node";
+import type * as SentryNode from "@sentry/node";
+
+import type { MedusaEnv } from "./env";
+
+const Sentry = require("@sentry/node") as typeof SentryNode;
+const { env } = require("./env") as { env: MedusaEnv };
 
 const piiKeyFragments = [
   "address",
@@ -8,8 +13,8 @@ const piiKeyFragments = [
   "card",
   "client_secret",
   "cookie",
-  "cvc",
   "cvv",
+  "cvc",
   "email",
   "expiry",
   "name",
@@ -27,8 +32,8 @@ const cardPattern = /\b(?:\d[ -]*?){13,19}\b/g;
 const bearerTokenPattern = /\bBearer\s+[A-Za-z0-9._~+/=-]+/gi;
 const stripeSecretPattern =
   /\b(?:pi|seti|cs|sk|rk)_(?:live|test)_[A-Za-z0-9_]+(?:_secret_[A-Za-z0-9_]+)?\b/g;
-const sensitiveRoutePattern =
-  /\/(?:api\/)?(?:auth|card|checkout|email|login|password|payment|reset-password)(?:\/|$)/i;
+
+let hasInitializedSentry = false;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -107,13 +112,7 @@ function keepUserIdOnly(user: Event["user"]): Event["user"] {
   return { id: String(user.id) };
 }
 
-function isSensitiveRequest(event: Event): boolean {
-  const url = event.request?.url;
-
-  return Boolean(url && sensitiveRoutePattern.test(url));
-}
-
-export function scrubSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb | null {
+function scrubSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb | null {
   const scrubbed: Breadcrumb = { ...breadcrumb };
 
   if (breadcrumb.data) {
@@ -131,9 +130,10 @@ export function scrubSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb | null
   return scrubbed;
 }
 
-export function scrubSentryEvent<TEvent extends Event>(event: TEvent): TEvent {
+function scrubSentryEvent<TEvent extends Event>(event: TEvent): TEvent {
   if (event.request) {
     delete event.request.cookies;
+    delete event.request.data;
     delete event.request.query_string;
     const scrubbedUrl = scrubUrl(event.request.url);
 
@@ -143,14 +143,8 @@ export function scrubSentryEvent<TEvent extends Event>(event: TEvent): TEvent {
       delete event.request.url;
     }
 
-    if (isSensitiveRequest(event)) {
-      delete event.request.data;
-    }
-
-    const { headers } = event.request;
-
-    if (headers) {
-      event.request.headers = redactKnownPii(headers) as Record<string, string>;
+    if (event.request.headers) {
+      event.request.headers = redactKnownPii(event.request.headers) as Record<string, string>;
     }
   }
 
@@ -187,12 +181,28 @@ export function scrubSentryEvent<TEvent extends Event>(event: TEvent): TEvent {
   return event;
 }
 
-export function captureError(error: unknown, context?: Record<string, unknown>): string {
-  return Sentry.withScope((scope) => {
-    if (context) {
-      scope.setContext("vaivae", redactKnownPii(context) as Record<string, unknown>);
-    }
+function initializeSentry(): void {
+  if (hasInitializedSentry) {
+    return;
+  }
 
-    return Sentry.captureException(error);
+  hasInitializedSentry = true;
+
+  Sentry.init({
+    beforeBreadcrumb: scrubSentryBreadcrumb,
+    beforeSend: scrubSentryEvent,
+    beforeSendTransaction: scrubSentryEvent,
+    dsn: env.SENTRY_DSN,
+    enabled: Boolean(env.SENTRY_DSN),
+    environment: env.SENTRY_ENVIRONMENT ?? process.env["NODE_ENV"] ?? "development",
+    release: env.SENTRY_RELEASE,
+    sendDefaultPii: false,
+    tracesSampleRate: 0.1,
   });
 }
+
+module.exports = {
+  initializeSentry,
+  scrubSentryBreadcrumb,
+  scrubSentryEvent,
+};

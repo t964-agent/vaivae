@@ -114,6 +114,10 @@ const envSchema = z
     SANITY_STUDIO_URL: z.preprocess(optionalString, z.string().optional()),
 
     MEDUSA_REVALIDATE_SECRET: z.preprocess(optionalString, z.string().optional()),
+
+    SENTRY_DSN: z.preprocess(optionalString, z.string().optional()),
+    SENTRY_ENVIRONMENT: z.preprocess(optionalString, z.string().optional()),
+    SENTRY_RELEASE: z.preprocess(optionalString, z.string().optional()),
   })
   .superRefine((value, ctx) => {
     if (value.KLAVIYO_PRIVATE_KEY && !value.KLAVIYO_NEWSLETTER_LIST_ID) {
@@ -180,6 +184,10 @@ const rawEnv = {
   SANITY_STUDIO_URL: process.env["SANITY_STUDIO_URL"],
 
   MEDUSA_REVALIDATE_SECRET: process.env["MEDUSA_REVALIDATE_SECRET"],
+
+  SENTRY_DSN: process.env["SENTRY_DSN"],
+  SENTRY_ENVIRONMENT: process.env["SENTRY_ENVIRONMENT"],
+  SENTRY_RELEASE: process.env["SENTRY_RELEASE"],
 };
 
 const parsedEnv = envSchema.safeParse(rawEnv);
@@ -204,6 +212,7 @@ const optionalRuntimeWarnings = [
   { key: "MUX_TOKEN_SECRET", consumer: "future Mux video operations" },
   { key: "SANITY_STUDIO_URL", consumer: "future Medusa Admin Sanity links" },
   { key: "MEDUSA_REVALIDATE_SECRET", consumer: "future storefront revalidation subscribers" },
+  { key: "SENTRY_DSN", consumer: "Medusa Sentry error reporting" },
 ] as const;
 
 if (!isMedusaBuildCommand) {

@@ -8,6 +8,143 @@ const securityHeaders = [
   ["Strict-Transport-Security", "max-age=31536000; includeSubDomains"],
 ] as const;
 
+function uniqueSources(sources: Array<string | null | undefined>): string[] {
+  return [...new Set(sources.filter((source): source is string => Boolean(source)))];
+}
+
+function getOrigin(value: string | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
+function createDirective(name: string, sources: Array<string | null | undefined>): string {
+  return `${name} ${uniqueSources(sources).join(" ")}`;
+}
+
+function createContentSecurityPolicy(nonce: string): string {
+  const medusaOrigin = getOrigin(process.env["NEXT_PUBLIC_MEDUSA_BACKEND_URL"]);
+  const posthogOrigin = getOrigin(process.env["NEXT_PUBLIC_POSTHOG_HOST"]);
+  const sentryOrigin = getOrigin(process.env["NEXT_PUBLIC_SENTRY_DSN"]);
+
+  return [
+    createDirective("default-src", ["'self'"]),
+    createDirective("script-src", [
+      "'self'",
+      `'nonce-${nonce}'`,
+      "https://app.termly.io",
+      "https://js.stripe.com",
+      "https://www.googletagmanager.com",
+      "https://*.googletagmanager.com",
+      "https://static.klaviyo.com",
+      "https://*.klaviyo.com",
+      "https://app.posthog.com",
+      "https://eu.posthog.com",
+      "https://*.posthog.com",
+      posthogOrigin,
+    ]),
+    createDirective("script-src-attr", ["'none'"]),
+    createDirective("style-src", [
+      "'self'",
+      "'unsafe-inline'",
+      "https://app.termly.io",
+      "https://fonts.googleapis.com",
+    ]),
+    createDirective("img-src", [
+      "'self'",
+      "data:",
+      "blob:",
+      "https://cdn.sanity.io",
+      "https://image.mux.com",
+      "https://*.litix.io",
+      "https://app.termly.io",
+      "https://q.stripe.com",
+      "https://www.google-analytics.com",
+      "https://*.google-analytics.com",
+      "https://www.googletagmanager.com",
+      "https://*.googletagmanager.com",
+      "https://static.klaviyo.com",
+      "https://*.klaviyo.com",
+      "https://app.posthog.com",
+      "https://eu.posthog.com",
+      "https://*.posthog.com",
+      "https://*.vercel.app",
+      posthogOrigin,
+    ]),
+    createDirective("media-src", [
+      "'self'",
+      "blob:",
+      "https://stream.mux.com",
+      "https://cdn.mux.com",
+      "https://*.mux.com",
+      "https://m.sanity-cdn.com",
+    ]),
+    createDirective("connect-src", [
+      "'self'",
+      medusaOrigin,
+      "https://api.vaivae.com",
+      "https://api.sanity.io",
+      "https://apicdn.sanity.io",
+      "https://*.api.sanity.io",
+      "https://*.apicdn.sanity.io",
+      "https://api.stripe.com",
+      "https://m.stripe.network",
+      "https://api.pwnedpasswords.com",
+      "https://app.termly.io",
+      "https://us.consent.api.termly.io",
+      "https://eu.consent.api.termly.io",
+      "https://stream.mux.com",
+      "https://inferred.litix.io",
+      "https://*.mux.com",
+      "https://*.litix.io",
+      "https://www.google-analytics.com",
+      "https://*.google-analytics.com",
+      "https://analytics.google.com",
+      "https://*.analytics.google.com",
+      "https://www.googletagmanager.com",
+      "https://*.googletagmanager.com",
+      "https://a.klaviyo.com",
+      "https://static.klaviyo.com",
+      "https://*.klaviyo.com",
+      "https://app.posthog.com",
+      "https://eu.posthog.com",
+      "https://*.posthog.com",
+      posthogOrigin,
+      "https://vitals.vercel-insights.com",
+      "https://va.vercel-scripts.com",
+      "https://*.vercel-insights.com",
+      "https://*.vercel.app",
+      sentryOrigin,
+      "https://*.sentry.io",
+      "https://*.ingest.sentry.io",
+      "https://*.ingest.us.sentry.io",
+      "https://*.ingest.de.sentry.io",
+    ]),
+    createDirective("frame-src", [
+      "'self'",
+      "https://js.stripe.com",
+      "https://hooks.stripe.com",
+      "https://app.termly.io",
+      "https://player.mux.com",
+      "https://www.googletagmanager.com",
+    ]),
+    createDirective("font-src", ["'self'", "https://fonts.gstatic.com", "data:"]),
+    createDirective("worker-src", ["'self'", "blob:"]),
+    createDirective("manifest-src", ["'self'"]),
+    createDirective("object-src", ["'none'"]),
+    createDirective("frame-ancestors", ["'self'"]),
+    createDirective("form-action", ["'self'", "https://hooks.stripe.com"]),
+    createDirective("base-uri", ["'self'"]),
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
 function createNonce(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
@@ -17,7 +154,8 @@ function createNonce(): string {
 
 export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", createNonce());
+  const nonce = createNonce();
+  requestHeaders.set("x-nonce", nonce);
 
   const response = NextResponse.next({
     request: {
@@ -29,7 +167,12 @@ export function proxy(request: NextRequest) {
     response.headers.set(key, value);
   }
 
-  // TODO(Agent 24): wire full nonce-based CSP once PostHog, Sentry, Sanity, and consent sources are final.
+  const cspHeader =
+    process.env["CSP_ENFORCE"] === "true"
+      ? "Content-Security-Policy"
+      : "Content-Security-Policy-Report-Only";
+  response.headers.set(cspHeader, createContentSecurityPolicy(nonce));
+
   return response;
 }
 

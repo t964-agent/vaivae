@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useOptimistic, useState } from "react";
+import { useEffect, useOptimistic, useRef, useState } from "react";
 
 import { CartLineItem } from "@/components/cart/cart-line-item";
 import { CartSummary } from "@/components/cart/cart-summary";
@@ -20,6 +20,7 @@ import {
   DrawerTitle,
 } from "@/components/ui";
 import { CART_UPDATED_EVENT, isCartUpdatedEvent } from "@/lib/cart-events";
+import { track } from "@/lib/analytics/track";
 import { getCartItemCount } from "@/lib/cart-utils";
 import type { StoreCart } from "@/medusa/types";
 
@@ -50,6 +51,14 @@ function optimisticCartReducer(
   return cart;
 }
 
+function getCartValue(cart: StoreCart | null): number {
+  return typeof cart?.total === "number" ? cart.total / 100 : 0;
+}
+
+function getCurrencyCode(currencyCode: string | null | undefined): string {
+  return (currencyCode?.trim() || "usd").toUpperCase();
+}
+
 export function CartDrawer({ initialCart }: CartDrawerProps) {
   const pathname = usePathname();
   const isOpen = useCartUiStore((store) => store.isOpen);
@@ -58,6 +67,7 @@ export function CartDrawer({ initialCart }: CartDrawerProps) {
   const [cart, setCart] = useState<StoreCart | null>(initialCart);
   const [statusMessage, setStatusMessage] = useState("");
   const [optimisticCart, applyOptimisticCart] = useOptimistic(cart, optimisticCartReducer);
+  const lastTrackedOpenRef = useRef<string | null>(null);
   const items = optimisticCart?.items ?? [];
   const hasItems = items.length > 0;
   const itemCount = getCartItemCount(optimisticCart);
@@ -82,6 +92,28 @@ export function CartDrawer({ initialCart }: CartDrawerProps) {
   useEffect(() => {
     close();
   }, [close, pathname]);
+
+  useEffect(() => {
+    if (!isOpen || !optimisticCart || !hasItems) {
+      return;
+    }
+
+    const trackingKey = `${optimisticCart.id}:${itemCount}:${optimisticCart.total ?? 0}`;
+
+    if (lastTrackedOpenRef.current === trackingKey) {
+      return;
+    }
+
+    lastTrackedOpenRef.current = trackingKey;
+    track({
+      name: "view_cart",
+      props: {
+        cartId: optimisticCart.id,
+        currency: getCurrencyCode(optimisticCart.currency_code),
+        value: getCartValue(optimisticCart),
+      },
+    });
+  }, [hasItems, isOpen, itemCount, optimisticCart]);
 
   function handleOpenChange(nextOpen: boolean): void {
     if (nextOpen) {

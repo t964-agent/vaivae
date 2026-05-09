@@ -31,6 +31,7 @@
     "@medusajs/payment-stripe": "catalog:",
     "@medusajs/analytics-posthog": "catalog:",
     "@medusajs/loyalty-plugin": "catalog:",
+    "@sentry/node": "10.52.0",
     "@alphabite/medusa-wishlist": "0.5.9",
     "@sanity/client": "7.22.0",
     "react": "catalog:",

@@ -10,6 +10,8 @@ const emptyStringToUndefined = (value: unknown): unknown => {
 
 const requiredString = z.string().trim().min(1);
 const optionalString = z.preprocess(emptyStringToUndefined, z.string().trim().min(1).optional());
+const requiredInProductionString =
+  process.env["NODE_ENV"] === "production" ? requiredString : optionalString;
 const requiredUrl = z.url();
 const optionalUrl = z.preprocess(emptyStringToUndefined, z.url().optional());
 const defaultSanityDataset =
@@ -41,7 +43,7 @@ export const publicEnvSchema = z.object({
 });
 
 export const serverEnvSchema = publicEnvSchema.extend({
-  MEDUSA_REVALIDATE_SECRET: requiredString,
+  MEDUSA_REVALIDATE_SECRET: requiredInProductionString,
   REGION_ID: requiredString,
   SANITY_API_READ_TOKEN: optionalString,
   SANITY_REVALIDATE_SECRET: requiredString,

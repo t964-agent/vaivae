@@ -4,6 +4,7 @@ import { Fraunces, Inter_Tight } from "next/font/google";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
+import { CartUiProvider } from "@/components/providers/cart-ui-provider";
 import { SanityLive } from "@/sanity/live";
 
 const fraunces = Fraunces({
@@ -36,8 +37,10 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       </a>
       {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
       <SanityLive />
-      {children}
-      <Toaster closeButton position="bottom-center" richColors />
+      <CartUiProvider>
+        {children}
+        <Toaster closeButton position="bottom-center" richColors />
+      </CartUiProvider>
       {/* PostHog will be wired in Agent 24 once Termly consent gating is in place per ADR-015 / §8.7.5. */}
       <SpeedInsights />
       <Analytics />

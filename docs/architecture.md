@@ -562,6 +562,7 @@ A separate **staging** environment is deferred until business operations require
 | Package                   | Version  | Type | Notes                                                                                            |
 | ------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------ |
 | `@medusajs/js-sdk`        | `2.14.2` | dep  | Pin to backend version.                                                                          |
+| `@medusajs/types`         | `2.14.2` | dep  | Type-only storefront import surface for Store API response types; keep lockstep with Medusa.     |
 | `@stripe/stripe-js`       | `9.4.0`  | dep  | Browser-side Stripe.js loader; npm `latest` tag as of 2026-05-09.                                |
 | `@stripe/react-stripe-js` | `6.3.0`  | dep  | React bindings for Payment Element; peers require `@stripe/stripe-js >=9.3.1 <10.0.0`, React 19. |
 | `@mux/mux-player-react`   | `3.13.0` | dep  | Editorial video player; peers include React 19.                                                  |
@@ -1871,11 +1872,11 @@ This section captures the concrete contracts between systems: clients, endpoints
 | Server (Server Components, Server Actions, route handlers) | `@medusajs/js-sdk`                          | Publishable API key + region context; admin key never used in storefront |
 | Browser                                                    | Same SDK or `fetch` for cart mutations only | Publishable API key (public)                                             |
 
-A typed wrapper `apps/storefront/lib/medusa.ts` exposes `medusaServer()` and `medusaBrowser()` clients; secrets are read via `process.env` server-side only.
+Typed wrappers under `apps/storefront/src/lib/medusa/` expose the server-only SDK singleton, region helpers, cart cookie helpers, and Server Actions. Secrets are read through the storefront env schema server-side only. Direct browser SDK usage is deferred until a non-sensitive client-only use case exists; cart mutations prefer Server Actions.
 
 #### 8.1.2 Cart Identification
 
-- Cart ID issued by Medusa stored in HttpOnly cookie `vaivae_cart` (Secure, SameSite=Lax, 30-day expiry).
+- Cart ID issued by Medusa stored in HttpOnly cookie `_vaivae_cart_id` (Secure in production, SameSite=Lax, path `/`, 30-day expiry). The leading underscore namespaces the cookie to vaïvae storefront plumbing.
 - Cookie set by Server Action when first line item is added.
 - On checkout, the same cookie is read to fetch and complete the cart.
 - Cart cookie cleared on order completion.
@@ -1884,10 +1885,10 @@ A typed wrapper `apps/storefront/lib/medusa.ts` exposes `medusaServer()` and `me
 
 Every product/cart fetch carries:
 
-- `region_id` (resolved server-side from a single `REGION_ID` env at launch; future: from `[countryCode]` segment).
+- `region_id` (resolved server-side from the cached US/USD Medusa region at launch; future: from `[countryCode]` segment).
 - Sales-channel scope is implicit in the publishable key.
 
-This is enforced by `medusaServer()` — calls without region context fail loudly.
+This is enforced by the Medusa helpers — calls without region context fail loudly. Phase 1 resolves the default US/USD region from Medusa and caches the region list with tag `regions` and a 1-hour revalidate window. Current implementation uses `unstable_cache` because `next-sanity` `defineLive` does not yet support `cacheComponents: true`; migrate this helper to `"use cache"`, `cacheTag("regions")`, and `cacheLife({ stale: 300, revalidate: 3600, expire: 86400 })` when that compatibility lands. Cart truth lives in Medusa; Zustand holds UI ephemera only. Cart fetches use React `cache()` for per-request memoization and are not cross-request cached. Medusa-driven storefront revalidation is received at `https://vaivae.com/api/revalidate/medusa`.
 
 #### 8.1.4 Error Handling & Retries
 
@@ -2090,7 +2091,7 @@ Sender identity:
 | Klaviyo (suppression / unsubscribes) | Medusa      | `https://api.vaivae.com/hooks/email/klaviyo` (custom)            | Shared secret                            |
 | Shippo (tracking updates)            | Medusa      | `https://api.vaivae.com/hooks/shipping/shippo` (custom, Phase 2) | Shippo signature                         |
 | Sanity                               | Vercel      | `https://vaivae.com/api/revalidate`                              | Sanity webhook signature + shared secret |
-| Medusa product events                | Vercel      | `https://vaivae.com/api/revalidate`                              | Shared secret in header                  |
+| Medusa product events                | Vercel      | `https://vaivae.com/api/revalidate/medusa`                       | Shared secret in header                  |
 
 > Bounce/complaint handling for transactional email is managed by Medusa Cloud's email dashboard — no custom webhook needed for Cloud Emails.
 

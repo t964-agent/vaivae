@@ -63,6 +63,7 @@
     "clsx": "2.1.1",
     "tailwind-merge": "3.5.0",
     "@medusajs/js-sdk": "catalog:",
+    "@medusajs/types": "catalog:",
     "@stripe/stripe-js": "9.4.0",
     "@stripe/react-stripe-js": "6.3.0",
     "@mux/mux-player-react": "3.13.0",

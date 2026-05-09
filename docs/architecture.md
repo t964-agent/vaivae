@@ -531,6 +531,9 @@ A separate **staging** environment is deferred until business operations require
 | `@radix-ui/react-visually-hidden` | `1.2.4`   | dep  |                                                                                                                                                                 |
 | `react-aria-components`           | `1.17.0`  | dep  | Add only when Radix is insufficient (complex combobox, datepicker). Use **subpath imports** (e.g. `react-aria-components/Select`) — full entry is ~247 KB gzip. |
 | `motion`                          | `12.38.0` | dep  | New package name; import from `motion/react`. **Replaces `framer-motion`.**                                                                                     |
+| `gsap`                            | `3.15.0`  | dep  | ScrollTrigger orchestration for route-level cinematic scrollytelling. GSAP Standard “No Charge” license; route-level code-split only.                           |
+| `@gsap/react`                     | `2.1.2`   | dep  | React hook wrapper for GSAP contexts and cleanup.                                                                                                               |
+| `lenis`                           | `1.3.23`  | dep  | Smooth-scroll layer for the home cinematic sequence; disabled for reduced motion.                                                                               |
 | `lucide-react`                    | `1.14.0`  | dep  | Tree-shakable; never use dynamic / all-icon imports.                                                                                                            |
 | `cmdk`                            | `1.1.1`   | dep  | Optional, for command palette / search overlay.                                                                                                                 |
 | `sonner`                          | `2.0.7`   | dep  | App-level toasts; preferred over `@radix-ui/react-toast`.                                                                                                       |
@@ -4048,6 +4051,8 @@ This is the canonical record of architectural decisions. Each entry captures **c
 | ADR-015 | Compliance Foundation — Termly Pro+, Global GDPR Posture, Off-Provider Backups | Accepted                                            |
 
 **Note (post-bootstrap remediation, 2026-05-09):** During Agent 1B registry remediation, the following clerical version corrections were applied: `@stripe/stripe-js` `8.0.0` -> `9.4.0`, `@stripe/react-stripe-js` `5.5.0` -> `6.3.0`, `@mux/mux-player-react` `3.10.0` -> `3.13.0`, and `klaviyo-api` `26.0.0` -> `22.0.1`. The manifest also documents `awilix@8.0.1` as a direct pin matching Medusa's `@medusajs/deps@2.14.2` and records that `@alphabite/medusa-wishlist@0.5.9` publishes exact Medusa `2.13.6` peer deps. These are registry-truth corrections, not architectural decision changes.
+
+**Note (post-bootstrap addition):** `gsap`, `@gsap/react`, and `lenis` were added to the storefront dependency manifest as part of Agent 11's cinematic home-page implementation. ADR-006 already specified these libraries for scroll-driven cinematic sequences; the manifest entries make the version pins explicit.
 
 ---
 

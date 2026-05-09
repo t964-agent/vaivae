@@ -29,18 +29,24 @@ export function getSlugValue(
 
 export function renderEmphasisText(value: string): ReactNode {
   const nodes: ReactNode[] = [];
-  const pattern = /<em>(.*?)<\/em>/gis;
+  const pattern = /(<br\s*\/?\s*>)|<em>(.*?)<\/em>/gis;
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(value)) !== null) {
-    const [raw, emphasized] = match;
+    const [raw, lineBreak, emphasized] = match;
 
     if (match.index > lastIndex) {
       nodes.push(value.slice(lastIndex, match.index));
     }
 
-    nodes.push(<em key={`${match.index}-${raw.length}`}>{emphasized ?? ""}</em>);
+    nodes.push(
+      lineBreak ? (
+        <br key={`${match.index}-${raw.length}`} />
+      ) : (
+        <em key={`${match.index}-${raw.length}`}>{emphasized ?? ""}</em>
+      ),
+    );
     lastIndex = match.index + raw.length;
   }
 

@@ -113,6 +113,42 @@
 }
 
 @layer utilities {
+  @keyframes vaivae-drift {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+      transform: translate(4%, -3%) scale(1.06);
+    }
+
+    66% {
+      transform: translate(-3%, 4%) scale(1.04);
+    }
+  }
+
+  @keyframes vaivae-heat {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes vaivae-drop {
+    0% {
+      top: -100%;
+    }
+
+    60%,
+    100% {
+      top: 100%;
+    }
+  }
+
   @keyframes vaivae-marquee-left {
     to {
       transform: translateX(calc(-50% - var(--marquee-gap) / 2));

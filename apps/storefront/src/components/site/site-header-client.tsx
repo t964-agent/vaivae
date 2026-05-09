@@ -131,7 +131,10 @@ export function SiteHeaderClient({ brandMark, navigation }: SiteHeaderClientProp
   }, [isHome]);
 
   return (
-    <header className="sticky top-0 z-40" role="banner">
+    <header
+      className={cn(isHome ? "fixed inset-x-0 top-0 z-40" : "sticky top-0 z-40")}
+      role="banner"
+    >
       {promoEnabled ? (
         <div className="bg-oxblood px-6 py-2 text-center font-body text-[0.68rem] tracking-[0.18em] text-on-dark uppercase md:px-8 lg:px-12">
           {navigation?.promoBannerLink ? (

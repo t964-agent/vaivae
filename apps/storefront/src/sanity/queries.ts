@@ -661,6 +661,23 @@ export const productListQuery = defineQuery(`*[_type == "product"] | order(title
   oneLineHook
 }`);
 
+export const productsByMedusaIdsQuery = defineQuery(`*[
+  _type == "product" &&
+  editorialReady == true &&
+  medusaProductId in $medusaProductIds
+] | order(title asc){
+  _id,
+  _type,
+  medusaProductId,
+  title,
+  "handle": handle.current,
+  editorialReady,
+  heroImage{
+    ${imageFragment}
+  },
+  oneLineHook
+}`);
+
 export const lookbookByHandleQuery =
   defineQuery(`*[_type == "lookbook" && slug.current == $handle][0]{
   _id,

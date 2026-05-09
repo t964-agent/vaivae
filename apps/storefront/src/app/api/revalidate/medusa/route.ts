@@ -56,6 +56,25 @@ function getRevalidationTags(payload: MedusaWebhookPayload): string[] {
     case "inventory_item.updated":
     case "inventory.updated":
       tags.add("inventory");
+      tags.add("products");
+      break;
+    case "product-category.created":
+    case "product-category.updated":
+    case "product-category.deleted":
+    case "product_category.created":
+    case "product_category.updated":
+    case "product_category.deleted":
+      tags.add("product-categories");
+      tags.add("products");
+      break;
+    case "product-collection.created":
+    case "product-collection.updated":
+    case "product-collection.deleted":
+    case "product_collection.created":
+    case "product_collection.updated":
+    case "product_collection.deleted":
+      tags.add("product-collections");
+      tags.add("products");
       break;
     default:
       break;

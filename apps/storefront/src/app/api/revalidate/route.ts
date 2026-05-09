@@ -52,7 +52,7 @@ function getRevalidationTags(document: RevalidationDocument): readonly string[] 
     case "siteSettings":
       return ["site-settings"];
     case "product":
-      return withSlugTag("product", document.slug);
+      return [...withSlugTag("product", document.slug), "products"];
     case "lookbook":
       return withSlugTag("lookbook", document.slug);
     case "journal":
@@ -64,7 +64,7 @@ function getRevalidationTags(document: RevalidationDocument): readonly string[] 
     case "material":
     case "colorSwatch":
     case "sizeGuide":
-      return ["product"];
+      return ["product", "products"];
     default:
       return [];
   }

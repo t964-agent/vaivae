@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Fraunces, Inter_Tight } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
@@ -40,11 +41,13 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
       <SanityLive />
       <CartUiProvider>
-        <SiteHeader />
-        <main className="min-h-dvh" id="main-content">
-          {children}
-        </main>
-        <SiteFooter />
+        <NuqsAdapter>
+          <SiteHeader />
+          <main className="min-h-dvh" id="main-content">
+            {children}
+          </main>
+          <SiteFooter />
+        </NuqsAdapter>
         <Toaster
           closeButton
           position="bottom-center"

@@ -95,6 +95,9 @@ const modules: InputConfigModules = [
   {
     resolve: "./src/modules/sanity-sync",
   },
+  {
+    resolve: "./src/modules/shipping-shippo",
+  },
   ...redisModules,
 ];
 

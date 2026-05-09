@@ -1403,12 +1403,13 @@ Build only if Cloud Emails proves insufficient for a specific template (e.g. nee
 
 Medusa v2 does not have an officially-maintained Shippo provider at the time of writing. We adopt a pragmatic split:
 
-| Concern                     | Approach                                                                                                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Checkout shipping rates** | Manual fulfillment provider with **flat-rate** shipping options per service zone. No live Shippo rates at launch.                                                                                      |
-| **Label generation**        | Subscriber on `order.placed` (or admin-triggered action) calls Shippo API via a thin `apps/medusa/src/modules/shipping-shippo/` service to purchase labels and store the tracking number on the order. |
-| **Tracking propagation**    | Tracking number stored on order; included in `order_shipped` email; surfaced on `/account/orders/[id]`.                                                                                                |
-| **Future**                  | Build a proper v2 fulfillment provider for Shippo when live rates / multi-carrier optimization become valuable (Phase 2+).                                                                             |
+| Concern                     | Approach                                                                                                                                                                                     |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Checkout shipping rates** | Manual fulfillment provider with **flat-rate** shipping options per service zone. No live Shippo rates at launch.                                                                            |
+| **Label generation**        | Subscriber on `order.fulfillment_created` calls Shippo API via `apps/medusa/src/modules/shipping-shippo/` to purchase labels and store label/tracking metadata on the fulfillment.           |
+| **Parcel / origin**         | Phase 1 uses one standard luxury garment parcel (`12x10x4 in`, `16 oz`) and a single brand origin address from `SHIPPO_FROM_*`, with code-owned fallback placeholders for local development. |
+| **Tracking propagation**    | Tracking number stored on fulfillment metadata; included in `order_shipped` email; surfaced on `/account/orders/[id]`.                                                                       |
+| **Future**                  | Build a proper v2 fulfillment provider for Shippo when live rates, multiple parcel sizes, product weight-driven package selection, or multi-carrier optimization become valuable (Phase 2+). |
 
 Rationale: building a v2 fulfillment provider for live rates is significant work and not needed at launch. Flat-rate shipping plus subscriber-driven label generation is the lowest-cost reliable path.
 
@@ -1441,20 +1442,20 @@ Medusa v2 distinguishes **subscribers** (asynchronous, at-least-once side effect
 
 Located at `apps/medusa/src/subscribers/`.
 
-| Subscriber               | File                                        | Events                                                        | Action                                                                                                                   |
-| ------------------------ | ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Sanity product sync      | `sanity-sync-product-*.ts`                  | `product.created`, `product.updated`, `product.deleted`       | Create/patch/delete Sanity `product` docs; refetch product by id; idempotent via deterministic `_id === medusaProductId` |
-| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                                | Trigger Cloud Emails `order_placed` template; log to notification log                                                    |
-| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                            | Cloud Emails `order_shipped` with tracking                                                                               |
-| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                            | Cloud Emails `order_refunded`                                                                                            |
-| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                         | Cloud Emails `password_reset`                                                                                            |
-| Welcome                  | `welcome-email.ts`                          | `customer.created`                                            | Cloud Emails `welcome`                                                                                                   |
-| Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                                |
-| Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                              |
-| Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                  |
-| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                             |
-| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                  |
-| Shippo label purchase    | `purchase-shipping-label.ts`                | `order.placed` (gated by config)                              | Calls Shippo via `shipping-shippo` service; stores tracking number on order                                              |
+| Subscriber               | File                                        | Events                                                        | Action                                                                                                                                           |
+| ------------------------ | ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sanity product sync      | `sanity-sync-product-*.ts`                  | `product.created`, `product.updated`, `product.deleted`       | Create/patch/delete Sanity `product` docs; refetch product by id; idempotent via deterministic `_id === medusaProductId`                         |
+| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                                | Trigger Cloud Emails `order_placed` template; log to notification log                                                                            |
+| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                            | Cloud Emails `order_shipped` with tracking                                                                                                       |
+| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                            | Cloud Emails `order_refunded`                                                                                                                    |
+| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                         | Cloud Emails `password_reset`                                                                                                                    |
+| Welcome                  | `welcome-email.ts`                          | `customer.created`                                            | Cloud Emails `welcome`                                                                                                                           |
+| Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                                                        |
+| Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                                                      |
+| Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                                          |
+| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                                                     |
+| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                                          |
+| Shippo label purchase    | `shippo-create-label.ts`                    | `order.fulfillment_created`                                   | Calls Shippo via `shipping-shippo` service; stores label URL, tracking number, tracking URL, transaction ID, and rate ID on fulfillment metadata |
 
 All subscribers are **idempotent**: they re-fetch authoritative state from Medusa, use upserts/notification-log keys, and tolerate replays.
 
@@ -1543,9 +1544,9 @@ featureFlags: []
 | **Cloud Emails**           | _Auto-configured by Medusa Cloud_                                                      | Verified sender domain set in Cloud dashboard                                                                                  |
 | **Klaviyo**                | `KLAVIYO_PRIVATE_API_KEY`, `KLAVIYO_PUBLIC_API_KEY`                                    | Private key server-only; public key for storefront onsite tracking                                                             |
 | **PostHog (server)**       | `POSTHOG_API_KEY`, `POSTHOG_HOST`                                                      | Used by `@medusajs/analytics-posthog`                                                                                          |
-| **Shippo**                 | `SHIPPO_API_KEY`                                                                       | Test token in dev                                                                                                              |
+| **Shippo**                 | `SHIPPO_API_KEY`, `SHIPPO_FROM_*`                                                      | Test token in dev; origin address can be overridden per environment                                                            |
 | **Resend (fallback only)** | `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`                               | Set only if custom Resend provider is enabled per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
-| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                          | Toggle subscriber-driven label purchase                                                                                        |
+| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                          | Reserved for future order-placed label autopurchase; the fulfillment-created Shippo label subscriber is not gated              |
 
 Secrets live in Medusa Cloud's environment manager (per environment) and are never committed. Local development uses `apps/medusa/.env.local`, which is `.gitignore`d.
 
@@ -2028,12 +2029,14 @@ We do **not** subscribe to additional Stripe events at launch. Custom flows (e.g
 
 #### 8.4.2 Label Purchase (Shippo)
 
-- Subscriber `purchase-shipping-label.ts` listens to `order.placed`.
-- If feature flag `SHIPPING_LABEL_AUTOPURCHASE=true`, the subscriber:
-  1. Calls Shippo API `POST /v1/transactions` with origin (Stock Location), destination (order shipping address), and parcel defaults.
-  2. Stores `tracking_number`, `tracking_url`, `label_url`, `shippo_transaction_id` on the order metadata.
-  3. Marks fulfillment as `shipment_created` (triggers `order.fulfillment_created` event).
-- If feature flag is off, fulfillment is created manually via Medusa Admin.
+- Subscriber `shippo-create-label.ts` listens to `order.fulfillment_created`, which Medusa v2.14 emits when an Admin-created order fulfillment is created.
+- The subscriber calls Shippo via the custom `shipping-shippo` module:
+  1. Creates a Shippo shipment with origin from `SHIPPO_FROM_*`, destination from the order shipping address, and the Phase 1 parcel default (`12x10x4 in`, `16 oz`).
+  2. Selects the cheapest returned rate and creates a Shippo transaction / label (`PDF_4x6`).
+  3. Stores `shippo_label_url`, `shippo_tracking_number`, `shippo_tracking_url`, `shippo_transaction_id`, `shippo_rate_id`, and `shippo_status` on fulfillment metadata.
+- The subscriber is idempotent: it skips purchase if `fulfillment.metadata.shippo_label_url` already exists.
+- If Shippo fails, the subscriber writes `shippo_error` and `shippo_failed_at` to fulfillment metadata, then re-throws so the event bus can retry according to environment retry settings.
+- Phase 2 moves package selection from the hardcoded parcel to Medusa-owned product/variant weights and multiple parcel sizes; live rates at checkout still require a proper Shippo fulfillment provider.
 
 #### 8.4.3 Tracking Propagation
 
@@ -4167,7 +4170,7 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - Custom modules: ~~`wishlist`~~ (superseded by [ADR-013](#adr-013-adopt-community-wishlist-plugin) — community plugin), `marketing-consent`, `sanity-sync`, `shipping-shippo`, ~~`resend-notification`~~ (superseded by [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) — Cloud Emails primary, Resend fallback only).
   - `marketing-consent` is implemented as an append-only `ConsentRecord` log linked 1:N to `Customer`; the Medusa service token is `marketing_consent`, the authenticated Store API is `GET/POST /store/customers/me/marketing-consent`, and changes emit `marketing-consent.updated`.
   - Email: ~~custom Resend Notification Module Provider~~ → **Medusa Cloud Emails** primary + **Klaviyo** for marketing (per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)).
-  - Shipping at launch: manual fulfillment provider with flat-rate options + subscriber-driven Shippo label generation. A full v2 Shippo fulfillment provider is deferred until live rates become valuable.
+  - Shipping at launch: manual fulfillment provider with flat-rate options + subscriber-driven Shippo label generation on `order.fulfillment_created`; labels are purchased through `shipping-shippo` and written to fulfillment metadata. A full v2 Shippo fulfillment provider is deferred until live rates, multiple parcel sizes, or product weight-driven package selection become valuable.
   - Tax: Stripe Tax via Medusa for US region.
   - Search: deferred; Meilisearch added in Phase 2 if needed.
 - **Consequences:**

@@ -88,6 +88,16 @@ const envSchema = z.object({
   KLAVIYO_PUBLIC_API_KEY: z.preprocess(optionalString, z.string().optional()),
 
   SHIPPO_API_KEY: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_NAME: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_COMPANY: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_STREET1: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_STREET2: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_CITY: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_STATE: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_POSTAL_CODE: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_COUNTRY_CODE: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_PHONE: z.preprocess(optionalString, z.string().optional()),
+  SHIPPO_FROM_EMAIL: z.preprocess(optionalString, z.string().optional()),
   SHIPPING_LABEL_AUTOPURCHASE: booleanFlag,
 
   MUX_TOKEN_ID: z.preprocess(optionalString, z.string().optional()),
@@ -133,6 +143,16 @@ const rawEnv = {
   KLAVIYO_PUBLIC_API_KEY: process.env["KLAVIYO_PUBLIC_API_KEY"],
 
   SHIPPO_API_KEY: process.env["SHIPPO_API_KEY"],
+  SHIPPO_FROM_NAME: process.env["SHIPPO_FROM_NAME"],
+  SHIPPO_FROM_COMPANY: process.env["SHIPPO_FROM_COMPANY"],
+  SHIPPO_FROM_STREET1: process.env["SHIPPO_FROM_STREET1"],
+  SHIPPO_FROM_STREET2: process.env["SHIPPO_FROM_STREET2"],
+  SHIPPO_FROM_CITY: process.env["SHIPPO_FROM_CITY"],
+  SHIPPO_FROM_STATE: process.env["SHIPPO_FROM_STATE"],
+  SHIPPO_FROM_POSTAL_CODE: process.env["SHIPPO_FROM_POSTAL_CODE"],
+  SHIPPO_FROM_COUNTRY_CODE: process.env["SHIPPO_FROM_COUNTRY_CODE"],
+  SHIPPO_FROM_PHONE: process.env["SHIPPO_FROM_PHONE"],
+  SHIPPO_FROM_EMAIL: process.env["SHIPPO_FROM_EMAIL"],
   SHIPPING_LABEL_AUTOPURCHASE: process.env["SHIPPING_LABEL_AUTOPURCHASE"],
 
   MUX_TOKEN_ID: process.env["MUX_TOKEN_ID"],
@@ -161,7 +181,7 @@ const env = parsedEnv.data;
 const optionalRuntimeWarnings = [
   { key: "KLAVIYO_PRIVATE_API_KEY", consumer: "Agent 23 Klaviyo subscribers" },
   { key: "KLAVIYO_PUBLIC_API_KEY", consumer: "Agent 23 Klaviyo subscribers" },
-  { key: "SHIPPO_API_KEY", consumer: "future Shippo label workflows" },
+  { key: "SHIPPO_API_KEY", consumer: "Shippo label subscriber" },
   { key: "MUX_TOKEN_ID", consumer: "future Mux video operations" },
   { key: "MUX_TOKEN_SECRET", consumer: "future Mux video operations" },
   { key: "SANITY_STUDIO_URL", consumer: "future Medusa Admin Sanity links" },

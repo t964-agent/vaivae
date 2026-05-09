@@ -103,7 +103,7 @@ function PreviewUiShowcase() {
   };
 
   return (
-    <main className="min-h-dvh bg-cream py-16 text-on-light" id="main-content">
+    <div className="min-h-dvh bg-cream py-16 text-on-light">
       <Container variant="wide">
         <Stack gap={10}>
           <Stack gap={3}>
@@ -357,7 +357,7 @@ function PreviewUiShowcase() {
           </div>
         </Stack>
       </Container>
-    </main>
+    </div>
   );
 }
 

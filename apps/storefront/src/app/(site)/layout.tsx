@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import { CartUiProvider } from "@/components/providers/cart-ui-provider";
+import { SiteFooter } from "@/components/site/site-footer";
+import { SiteHeader } from "@/components/site/site-header";
 import { SanityLive } from "@/sanity/live";
 
 const fraunces = Fraunces({
@@ -38,7 +40,11 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       {/* Public storefront only; /studio uses the isolated (studio) layout without SanityLive. */}
       <SanityLive />
       <CartUiProvider>
-        {children}
+        <SiteHeader />
+        <main className="min-h-dvh" id="main-content">
+          {children}
+        </main>
+        <SiteFooter />
         <Toaster
           closeButton
           position="bottom-center"

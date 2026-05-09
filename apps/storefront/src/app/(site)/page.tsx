@@ -32,10 +32,10 @@ export default async function HomePage() {
   const regionSmokeState = await getRegionSmokeState();
 
   return (
-    <main className="min-h-dvh bg-cream text-on-light" id="main-content">
+    <section className="min-h-dvh bg-cream text-on-light">
       <section className="mx-auto flex min-h-dvh w-full max-w-6xl items-end px-6 py-8 sm:px-10 lg:px-14">
         <RegionSmokeTest state={regionSmokeState} />
       </section>
-    </main>
+    </section>
   );
 }

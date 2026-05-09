@@ -39,7 +39,28 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       <SanityLive />
       <CartUiProvider>
         {children}
-        <Toaster closeButton position="bottom-center" richColors />
+        <Toaster
+          closeButton
+          position="bottom-center"
+          richColors
+          theme="light"
+          toastOptions={{
+            closeButtonAriaLabel: "Dismiss toast",
+            classNames: {
+              actionButton: "bg-oxblood! text-on-dark!",
+              cancelButton: "bg-on-light/10! text-on-light!",
+              closeButton: "border-on-light/20! bg-cream! text-on-light!",
+              description: "font-body! text-on-light/65!",
+              error: "border-accent-red/45!",
+              info: "border-ink/20!",
+              success: "border-accent-gold/45!",
+              title: "font-body! font-medium! tracking-[-0.01em] text-on-light!",
+              toast: "border-on-light/10! bg-cream! text-on-light! shadow-fine!",
+              warning: "border-accent-orange/45!",
+            },
+            duration: 4500,
+          }}
+        />
       </CartUiProvider>
       {/* PostHog will be wired in Agent 24 once Termly consent gating is in place per ADR-015 / §8.7.5. */}
       <SpeedInsights />

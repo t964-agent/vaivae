@@ -33,7 +33,9 @@ const accountLinks = [
   { href: "/account" as Route, label: "Account home" },
   { href: "/account/orders" as Route, label: "Orders" },
   { href: "/account/addresses" as Route, label: "Addresses" },
+  { href: "/account/profile" as Route, label: "Profile" },
   { href: "/account/wishlist" as Route, label: "Wishlist" },
+  { href: "/account/marketing-preferences" as Route, label: "Marketing preferences" },
 ] as const;
 
 function getCustomerName(customer: UserMenuCustomer): string {

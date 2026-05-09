@@ -440,6 +440,27 @@ export async function getProductByHandle(
   return getCachedProductByHandle(handle, regionId);
 }
 
+export async function listProductsByIds(
+  productIds: readonly string[],
+  regionId: string,
+): Promise<StoreProduct[]> {
+  const normalizedProductIds = normalizeStrings(productIds);
+  const normalizedRegionId = regionId.trim();
+
+  if (normalizedProductIds.length === 0 || !normalizedRegionId) {
+    return [];
+  }
+
+  const { products } = await getMedusaClient().store.product.list({
+    fields: PRODUCT_DETAIL_FIELDS,
+    id: normalizedProductIds,
+    limit: normalizedProductIds.length,
+    region_id: normalizedRegionId,
+  });
+
+  return products;
+}
+
 export async function getProductRecommendations({
   limit,
   productId,

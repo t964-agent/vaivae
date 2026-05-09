@@ -58,11 +58,16 @@ const updateProfileSchema = z.object({
   phone: optionalPhoneSchema,
 });
 
+const updatePasswordSchema = z.object({
+  newPassword: passwordSchema,
+});
+
 type RegisterInput = z.input<typeof registerSchema>;
 type LoginInput = z.input<typeof loginSchema>;
 type ForgotPasswordInput = z.input<typeof forgotPasswordSchema>;
 type ResetPasswordInput = z.input<typeof resetPasswordSchema>;
 type UpdateProfileInput = z.input<typeof updateProfileSchema>;
+type UpdatePasswordInput = z.input<typeof updatePasswordSchema>;
 type RegisterData = z.output<typeof registerSchema>;
 type LoginData = z.output<typeof loginSchema>;
 
@@ -357,5 +362,43 @@ export async function updateProfileAction(
     return { data: { customerId: customer.id }, ok: true };
   } catch {
     return { error: "Unable to update your profile. Try again in a moment.", ok: false };
+  }
+}
+
+export async function updatePasswordAction(
+  input: UpdatePasswordInput,
+): Promise<SimpleAuthActionResult> {
+  const parsed = updatePasswordSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return getValidationError(parsed.error);
+  }
+
+  const token = await getAuthToken();
+
+  if (!token) {
+    return { error: "Sign in to update your password.", ok: false };
+  }
+
+  const customer = await retrieveCustomerWithToken(token);
+
+  if (!customer?.email) {
+    return { error: "Sign in again before updating your password.", ok: false };
+  }
+
+  try {
+    await postMedusaAuth(
+      "/auth/customer/emailpass/update",
+      {
+        email: customer.email,
+        password: parsed.data.newPassword,
+      },
+      token,
+    );
+    await extendAuthToken(token);
+
+    return { ok: true };
+  } catch {
+    return { error: "Unable to update your password. Try again in a moment.", ok: false };
   }
 }

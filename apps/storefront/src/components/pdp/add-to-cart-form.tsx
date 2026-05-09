@@ -8,6 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { useCartUiStore } from "@/components/providers/cart-ui-provider";
+import { WishlistToggleButton } from "@/components/account/wishlist-toggle-button";
 import {
   Button,
   Form,
@@ -39,7 +40,14 @@ type AddToCartFormValues = z.infer<typeof addToCartFormSchema>;
 
 export type AddToCartFormProps = {
   colorSwatches?: EditorialProduct["colorSwatches"] | null | undefined;
+  isAuthenticated?: boolean | undefined;
   product: StoreProduct;
+  wishlistItems?: PdpWishlistItem[] | undefined;
+};
+
+export type PdpWishlistItem = {
+  itemId: string;
+  variantId: string;
 };
 
 function isVariantPurchasable(variant: StoreProductVariant | null | undefined): boolean {
@@ -102,7 +110,12 @@ function getAvailabilityNote(variant: StoreProductVariant | null | undefined): s
   return "Ships in 3-5 business days.";
 }
 
-export function AddToCartForm({ colorSwatches, product }: AddToCartFormProps) {
+export function AddToCartForm({
+  colorSwatches,
+  isAuthenticated = false,
+  product,
+  wishlistItems = [],
+}: AddToCartFormProps) {
   const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const initialVariant = useMemo(() => getFirstSelectableVariant(variants), [variants]);
   const [isPending, startTransition] = useTransition();
@@ -120,6 +133,9 @@ export function AddToCartForm({ colorSwatches, product }: AddToCartFormProps) {
   const quantity = useWatch({ control: form.control, name: "quantity" }) ?? 1;
   const selectedVariant = variants.find((variant) => variant.id === variantId) ?? null;
   const selectedVariantAvailable = isVariantPurchasable(selectedVariant);
+  const selectedWishlistItem = selectedVariant
+    ? wishlistItems.find((item) => item.variantId === selectedVariant.id)
+    : null;
   const maxQuantity = getMaxQuantity(selectedVariant);
   const availabilityNote = getAvailabilityNote(selectedVariant);
   const price = formatPrice(selectedVariant);
@@ -258,15 +274,13 @@ export function AddToCartForm({ colorSwatches, product }: AddToCartFormProps) {
               <Link href={"/#newsletter" as Route}>Notify me</Link>
             </Button>
           )}
-          <Button
-            aria-label="Add to wishlist, coming soon"
-            className="w-full"
-            disabled
-            type="button"
-            variant="underline"
-          >
-            Add to wishlist
-          </Button>
+          <WishlistToggleButton
+            initialIsInWishlist={Boolean(selectedWishlistItem)}
+            initialWishlistItemId={selectedWishlistItem?.itemId ?? null}
+            isAuthenticated={isAuthenticated}
+            key={selectedVariant?.id ?? "wishlist-unselected"}
+            variantId={selectedVariant?.id ?? null}
+          />
         </Stack>
       </form>
     </Form>

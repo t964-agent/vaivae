@@ -15,14 +15,16 @@ import type { StoreProduct } from "@/medusa/types";
 import type { ProductEditorialFragment } from "@/lib/sanity/products";
 import type { SanityImage } from "@/sanity/types";
 
-import { AddToCartForm } from "./add-to-cart-form";
+import { AddToCartForm, type PdpWishlistItem } from "./add-to-cart-form";
 import { ProductGallery, type ProductGalleryImage } from "./product-gallery";
 import { SpecsAccordion } from "./specs-accordion";
 
 export type PdpLayoutProps = {
   editorial: EditorialProduct;
+  isAuthenticated?: boolean | undefined;
   product: StoreProduct;
   recommendations: StoreProduct[];
+  wishlistItems?: PdpWishlistItem[] | undefined;
 };
 
 function hasSanityImage(image: SanityImage | null | undefined): image is SanityImage {
@@ -168,7 +170,13 @@ function LookbookFeature({ editorial }: { editorial: EditorialProduct }) {
   );
 }
 
-export async function PdpLayout({ editorial, product, recommendations }: PdpLayoutProps) {
+export async function PdpLayout({
+  editorial,
+  isAuthenticated = false,
+  product,
+  recommendations,
+  wishlistItems = [],
+}: PdpLayoutProps) {
   const galleryImages = getPdpGalleryImages(product, editorial);
   const editorialReady = editorial?.editorialReady === true;
   const storyModules = (
@@ -199,7 +207,12 @@ export async function PdpLayout({ editorial, product, recommendations }: PdpLayo
                 ) : null}
               </Stack>
 
-              <AddToCartForm colorSwatches={editorial?.colorSwatches} product={product} />
+              <AddToCartForm
+                colorSwatches={editorial?.colorSwatches}
+                isAuthenticated={isAuthenticated}
+                product={product}
+                wishlistItems={wishlistItems}
+              />
               <SpecsAccordion editorial={editorial} product={product} />
             </Stack>
           </div>

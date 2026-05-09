@@ -862,15 +862,15 @@ Document types planned for Phase 1. Each schema is fully defined in code in `app
 
 #### 4.2.3 Customer-Side Data
 
-| Data                           | Storage                                                                                       | Why                                                                                                                                        |
-| ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Wishlist (logged-in)           | `@alphabite/medusa-wishlist` plugin (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)) | Persists across devices; needs auth and variant validation                                                                                 |
-| Wishlist (guest)               | `localStorage`                                                                                | No friction at launch                                                                                                                      |
-| Wishlist (transition on login) | Merged into plugin wishlist via `POST /store/wishlist/merge` (provided by plugin)             | Best-of-both-worlds hybrid                                                                                                                 |
-| Recently viewed                | `localStorage` (with TTL)                                                                     | Personalization data; high-write, low-durability needs                                                                                     |
-| Marketing opt-in & consent     | Medusa custom `marketing-consent` module on `Customer`                                        | Durable consent record; **synced to Klaviyo from launch** per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
-| GDPR consent log               | Medusa custom module (`marketing-consent.ConsentEvent`)                                       | Versioned with timestamp, source, IP/UA where required                                                                                     |
-| Auth session                   | Medusa-issued JWT in HttpOnly cookie                                                          | See [§9](#9-authentication--authorization)                                                                                                 |
+| Data                           | Storage                                                                                                                          | Why                                                                                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Wishlist (logged-in)           | `@alphabite/medusa-wishlist` plugin (per [ADR-013](#adr-013-adopt-community-wishlist-plugin))                                    | Persists across devices; needs auth and variant validation                                                                                 |
+| Wishlist (guest)               | `localStorage`                                                                                                                   | No friction at launch                                                                                                                      |
+| Wishlist (transition on login) | Storefront persists guest wishlist id, then transfers with `POST /store/wishlists/:id/transfer` after login (provided by plugin) | Best-of-both-worlds hybrid                                                                                                                 |
+| Recently viewed                | `localStorage` (with TTL)                                                                                                        | Personalization data; high-write, low-durability needs                                                                                     |
+| Marketing opt-in & consent     | Medusa custom `marketing-consent` module on `Customer`                                                                           | Durable consent record; **synced to Klaviyo from launch** per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
+| GDPR consent log               | Medusa custom module (`marketing-consent.ConsentEvent`)                                                                          | Versioned with timestamp, source, IP/UA where required                                                                                     |
+| Auth session                   | Medusa-issued JWT in HttpOnly cookie                                                                                             | See [§9](#9-authentication--authorization)                                                                                                 |
 
 ### 4.3 Sync Strategy
 
@@ -955,20 +955,21 @@ app/
 │   ├── press/page.tsx               /press
 │   ├── wholesale/page.tsx           /wholesale
 │   ├── search/page.tsx              /search
+│   ├── account/                     authenticated customer area
+│   │   ├── layout.tsx               account chrome + server-side auth guard
+│   │   ├── page.tsx                 /account
+│   │   ├── orders/page.tsx          /account/orders
+│   │   ├── orders/[orderId]/page.tsx
+│   │   ├── addresses/page.tsx
+│   │   ├── profile/page.tsx
+│   │   ├── wishlist/page.tsx
+│   │   └── marketing-preferences/page.tsx
 │   └── (legal)/
 │       ├── privacy/page.tsx
 │       ├── terms/page.tsx
 │       ├── returns/page.tsx
 │       ├── shipping/page.tsx
 │       └── faq/page.tsx
-├── (account)/                       authenticated customer area
-│   ├── layout.tsx                   account chrome
-│   ├── account/page.tsx             /account
-│   ├── account/orders/page.tsx
-│   ├── account/orders/[id]/page.tsx
-│   ├── account/addresses/page.tsx
-│   ├── wishlist/page.tsx            /wishlist
-│   └── cart/page.tsx                /cart
 ├── (checkout)/                      isolated checkout funnel
 │   ├── layout.tsx                   minimal chrome, no marketing scripts
 │   ├── checkout/page.tsx            /checkout
@@ -1003,28 +1004,29 @@ The cart is **not** an intercepting route by default — keeping it as a client-
 
 #### 5.1.3 Rendering Strategy Per Page
 
-| Page                                    | Source                                         | Strategy                                    | Cache Tag                                   |
-| --------------------------------------- | ---------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
-| `/` (home)                              | Sanity + featured Medusa products              | `force-cache` + tag revalidation            | `sanity:home`, `product:*` (where featured) |
-| `/shop`                                 | Medusa collections + products                  | ISR, tag revalidation                       | `collection:*`, `product:*`                 |
-| `/shop/[collection]`                    | Medusa                                         | ISR per collection                          | `collection:[slug]`                         |
-| `/products/[handle]`                    | Medusa (price, stock) + Sanity (story)         | Static shell + dynamic price/stock segment  | `product:[handle]`, `sanity:product:[id]`   |
-| `/journal`, `/journal/[slug]`           | Sanity                                         | ISR                                         | `sanity:journal:*`                          |
-| `/lookbook`, `/lookbook/[slug]`         | Sanity + Mux                                   | ISR                                         | `sanity:lookbook:*`                         |
-| `/capsules`, `/capsules/[slug]`         | Sanity (+ Medusa product refs)                 | ISR                                         | `sanity:capsule:*`                          |
-| `/about`, `/press`, `/wholesale`, legal | Sanity                                         | Static / ISR                                | `sanity:page:[slug]`                        |
-| `/search`                               | Search service / Medusa                        | Dynamic                                     | —                                           |
-| `/cart`                                 | Medusa cart                                    | `no-store`, dynamic                         | —                                           |
-| `/checkout`                             | Medusa + Stripe                                | `no-store`, dynamic, isolated layout        | —                                           |
-| `/account/*`                            | Medusa customer                                | `no-store`, dynamic, server-side auth check | —                                           |
-| `/wishlist`                             | Medusa wishlist (auth) or localStorage (guest) | Dynamic                                     | —                                           |
-| `/thank-you/[orderId]`                  | Medusa order                                   | Dynamic, server-validated by token          | —                                           |
-| `/studio`                               | Sanity Studio (client)                         | Static shell, client-rendered               | —                                           |
+| Page                                    | Source                                 | Strategy                                    | Cache Tag                                   |
+| --------------------------------------- | -------------------------------------- | ------------------------------------------- | ------------------------------------------- |
+| `/` (home)                              | Sanity + featured Medusa products      | `force-cache` + tag revalidation            | `sanity:home`, `product:*` (where featured) |
+| `/shop`                                 | Medusa collections + products          | ISR, tag revalidation                       | `collection:*`, `product:*`                 |
+| `/shop/[collection]`                    | Medusa                                 | ISR per collection                          | `collection:[slug]`                         |
+| `/products/[handle]`                    | Medusa (price, stock) + Sanity (story) | Static shell + dynamic price/stock segment  | `product:[handle]`, `sanity:product:[id]`   |
+| `/journal`, `/journal/[slug]`           | Sanity                                 | ISR                                         | `sanity:journal:*`                          |
+| `/lookbook`, `/lookbook/[slug]`         | Sanity + Mux                           | ISR                                         | `sanity:lookbook:*`                         |
+| `/capsules`, `/capsules/[slug]`         | Sanity (+ Medusa product refs)         | ISR                                         | `sanity:capsule:*`                          |
+| `/about`, `/press`, `/wholesale`, legal | Sanity                                 | Static / ISR                                | `sanity:page:[slug]`                        |
+| `/search`                               | Search service / Medusa                | Dynamic                                     | —                                           |
+| `/cart`                                 | Medusa cart                            | `no-store`, dynamic                         | —                                           |
+| `/checkout`                             | Medusa + Stripe                        | `no-store`, dynamic, isolated layout        | —                                           |
+| `/account/*`                            | Medusa customer                        | `no-store`, dynamic, server-side auth check | —                                           |
+| `/account/wishlist`                     | Medusa wishlist (auth)                 | `no-store`, dynamic, server-side auth check | —                                           |
+| `/thank-you/[orderId]`                  | Medusa order                           | Dynamic, server-validated by token          | —                                           |
+| `/studio`                               | Sanity Studio (client)                 | Static shell, client-rendered               | —                                           |
 
 Rules:
 
 - `force-cache`, `no-store`, `revalidate`, and tags are **always explicit**. We never rely on Next.js defaults for cache behavior.
 - Cart, account, and checkout routes never touch the global static cache.
+- `/account/layout.tsx` is the authoritative account guard. It awaits the Medusa customer session server-side and redirects unauthenticated users to `/login?next=/account`; all `/account/*` sub-routes inherit that guard.
 - The LCP element is **always in the static shell**. We do not stream the hero image or the H1.
 - `generateStaticParams` is used for top products, collections, capsules, and journal articles. The long tail is rendered on demand.
 
@@ -1232,9 +1234,11 @@ Rules:
 | `/thank-you/[orderId]`                                | Medusa order                            | `no-store`                         | session/token    | Token-gated                                     |
 | `/account`                                            | Medusa customer                         | `no-store`                         | required         |                                                 |
 | `/account/orders`                                     | Medusa                                  | `no-store`                         | required         |                                                 |
-| `/account/orders/[id]`                                | Medusa                                  | `no-store`                         | required         |                                                 |
+| `/account/orders/[orderId]`                           | Medusa                                  | `no-store`                         | required         |                                                 |
 | `/account/addresses`                                  | Medusa                                  | `no-store`                         | required         |                                                 |
-| `/wishlist`                                           | Medusa (auth) / localStorage (guest)    | `no-store`                         | optional         |                                                 |
+| `/account/profile`                                    | Medusa customer                         | `no-store`                         | required         | Email edit deferred until verification flow     |
+| `/account/wishlist`                                   | `@alphabite/medusa-wishlist` plugin     | `no-store`                         | required         | PDP heart redirects guests to sign in           |
+| `/account/marketing-preferences`                      | Stub Server Action until module wiring  | `no-store`                         | required         | Agent 20 wires durable `marketing-consent`      |
 | `/privacy`, `/terms`, `/returns`, `/shipping`, `/faq` | Sanity (`legalPage`)                    | ISR                                | —                |                                                 |
 | `/studio`                                             | Sanity Studio                           | Static + client                    | Sanity auth      | Embedded                                        |
 | `404`, `500`                                          | —                                       | Static / static error shell        | —                | Branded                                         |
@@ -1468,7 +1472,9 @@ Standard workflows we use **as-shipped**:
 | `POST /admin/sanity/resync`     | `src/api/admin/sanity/resync/route.ts`     | Trigger single-product resync workflow                              |
 | `POST /admin/sanity/resync-all` | `src/api/admin/sanity/resync-all/route.ts` | Trigger batch resync workflow                                       |
 
-> Wishlist API routes (`/store/wishlist`, `/store/wishlist/merge`) are provided by `@alphabite/medusa-wishlist` per [ADR-013](#adr-013-adopt-community-wishlist-plugin) — no custom implementation needed.
+> Storefront note: `/account/marketing-preferences` uses a temporary Server Action stub that records non-PII intent only. Agent 20 wires the durable `POST /store/marketing-consent` backend route before launch consent can be considered stored.
+
+> Wishlist API routes are provided by `@alphabite/medusa-wishlist` per [ADR-013](#adr-013-adopt-community-wishlist-plugin) — no custom implementation needed. Published `0.5.9` routes are plural: `GET /store/wishlists`, `POST /store/wishlists`, `GET /store/wishlists/:id/items`, `POST /store/wishlists/:id/add-item`, `DELETE /store/wishlists/:id/items/:item_id`, and `POST /store/wishlists/:id/transfer`.
 
 ### 6.4 Admin Customization
 

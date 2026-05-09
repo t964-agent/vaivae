@@ -6,6 +6,8 @@ import { PdpLayout } from "@/components/pdp/pdp-layout";
 import { getProductByHandle, getProductRecommendations } from "@/medusa/products";
 import { getDefaultRegion } from "@/medusa/regions";
 import type { StoreProduct, StoreRegion } from "@/medusa/types";
+import { getCurrentCustomer } from "@/medusa/customer";
+import { getWishlist } from "@/medusa/wishlist";
 import { getEditorialProduct, type EditorialProduct } from "@/lib/sanity/products";
 import { getProductJsonLd } from "@/lib/seo/product-jsonld";
 import { urlFor } from "@/sanity/image";
@@ -140,6 +142,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   const canonicalUrl = getCanonicalUrl(data.product.handle);
+  const [customer, wishlistItems] = await Promise.all([
+    getCurrentCustomer().catch(() => null),
+    getWishlist().catch(() => []),
+  ]);
   const jsonLd = getProductJsonLd({
     editorial: data.editorial,
     product: data.product,
@@ -154,8 +160,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
       />
       <PdpLayout
         editorial={data.editorial}
+        isAuthenticated={Boolean(customer)}
         product={data.product}
         recommendations={data.recommendations}
+        wishlistItems={wishlistItems.map((item) => ({
+          itemId: item.id,
+          variantId: item.product_variant_id,
+        }))}
       />
     </>
   );

@@ -1,11 +1,12 @@
 "use client";
 
 import { useElements, useStripe } from "@stripe/react-stripe-js";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { CheckoutAddressData, CheckoutContactData } from "@/components/checkout/types";
-import { Button, Separator } from "@/components/ui";
+import { Button, Checkbox, Separator } from "@/components/ui";
 import { dispatchCartUpdated } from "@/lib/cart-events";
 import { formatPrice } from "@/lib/format";
 import { toast } from "@/lib/toast";
@@ -53,7 +54,9 @@ export function CheckoutReviewStep({
   const stripe = useStripe();
   const elements = useElements();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const canSubmit = Boolean(stripe && elements && paymentReady) && !disabled && !isSubmitting;
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const canSubmit =
+    Boolean(stripe && elements && paymentReady) && !disabled && !isSubmitting && termsAccepted;
 
   async function placeOrder(): Promise<void> {
     if (!stripe || !elements || !canSubmit) {
@@ -145,6 +148,26 @@ export function CheckoutReviewStep({
         </span>
       </div>
 
+      <div className="flex items-start gap-3">
+        <Checkbox
+          aria-required="true"
+          checked={termsAccepted}
+          disabled={disabled || isSubmitting}
+          id="checkout-terms"
+          onCheckedChange={(value) => setTermsAccepted(value === true)}
+        />
+        <p className="text-sm leading-5 font-normal text-on-light/65">
+          <label htmlFor="checkout-terms">I agree to the vaïvae </label>
+          <Link
+            className="text-on-light underline underline-offset-4 hover:text-oxblood"
+            href="/terms"
+          >
+            Terms of Service
+          </Link>
+          .
+        </p>
+      </div>
+
       <Button
         disabled={!canSubmit}
         loading={isSubmitting}
@@ -157,6 +180,11 @@ export function CheckoutReviewStep({
       {!paymentReady ? (
         <p className="text-sm leading-5 text-on-light/55" role="status">
           Complete payment details and billing address to place the order.
+        </p>
+      ) : null}
+      {paymentReady && !termsAccepted ? (
+        <p className="text-sm leading-5 text-on-light/55" role="status">
+          Accept the Terms of Service to place the order.
         </p>
       ) : null}
     </div>

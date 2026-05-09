@@ -2453,11 +2453,21 @@ Termly Pro+ provides:
 - Essential cookies (cart ID, session) excluded from consent gating.
 - CI test verifies no analytics SDK initializes before consent on any route.
 
+**Storefront implementation**:
+
+- Public root slugs are resolved by `apps/storefront/src/app/(site)/[slug]/page.tsx` in this order: `legal` document → generic `page` document → 404.
+- Sanity `page` and `legal` schemas guard top-level app routes and legal policy slugs. `legal` documents may use their own canonical kind slug (for example `kind: privacy` with slug `privacy`); generic `page` documents may not claim legal slugs.
+- Cross-document-type slug uniqueness is still an editor trust contract because Sanity does not enforce it by default. TODO: add a custom cross-type `isUnique` hardener if editors start managing many root-level pages.
+- Termly CMP is wired in the public storefront layout with `NEXT_PUBLIC_TERMLY_WEBSITE_UUID` using `https://app.termly.io/embed.min.js?autoBlock=on&websiteUUID=...`; local development skips the script when the UUID is unset and logs a development-only warning.
+- `/cookies` embeds Termly's live cookie inventory widget. Termly remains the source of truth for cookie inventory; cookie records are not mirrored into Sanity.
+- `apps/storefront/src/lib/consent/use-consent.ts` exposes `useConsent()` returning `{ analytics, advertising, ready }`. Agent 24 owns analytics initialization and must use this hook or an equivalent Termly/GTM consent state before loading non-essential tags.
+- Termly dashboard setup: configure a custom bottom banner, apply vaïvae brand colors, keep `Accept all`, `Reject non-essential`, and `Manage choices` available, enable Google Consent Mode v2, route privacy/SAR notifications to `privacy@vaivae.com`, and complete lawyer review before launch.
+
 #### 10.2.3 Data Subject Rights
 
 Process for handling DSRs (right to access, rectify, delete, port):
 
-- Inbound channel: `privacy@vaivae.com` and a `/contact?subject=privacy` form.
+- Inbound channel: `privacy@vaivae.com` and a `/contact?subject=privacy` form. Termly's automated SAR/DSAR form is deferred for Phase 1; when enabled, it must notify the monitored `privacy@vaivae.com` alias.
 - SLA: respond within **30 days** (GDPR baseline; CCPA allows 45 days).
 - Customer deletion implemented via Medusa Admin action that:
   - Anonymizes the `Customer` record (clears email, name, phone, addresses).
@@ -2499,6 +2509,7 @@ This policy is reflected in the Termly-generated privacy policy and reviewed by 
 - Medusa Cloud DPA: accepted on signup.
 - Sanity DPA: available on Growth+; sign before going to production.
 - Resend DPA: accepted on plan signup.
+- Termly DPA: accepted before enabling CMP, policy hosting, or DSAR intake in production.
 - Cloudflare DPA: built into ToS.
 - Maintain a **DPA registry** in `docs/compliance/dpas.md` listing each processor + DPA URL + accepted date.
 

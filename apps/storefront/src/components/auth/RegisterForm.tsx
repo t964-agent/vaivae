@@ -244,7 +244,7 @@ export function RegisterForm({ nextPath }: RegisterFormProps) {
               className="text-on-light underline underline-offset-4 hover:text-oxblood"
               href="/terms"
             >
-              Terms
+              Terms of Service
             </Link>{" "}
             and{" "}
             <Link

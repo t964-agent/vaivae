@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +12,7 @@ import {
   Checkbox,
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -113,6 +115,13 @@ export function NewsletterSignupForm({ submitLabel }: NewsletterSignupFormProps)
                   Sign me up for the vaïvae editorial. I can unsubscribe anytime.
                 </FormLabel>
               </div>
+              <FormDescription className="max-w-md text-xs leading-5 text-on-dark/55">
+                We process newsletter consent under our{" "}
+                <Link className="text-on-dark underline underline-offset-4" href="/privacy">
+                  Privacy Policy
+                </Link>
+                .
+              </FormDescription>
               <FormMessage className="border-accent-gold text-on-dark/80" />
             </FormItem>
           )}

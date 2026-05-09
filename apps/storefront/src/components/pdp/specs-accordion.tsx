@@ -192,10 +192,10 @@ function ShippingReturnsSection() {
       <p>Returns are accepted for eligible unworn pieces under the published policy.</p>
       <div className="flex flex-wrap gap-4">
         <Button asChild variant="underline">
-          <Link href={"/shipping" as Route}>Shipping details</Link>
+          <Link href={"/shipping" as Route}>Shipping policy</Link>
         </Button>
         <Button asChild variant="underline">
-          <Link href={"/returns" as Route}>Return policy</Link>
+          <Link href={"/returns" as Route}>Returns policy</Link>
         </Button>
       </div>
     </div>

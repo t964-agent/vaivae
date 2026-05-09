@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Fraunces, Inter_Tight } from "next/font/google";
 import { draftMode } from "next/headers";
+import Script from "next/script";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
@@ -36,6 +37,8 @@ type SiteLayoutProps = {
   children: ReactNode;
 };
 
+let hasWarnedMissingTermlyUuid = false;
+
 async function getInitialCart(): Promise<StoreCart | null> {
   try {
     return await getCart();
@@ -44,14 +47,32 @@ async function getInitialCart(): Promise<StoreCart | null> {
   }
 }
 
+function getTermlyWebsiteUuid(): string | undefined {
+  const websiteUuid = process.env["NEXT_PUBLIC_TERMLY_WEBSITE_UUID"]?.trim();
+
+  if (!websiteUuid && process.env["NODE_ENV"] === "development" && !hasWarnedMissingTermlyUuid) {
+    hasWarnedMissingTermlyUuid = true;
+    console.warn("Termly CMP skipped: NEXT_PUBLIC_TERMLY_WEBSITE_UUID is not set.");
+  }
+
+  return websiteUuid || undefined;
+}
+
 export default async function SiteLayout({ children }: SiteLayoutProps) {
   const [cart, draft] = await Promise.all([getInitialCart(), draftMode()]);
   const cartItemCount = getCartItemCount(cart);
+  const termlyWebsiteUuid = getTermlyWebsiteUuid();
 
   return (
     <div
       className={`${fraunces.variable} ${interTight.variable} min-h-dvh bg-cream font-body text-on-light antialiased selection:bg-accent-gold selection:text-ink`}
     >
+      {termlyWebsiteUuid ? (
+        <Script
+          src={`https://app.termly.io/embed.min.js?autoBlock=on&websiteUUID=${termlyWebsiteUuid}`}
+          strategy="afterInteractive"
+        />
+      ) : null}
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>

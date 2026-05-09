@@ -11,25 +11,23 @@ type SiteSettings = GlobalQueryResult["siteSettings"];
 type PaymentMethod = NonNullable<NonNullable<Footer>["paymentMethods"]>[number];
 
 const fallbackLegalLinks = [
-  {
-    _key: "fallback-privacy",
-    _type: "link",
-    href: "/privacy",
-    internalTarget: null,
-    label: "Privacy",
-    targetBlank: false,
-    type: "internal",
-  },
-  {
-    _key: "fallback-terms",
-    _type: "link",
-    href: "/terms",
-    internalTarget: null,
-    label: "Terms",
-    targetBlank: false,
-    type: "internal",
-  },
-] satisfies ChromeLink[];
+  { label: "Privacy", slug: "privacy" },
+  { label: "Terms", slug: "terms" },
+  { label: "Returns", slug: "returns" },
+  { label: "Shipping", slug: "shipping" },
+  { label: "Accessibility", slug: "accessibility" },
+  { label: "Cookies", slug: "cookies" },
+  { label: "Wholesale", slug: "wholesale" },
+  { label: "Imprint", slug: "imprint" },
+].map(({ label, slug }) => ({
+  _key: `fallback-${slug}`,
+  _type: "link" as const,
+  href: `/${slug}`,
+  internalTarget: null,
+  label,
+  targetBlank: false,
+  type: "internal" as const,
+})) satisfies ChromeLink[];
 
 function getUsableLinks(links: ChromeLink[] | null | undefined): ChromeLink[] {
   return links?.filter((link) => Boolean(link.label?.trim())) ?? [];

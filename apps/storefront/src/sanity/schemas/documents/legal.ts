@@ -3,7 +3,44 @@ import { defineField, defineType } from "sanity";
 
 import { defineEditorialBodyField } from "../pageBuilder/common";
 
-const reservedLegalSlugs = new Set(["studio", "cart", "account", "checkout", "api"]);
+const legalKindSlugs = new Set<string>([
+  "accessibility",
+  "cookies",
+  "imprint",
+  "privacy",
+  "returns",
+  "shipping",
+  "terms",
+  "wholesale",
+]);
+
+const reservedLegalSlugs = new Set<string>([
+  "account",
+  "api",
+  "accessibility",
+  "capsule",
+  "cart",
+  "checkout",
+  "collections",
+  "cookies",
+  "home",
+  "imprint",
+  "journal",
+  "login",
+  "lookbook",
+  "product",
+  "privacy",
+  "products",
+  "register",
+  "returns",
+  "robots.txt",
+  "search",
+  "shipping",
+  "sitemap.xml",
+  "studio",
+  "terms",
+  "wholesale",
+]);
 
 function getSlugCurrent(value: unknown): string | undefined {
   if (!value || typeof value !== "object" || !("current" in value)) {
@@ -13,6 +50,16 @@ function getSlugCurrent(value: unknown): string | undefined {
   const current = value.current;
 
   return typeof current === "string" ? current.trim() : undefined;
+}
+
+function getDocumentKind(document: unknown): string | undefined {
+  if (!document || typeof document !== "object" || !("kind" in document)) {
+    return undefined;
+  }
+
+  const kind = document.kind;
+
+  return typeof kind === "string" ? kind.trim() : undefined;
 }
 
 export const legal = defineType({
@@ -32,11 +79,17 @@ export const legal = defineType({
       title: "Slug",
       type: "slug",
       validation: (rule) =>
-        rule.required().custom((value) => {
+        rule.required().custom((value, context) => {
           const slug = getSlugCurrent(value);
 
           if (!slug) {
             return "Slug is required.";
+          }
+
+          if (legalKindSlugs.has(slug)) {
+            const kind = getDocumentKind(context.document);
+
+            return kind === slug ? true : `"${slug}" is reserved for the ${slug} legal page.`;
           }
 
           if (reservedLegalSlugs.has(slug)) {

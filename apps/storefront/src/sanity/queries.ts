@@ -580,6 +580,13 @@ export const pageBySlugQuery = defineQuery(`*[_type == "page" && slug.current ==
   }
 }`);
 
+export const pageListQuery = defineQuery(`*[_type == "page"] | order(title asc){
+  _id,
+  _type,
+  title,
+  "slug": slug.current
+}`);
+
 const productDetailFragment = `_id,
   _type,
   _createdAt,
@@ -643,8 +650,7 @@ const productDetailFragment = `_id,
   certifications,
   seo{
     ${seoFragment}
-  }
-}`;
+  }`;
 
 export const productByHandleQuery =
   defineQuery(`*[_type == "product" && handle.current == $handle][0]{

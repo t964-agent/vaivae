@@ -3967,6 +3967,16 @@ export type PageBySlugQueryResult = {
 } | null;
 
 // Source: src/sanity/queries.ts
+// Variable: pageListQuery
+// Query: *[_type == "page"] | order(title asc){  _id,  _type,  title,  "slug": slug.current}
+export type PageListQueryResult = Array<{
+  _id: string;
+  _type: "page";
+  title: string | null;
+  slug: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
 // Variable: productByHandleQuery
 // Query: *[_type == "product" && handle.current == $handle][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  medusaProductId,  title,  "handle": handle.current,  mirrorMaterials,  editorialReady,  eyebrow,  oneLineHook,  narrative[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  pdpStorytelling[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  },  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  gallery[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  lookbookFeature->{    _id,    _type,    title,    "slug": slug.current,    coverImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  modelSpecs{    height,    wearingSize,    notes  },  "materials": array::compact(materials[]->{    _id,_type,name,composition,origin,careInstructions,"slug": slug.current,description[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  }),  colorSwatches[]{    _key,    _type,    medusaVariantOptionValueId,    swatch->{      _id,_type,name,"slug": slug.current,hex,image{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},fallbackTextColor    }  },  sizeGuide->{    _id,_type,name,"slug": slug.current,description,measurements[]{  _key,  _type,  size,  bust,  waist,  hips,  length,  note},unitSystem,tipsRichText[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  },  careNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  madeIn,  sustainabilityNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  certifications,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  }}
 export type ProductByHandleQueryResult = {
@@ -4444,9 +4454,519 @@ export type ProductByHandleQueryResult = {
 } | null;
 
 // Source: src/sanity/queries.ts
+// Variable: productByMedusaIdQuery
+// Query: *[_type == "product" && _id == $medusaProductId][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  medusaProductId,  title,  "handle": handle.current,  mirrorMaterials,  editorialReady,  eyebrow,  oneLineHook,  narrative[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  pdpStorytelling[]{    _key,_type,_type == "heroFilm" => {  eyebrow,  heading,  subhead,  media{    sourceType,    muxPlaybackId,    directUrl,    posterImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  scrollIndicator,  marquee{    enabled,    text,    separator,    speed,    direction  },  chapters[]{    _key,    _type,    eyebrow,    heading,    body[],    note,    mediaPoster{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    align  },  terminalCta{    eyebrow,    heading,    body,    primaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    },    secondaryCta{      _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style    }  }},_type == "brandPromise" => {  eyebrow,  statement,  body[],  width,  alignment,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "productRail" => {  eyebrow,  heading,  intro,  layout,  columns,  density,  "products": array::compact(products[]->{    _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "capsuleRail" => {  eyebrow,  heading,  "capsules": array::compact(capsules[]->{    _id,    _type,    title,    "slug": slug.current  }),  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "editorialExcerpt" => {  journalEntry->{    _id,    _type,    title,    "slug": slug.current  },  eyebrow,  customHeading,  quote,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "lookbookGrid" => {  eyebrow,  heading,  lookbookEntry->{    _id,    _type,    title,    "slug": slug.current  },  images[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  layout,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "journalRail" => {  eyebrow,  heading,  mode,  "entries": array::compact(entries[]->{    _id,    _type,    title,    "slug": slug.current  }),  limit,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "imagePair" => {  eyebrow,  heading,  leftImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  leftCaption,  rightImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  rightCaption,  layout,  theme,  cta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  }},_type == "videoChapter" => {  eyebrow,  heading,  muxPlaybackId,  posterImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  body[],  productHotspots[]{    _key,    _type,    label,    timestampSeconds,    product->{      _id,_type,"medusaProductId": medusaProductId,title,"handle": handle.current,editorialReady,oneLineHook,heroImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}    }  },  theme},_type == "quote" => {  quote,  attribution,  source,  style},_type == "ctaSection" => {  eyebrow,  heading,  body,  primaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  secondaryCta{    _type,label,link{  _type,type,label,internal{  _ref,  _type,  _weak},"internalTarget": internal->{  _id,_type,"title": coalesce(siteName, title, name),"slug": coalesce(slug.current, handle.current)},href,targetBlank},style  },  background{    type,    solidColor,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  theme}  },  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  gallery[]{    _key,    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  lookbookFeature->{    _id,    _type,    title,    "slug": slug.current,    coverImage{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    }  },  modelSpecs{    height,    wearingSize,    notes  },  "materials": array::compact(materials[]->{    _id,_type,name,composition,origin,careInstructions,"slug": slug.current,description[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  }),  colorSwatches[]{    _key,    _type,    medusaVariantOptionValueId,    swatch->{      _id,_type,name,"slug": slug.current,hex,image{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},fallbackTextColor    }  },  sizeGuide->{    _id,_type,name,"slug": slug.current,description,measurements[]{  _key,  _type,  size,  bust,  waist,  hips,  length,  note},unitSystem,tipsRichText[]{  ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}}  },  careNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  madeIn,  sustainabilityNotes[]{    ...,_type == "vaivaeImage" => {  _key,  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption}  },  certifications,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  }}
+export type ProductByMedusaIdQueryResult = {
+  _id: string;
+  _type: "product";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  medusaProductId: string | null;
+  title: string | null;
+  handle: string | null;
+  mirrorMaterials: Array<string> | null;
+  editorialReady: boolean | null;
+  eyebrow: string | null;
+  oneLineHook: string | null;
+  narrative: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  pdpStorytelling: Array<
+    | {
+        _key: string;
+        _type: "imagePair";
+        eyebrow: string | null;
+        heading: string | null;
+        leftImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        leftCaption: string | null;
+        rightImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        rightCaption: string | null;
+        layout: "balanced" | "left-emphasis" | "right-emphasis" | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+        cta: {
+          _type: "cta";
+          label: string | null;
+          link: {
+            _type: "link";
+            type: "external" | "internal" | null;
+            label: string | null;
+            internal: {
+              _ref: string;
+              _type: "reference";
+              _weak: boolean | null;
+            } | null;
+            internalTarget:
+              | {
+                  _id: string;
+                  _type: "capsule";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "homePage";
+                  title: string | null;
+                  slug: null;
+                }
+              | {
+                  _id: string;
+                  _type: "journal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "legal";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "lookbook";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "page";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "product";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
+                  _type: "siteSettings";
+                  title: string | null;
+                  slug: null;
+                }
+              | null;
+            href: string | null;
+            targetBlank: boolean | null;
+          } | null;
+          style: "ghost" | "primary" | "underline" | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "quote";
+        quote: string | null;
+        attribution: string | null;
+        source: string | null;
+        style: "press" | "pull" | null;
+      }
+    | {
+        _key: string;
+        _type: "videoChapter";
+        eyebrow: string | null;
+        heading: string | null;
+        muxPlaybackId: string | null;
+        posterImage: {
+          _type: "vaivaeImage";
+          asset: {
+            _id: string;
+            _type: "sanity.imageAsset";
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number | null;
+                height: number | null;
+                aspectRatio: number | null;
+              } | null;
+            } | null;
+          } | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+          alt: string | null;
+          caption: string | null;
+        } | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+          listItem?: never;
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }> | null;
+        productHotspots: Array<{
+          _key: string;
+          _type: "productHotspot";
+          label: string | null;
+          timestampSeconds: number | null;
+          product: {
+            _id: string;
+            _type: "product";
+            medusaProductId: string | null;
+            title: string | null;
+            handle: string | null;
+            editorialReady: boolean | null;
+            oneLineHook: string | null;
+            heroImage: {
+              _type: "vaivaeImage";
+              asset: {
+                _id: string;
+                _type: "sanity.imageAsset";
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number | null;
+                    height: number | null;
+                    aspectRatio: number | null;
+                  } | null;
+                } | null;
+              } | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+              alt: string | null;
+              caption: string | null;
+            } | null;
+          } | null;
+        }> | null;
+        theme: "dark-text-on-light" | "light-text-on-dark" | null;
+      }
+  > | null;
+  heroImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  gallery: Array<{
+    _key: string;
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  }> | null;
+  lookbookFeature: {
+    _id: string;
+    _type: "lookbook";
+    title: string | null;
+    slug: string | null;
+    coverImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+  } | null;
+  modelSpecs: {
+    height: string | null;
+    wearingSize: string | null;
+    notes: string | null;
+  } | null;
+  materials: Array<{
+    _id: string;
+    _type: "material";
+    name: string | null;
+    composition: string | null;
+    origin: string | null;
+    careInstructions: string | null;
+    slug: string | null;
+    description: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  }> | null;
+  colorSwatches: Array<{
+    _key: string;
+    _type: "productColorSwatch";
+    medusaVariantOptionValueId: string | null;
+    swatch: {
+      _id: string;
+      _type: "colorSwatch";
+      name: string | null;
+      slug: string | null;
+      hex: string | null;
+      image: {
+        _type: "vaivaeImage";
+        asset: {
+          _id: string;
+          _type: "sanity.imageAsset";
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number | null;
+              height: number | null;
+              aspectRatio: number | null;
+            } | null;
+          } | null;
+        } | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        caption: string | null;
+      } | null;
+      fallbackTextColor: "dark" | "light" | null;
+    } | null;
+  }> | null;
+  sizeGuide: {
+    _id: string;
+    _type: "sizeGuide";
+    name: string | null;
+    slug: string | null;
+    description: string | null;
+    measurements: Array<{
+      _key: string;
+      _type: "measurement";
+      size: string | null;
+      bust: string | null;
+      waist: string | null;
+      hips: string | null;
+      length: string | null;
+      note: string | null;
+    }> | null;
+    unitSystem: "both" | "cm" | "in" | null;
+    tipsRichText: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+      listItem?: never;
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  } | null;
+  careNotes: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  madeIn: string | null;
+  sustainabilityNotes: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal" | "pullQuote";
+    listItem?: never;
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  certifications: Array<"BCI" | "Fair Trade" | "GOTS" | "GRS" | "OEKO-TEX"> | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/queries.ts
 // Variable: productListQuery
 // Query: *[_type == "product"] | order(title asc){  _id,  _type,  medusaProductId,  title,  "handle": handle.current,  editorialReady,  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  oneLineHook}
 export type ProductListQueryResult = Array<{
+  _id: string;
+  _type: "product";
+  medusaProductId: string | null;
+  title: string | null;
+  handle: string | null;
+  editorialReady: boolean | null;
+  heroImage: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  oneLineHook: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: productsByMedusaIdsQuery
+// Query: *[  _type == "product" &&  editorialReady == true &&  medusaProductId in $medusaProductIds] | order(title asc){  _id,  _type,  medusaProductId,  title,  "handle": handle.current,  editorialReady,  heroImage{    _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption  },  oneLineHook}
+export type ProductsByMedusaIdsQueryResult = Array<{
   _id: string;
   _type: "product";
   medusaProductId: string | null;
@@ -6718,8 +7238,11 @@ declare module "@sanity/client" {
     '*[_type == "footer" && _id == "footer"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  columns[]{\n    _key,\n    _type,\n    title,\n    links[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  newsletterEnabled,\n  newsletterHeading,\n  newsletterDescription,\n  newsletterCtaLabel,\n  legalLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  copyrightText,\n  paymentMethods\n}': FooterQueryResult;
     '*[_type == "homePage" && _id == "homePage"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': HomePageQueryResult;
     '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  pageBuilder[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  }\n}': PageBySlugQueryResult;
+    '*[_type == "page"] | order(title asc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current\n}': PageListQueryResult;
     '*[_type == "product" && handle.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  mirrorMaterials,\n  editorialReady,\n  eyebrow,\n  oneLineHook,\n  narrative[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  pdpStorytelling[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  },\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  gallery[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  lookbookFeature->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  modelSpecs{\n    height,\n    wearingSize,\n    notes\n  },\n  "materials": array::compact(materials[]->{\n    _id,\n_type,\nname,\ncomposition,\norigin,\ncareInstructions,\n"slug": slug.current,\ndescription[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  }),\n  colorSwatches[]{\n    _key,\n    _type,\n    medusaVariantOptionValueId,\n    swatch->{\n      _id,\n_type,\nname,\n"slug": slug.current,\nhex,\nimage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nfallbackTextColor\n    }\n  },\n  sizeGuide->{\n    _id,\n_type,\nname,\n"slug": slug.current,\ndescription,\nmeasurements[]{\n  _key,\n  _type,\n  size,\n  bust,\n  waist,\n  hips,\n  length,\n  note\n},\nunitSystem,\ntipsRichText[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  },\n  careNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  madeIn,\n  sustainabilityNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  certifications,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  }\n}': ProductByHandleQueryResult;
+    '*[_type == "product" && _id == $medusaProductId][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  mirrorMaterials,\n  editorialReady,\n  eyebrow,\n  oneLineHook,\n  narrative[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  pdpStorytelling[]{\n    _key,\n_type,\n_type == "heroFilm" => {\n  eyebrow,\n  heading,\n  subhead,\n  media{\n    sourceType,\n    muxPlaybackId,\n    directUrl,\n    posterImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  scrollIndicator,\n  marquee{\n    enabled,\n    text,\n    separator,\n    speed,\n    direction\n  },\n  chapters[]{\n    _key,\n    _type,\n    eyebrow,\n    heading,\n    body[],\n    note,\n    mediaPoster{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    align\n  },\n  terminalCta{\n    eyebrow,\n    heading,\n    body,\n    primaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    },\n    secondaryCta{\n      _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n    }\n  }\n},\n_type == "brandPromise" => {\n  eyebrow,\n  statement,\n  body[],\n  width,\n  alignment,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "productRail" => {\n  eyebrow,\n  heading,\n  intro,\n  layout,\n  columns,\n  density,\n  "products": array::compact(products[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "capsuleRail" => {\n  eyebrow,\n  heading,\n  "capsules": array::compact(capsules[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "editorialExcerpt" => {\n  journalEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  eyebrow,\n  customHeading,\n  quote,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "lookbookGrid" => {\n  eyebrow,\n  heading,\n  lookbookEntry->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  },\n  images[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  layout,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "journalRail" => {\n  eyebrow,\n  heading,\n  mode,\n  "entries": array::compact(entries[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current\n  }),\n  limit,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "imagePair" => {\n  eyebrow,\n  heading,\n  leftImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  leftCaption,\n  rightImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  rightCaption,\n  layout,\n  theme,\n  cta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  }\n},\n_type == "videoChapter" => {\n  eyebrow,\n  heading,\n  muxPlaybackId,\n  posterImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  body[],\n  productHotspots[]{\n    _key,\n    _type,\n    label,\n    timestampSeconds,\n    product->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    }\n  },\n  theme\n},\n_type == "quote" => {\n  quote,\n  attribution,\n  source,\n  style\n},\n_type == "ctaSection" => {\n  eyebrow,\n  heading,\n  body,\n  primaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  secondaryCta{\n    _type,\nlabel,\nlink{\n  _type,\ntype,\nlabel,\ninternal{\n  _ref,\n  _type,\n  _weak\n},\n"internalTarget": internal->{\n  _id,\n_type,\n"title": coalesce(siteName, title, name),\n"slug": coalesce(slug.current, handle.current)\n},\nhref,\ntargetBlank\n},\nstyle\n  },\n  background{\n    type,\n    solidColor,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  theme\n}\n  },\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  gallery[]{\n    _key,\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  lookbookFeature->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  modelSpecs{\n    height,\n    wearingSize,\n    notes\n  },\n  "materials": array::compact(materials[]->{\n    _id,\n_type,\nname,\ncomposition,\norigin,\ncareInstructions,\n"slug": slug.current,\ndescription[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  }),\n  colorSwatches[]{\n    _key,\n    _type,\n    medusaVariantOptionValueId,\n    swatch->{\n      _id,\n_type,\nname,\n"slug": slug.current,\nhex,\nimage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nfallbackTextColor\n    }\n  },\n  sizeGuide->{\n    _id,\n_type,\nname,\n"slug": slug.current,\ndescription,\nmeasurements[]{\n  _key,\n  _type,\n  size,\n  bust,\n  waist,\n  hips,\n  length,\n  note\n},\nunitSystem,\ntipsRichText[]{\n  ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n}\n  },\n  careNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  madeIn,\n  sustainabilityNotes[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  certifications,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  }\n}': ProductByMedusaIdQueryResult;
     '*[_type == "product"] | order(title asc){\n  _id,\n  _type,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  editorialReady,\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  oneLineHook\n}': ProductListQueryResult;
+    '*[\n  _type == "product" &&\n  editorialReady == true &&\n  medusaProductId in $medusaProductIds\n] | order(title asc){\n  _id,\n  _type,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  editorialReady,\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  oneLineHook\n}': ProductsByMedusaIdsQueryResult;
     '*[_type == "lookbook" && slug.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  coverVideo{\n    muxAssetId\n  },\n  seasonOrDrop->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    eyebrow,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  },\n  description[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  looks[]{\n    _key,\n    _type,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    caption,\n    "products": array::compact(products[]->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    })\n  },\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': LookbookByHandleQueryResult;
     '*[_type == "lookbook"] | order(publishedAt desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  publishedAt\n}': LookbookListQueryResult;
     '*[_type == "journal" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  subtitle,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  excerpt,\n  body[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  tags,\n  "relatedProducts": array::compact(relatedProducts[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  "relatedLookbooks": array::compact(relatedLookbooks[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  }),\n  author,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': JournalEntryQueryResult;

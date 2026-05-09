@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+pnpm --config.verify-deps-before-run=false lint-staged
+
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact -v; then
+    echo "gitleaks protect failed; retrying with the current gitleaks git pre-commit command" >&2
+    gitleaks git --pre-commit --staged --redact --verbose
+  fi
+else
+  echo "warning: gitleaks 8.30.1 is not installed; skipping local secret scan" >&2
+  echo "install with: brew install gitleaks, or download a Linux release from https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1" >&2
+fi

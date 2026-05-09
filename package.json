@@ -1,0 +1,41 @@
+{
+  "name": "vaivae",
+  "version": "0.0.0",
+  "private": true,
+  "description": "vaïvae — luxury editorial fashion ecommerce. Monorepo containing the Next.js storefront (with embedded Sanity Studio) and the Medusa v2 backend.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.0.9",
+  "engines": {
+    "node": "24.15.0",
+    "pnpm": "11.0.9"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "clean": "turbo run clean && rm -rf node_modules .turbo"
+  },
+  "devDependencies": {
+    "turbo": "2.9.12",
+    "typescript": "6.0.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "eslint-config-prettier": "10.1.8",
+    "@typescript-eslint/parser": "8.59.2",
+    "@typescript-eslint/eslint-plugin": "8.59.2",
+    "prettier": "3.8.3",
+    "prettier-plugin-tailwindcss": "0.8.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.0.3",
+    "@commitlint/cli": "21.0.0",
+    "@commitlint/config-conventional": "21.0.0",
+    "tsx": "4.21.0"
+  }
+}

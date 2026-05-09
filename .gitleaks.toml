@@ -1,0 +1,29 @@
+title = "vaivae gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "stripe-live-key"
+description = "Stripe live secret or publishable key"
+regex = '''[sp]k_live_[0-9A-Za-z]{24,}'''
+keywords = ["sk_live_", "pk_live_"]
+
+[[rules]]
+id = "sanity-api-token"
+description = "Sanity API token"
+regex = '''sk[0-9A-Za-z_=-]{62,}'''
+keywords = ["sk"]
+
+[[rules]]
+id = "medusa-auth-secret"
+description = "Medusa JWT_SECRET or COOKIE_SECRET value"
+regex = '''(?i)(jwt_secret|cookie_secret)\s*[:=]\s*["']?([A-Za-z0-9+/=._-]{32,})'''
+secretGroup = 2
+keywords = ["JWT_SECRET", "COOKIE_SECRET", "jwt_secret", "cookie_secret"]
+
+[[rules]]
+id = "klaviyo-private-key"
+description = "Klaviyo private API key"
+regex = '''pk_[0-9A-Za-z]{32,}'''
+keywords = ["pk_"]

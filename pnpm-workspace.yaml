@@ -1,0 +1,30 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Catalogs centralize shared dependency versions.
+# When a package depends on `react` it can reference `catalog:` instead of pinning the version twice.
+catalog:
+  # Runtime — keep `react` and `react-dom` aligned across the monorepo
+  react: 19.2.6
+  react-dom: 19.2.6
+  "@types/react": 19.2.14
+  "@types/react-dom": 19.2.3
+  "@types/node": 24.12.3
+
+  # Medusa — every @medusajs/* package must be locked to the same version
+  "@medusajs/medusa": 2.14.2
+  "@medusajs/framework": 2.14.2
+  "@medusajs/types": 2.14.2
+  "@medusajs/utils": 2.14.2
+  "@medusajs/cli": 2.14.2
+  "@medusajs/admin-vite-plugin": 2.14.2
+  "@medusajs/admin-shared": 2.14.2
+  "@medusajs/admin-sdk": 2.14.2
+  "@medusajs/payment-stripe": 2.14.2
+  "@medusajs/analytics-posthog": 2.14.2
+  "@medusajs/loyalty-plugin": 2.14.2
+  "@medusajs/js-sdk": 2.14.2
+
+  # TypeScript toolchain shared across workspaces
+  typescript: 6.0.3

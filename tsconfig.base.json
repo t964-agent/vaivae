@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    /* Module / runtime */
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Emit */
+    "noEmit": true,
+    "jsx": "preserve",
+    "incremental": true,
+
+    /* Strictness — every flag is intentional. Loosening any of these requires an ADR. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedSideEffectImports": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitOverride": true,
+
+    /* Quality of life */
+    "allowJs": false,
+    "checkJs": false,
+    "downlevelIteration": false,
+    "removeComments": false,
+
+    /* Paths — extending tsconfigs add their own `paths` for app-specific aliases */
+    "baseUrl": "."
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/build",
+    "**/.next",
+    "**/.medusa",
+    "**/.turbo",
+    "**/coverage",
+    "**/playwright-report",
+    "_archive"
+  ]
+}

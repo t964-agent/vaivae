@@ -40,7 +40,7 @@ export const config = {
         { key: "next-router-prefetch", type: "header" },
         { key: "purpose", type: "header", value: "prefetch" },
       ],
-      source: "/((?!api|_next|_vercel|.*\\..*).*)",
+      source: "/((?!api/revalidate|api|studio|_next|_vercel|.*\\..*).*)",
     },
   ],
 };

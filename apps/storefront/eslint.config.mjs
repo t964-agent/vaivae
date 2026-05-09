@@ -6,6 +6,9 @@ import { baseConfig } from "../../eslint.config.mjs";
 
 const config = [
   ...baseConfig,
+  {
+    ignores: ["src/sanity/sanity.types.ts"],
+  },
   ...nextCoreWebVitals,
   ...nextTypescript,
   {

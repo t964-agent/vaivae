@@ -13,6 +13,7 @@ const ignores = [
   "**/playwright-report/**",
   "**/test-results/**",
   "**/.turbo/**",
+  "apps/storefront/src/sanity/sanity.types.ts",
   "pnpm-lock.yaml",
 ];
 

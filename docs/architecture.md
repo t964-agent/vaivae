@@ -981,6 +981,7 @@ Notes:
 - Capsules and collections are intentionally separate: `capsules/[slug]` is **Sanity-driven** editorial; `shop/[collection]` is **Medusa-driven** commerce.
 - Checkout has its own layout group with no marketing scripts, no third-party widgets, and no animations that hurt INP.
 - The Sanity Studio mounts at `/studio` via `next-sanity` and is excluded from i18n/middleware paths.
+- Implementation note: the embedded Studio uses `app/(studio)/studio/[[...tool]]/page.tsx` with a separate `(studio)` layout. Public storefront live/visual plumbing, toasts, analytics, and brand chrome live in the `(site)` layout so `/studio` never inherits `<SanityLive />` or Visual Editing components.
 
 #### 5.1.2 Parallel & Intercepting Routes
 

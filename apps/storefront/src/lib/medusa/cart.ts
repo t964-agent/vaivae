@@ -9,7 +9,7 @@ import type { StoreCart } from "@/medusa/types";
 
 export const cartQueryParams = {
   fields:
-    "id,email,currency_code,region_id,total,subtotal,item_total,tax_total,shipping_total,discount_total,*items,*items.product,*items.variant,*items.variant.options,*items.variant.options.option,*items.variant.images,*region",
+    "id,email,currency_code,region_id,total,subtotal,item_total,tax_total,shipping_total,discount_total,*shipping_address,*billing_address,*shipping_methods,*payment_collection,*payment_collection.payment_sessions,*items,*items.product,*items.variant,*items.variant.options,*items.variant.options.option,*items.variant.images,*region",
 } as const;
 
 function isMissingCartError(error: unknown): boolean {

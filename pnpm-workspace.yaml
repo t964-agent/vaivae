@@ -31,6 +31,8 @@ catalog:
   "@medusajs/admin-vite-plugin": 2.14.2
   "@medusajs/admin-shared": 2.14.2
   "@medusajs/admin-sdk": 2.14.2
+  "@medusajs/dashboard": 2.14.2
+  "@medusajs/draft-order": 2.14.2
   "@medusajs/payment-stripe": 2.14.2
   "@medusajs/analytics-posthog": 2.14.2
   "@medusajs/loyalty-plugin": 2.14.2

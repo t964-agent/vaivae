@@ -89,6 +89,9 @@ const modules: InputConfigModules = [
       ],
     },
   },
+  {
+    resolve: "./src/modules/marketing-consent",
+  },
   ...redisModules,
 ];
 

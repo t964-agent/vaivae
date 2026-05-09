@@ -862,15 +862,17 @@ Document types planned for Phase 1. Each schema is fully defined in code in `app
 
 #### 4.2.3 Customer-Side Data
 
-| Data                           | Storage                                                                                                                          | Why                                                                                                                                        |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Wishlist (logged-in)           | `@alphabite/medusa-wishlist` plugin (per [ADR-013](#adr-013-adopt-community-wishlist-plugin))                                    | Persists across devices; needs auth and variant validation                                                                                 |
-| Wishlist (guest)               | `localStorage`                                                                                                                   | No friction at launch                                                                                                                      |
-| Wishlist (transition on login) | Storefront persists guest wishlist id, then transfers with `POST /store/wishlists/:id/transfer` after login (provided by plugin) | Best-of-both-worlds hybrid                                                                                                                 |
-| Recently viewed                | `localStorage` (with TTL)                                                                                                        | Personalization data; high-write, low-durability needs                                                                                     |
-| Marketing opt-in & consent     | Medusa custom `marketing-consent` module on `Customer`                                                                           | Durable consent record; **synced to Klaviyo from launch** per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
-| GDPR consent log               | Medusa custom module (`marketing-consent.ConsentEvent`)                                                                          | Versioned with timestamp, source, IP/UA where required                                                                                     |
-| Auth session                   | Medusa-issued JWT in HttpOnly cookie                                                                                             | See [§9](#9-authentication--authorization)                                                                                                 |
+| Data                           | Storage                                                                                                                          | Why                                                                                                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wishlist (logged-in)           | `@alphabite/medusa-wishlist` plugin (per [ADR-013](#adr-013-adopt-community-wishlist-plugin))                                    | Persists across devices; needs auth and variant validation                                                                                          |
+| Wishlist (guest)               | `localStorage`                                                                                                                   | No friction at launch                                                                                                                               |
+| Wishlist (transition on login) | Storefront persists guest wishlist id, then transfers with `POST /store/wishlists/:id/transfer` after login (provided by plugin) | Best-of-both-worlds hybrid                                                                                                                          |
+| Recently viewed                | `localStorage` (with TTL)                                                                                                        | Personalization data; high-write, low-durability needs                                                                                              |
+| Marketing opt-in & consent     | Medusa custom `marketing-consent` module on `Customer`                                                                           | Durable append-only consent log; **synced to Klaviyo from launch** per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
+| GDPR consent log               | Medusa custom module (`marketing-consent.ConsentRecord`)                                                                         | Versioned with timestamp, source, IP/UA where required                                                                                              |
+| Auth session                   | Medusa-issued JWT in HttpOnly cookie                                                                                             | See [§9](#9-authentication--authorization)                                                                                                          |
+
+Implementation note: `marketing-consent` stores `ConsentRecord` rows as an append-only forensic log. Current state is derived from the latest `consented_at` row for a customer, unsubscribe rows set `expires_at` for the 30-day suppression-retention window, and `POST /store/customers/me/marketing-consent` emits `marketing-consent.updated` for Klaviyo sync subscribers. The Medusa service token is `marketing_consent` because Medusa v2 module names must be alphanumeric/underscore; the folder, Store API path, and event name retain `marketing-consent`.
 
 ### 4.3 Sync Strategy
 
@@ -1213,35 +1215,35 @@ Rules:
 
 ### 5.5 Page Inventory
 
-| Route                                                 | Source                                  | Rendering                          | Auth             | Notes                                           |
-| ----------------------------------------------------- | --------------------------------------- | ---------------------------------- | ---------------- | ----------------------------------------------- |
-| `/`                                                   | Sanity (`homePage`) + Medusa (featured) | ISR, tags                          | —                | Hero is LCP — static                            |
-| `/shop`                                               | Medusa                                  | ISR                                | —                | Default sort + filters via URL                  |
-| `/shop/[collection]`                                  | Medusa collection                       | ISR                                | —                | Filters by URL params                           |
-| `/products/[handle]`                                  | Medusa + Sanity (`productContent`)      | Static shell + dynamic price/stock | —                | Quick view via intercepting route               |
-| `/journal`                                            | Sanity (`journalArticle` list)          | ISR                                | —                | Pagination via URL                              |
-| `/journal/[slug]`                                     | Sanity (`journalArticle`)               | ISR                                | —                | Long-form Portable Text                         |
-| `/lookbook`                                           | Sanity (`lookbook` list)                | ISR                                | —                | Visual-first                                    |
-| `/lookbook/[slug]`                                    | Sanity + Mux                            | ISR                                | —                | Heavy media lazy below fold                     |
-| `/capsules`                                           | Sanity (`capsulePage` list)             | ISR                                | —                |                                                 |
-| `/capsules/[slug]`                                    | Sanity + Medusa product refs            | ISR                                | —                |                                                 |
-| `/about`                                              | Sanity (`aboutPage`)                    | Static                             | —                |                                                 |
-| `/press`                                              | Sanity (`pressPage`)                    | ISR                                | —                | Downloadable assets                             |
-| `/wholesale`                                          | Sanity (`wholesalePage`) + form         | Static + Server Action             | —                | Inquiry form                                    |
-| `/search`                                             | Search service / Medusa                 | Dynamic                            | —                | Phase 1: native; Phase 2: Meilisearch/Typesense |
-| `/cart`                                               | Medusa cart                             | `no-store`                         | optional         | Cart ID via cookie                              |
-| `/checkout`                                           | Medusa + Stripe                         | `no-store`                         | optional (guest) | Isolated layout                                 |
-| `/thank-you/[orderId]`                                | Medusa order                            | `no-store`                         | session/token    | Token-gated                                     |
-| `/account`                                            | Medusa customer                         | `no-store`                         | required         |                                                 |
-| `/account/orders`                                     | Medusa                                  | `no-store`                         | required         |                                                 |
-| `/account/orders/[orderId]`                           | Medusa                                  | `no-store`                         | required         |                                                 |
-| `/account/addresses`                                  | Medusa                                  | `no-store`                         | required         |                                                 |
-| `/account/profile`                                    | Medusa customer                         | `no-store`                         | required         | Email edit deferred until verification flow     |
-| `/account/wishlist`                                   | `@alphabite/medusa-wishlist` plugin     | `no-store`                         | required         | PDP heart redirects guests to sign in           |
-| `/account/marketing-preferences`                      | Stub Server Action until module wiring  | `no-store`                         | required         | Agent 20 wires durable `marketing-consent`      |
-| `/privacy`, `/terms`, `/returns`, `/shipping`, `/faq` | Sanity (`legalPage`)                    | ISR                                | —                |                                                 |
-| `/studio`                                             | Sanity Studio                           | Static + client                    | Sanity auth      | Embedded                                        |
-| `404`, `500`                                          | —                                       | Static / static error shell        | —                | Branded                                         |
+| Route                                                 | Source                                   | Rendering                          | Auth             | Notes                                           |
+| ----------------------------------------------------- | ---------------------------------------- | ---------------------------------- | ---------------- | ----------------------------------------------- |
+| `/`                                                   | Sanity (`homePage`) + Medusa (featured)  | ISR, tags                          | —                | Hero is LCP — static                            |
+| `/shop`                                               | Medusa                                   | ISR                                | —                | Default sort + filters via URL                  |
+| `/shop/[collection]`                                  | Medusa collection                        | ISR                                | —                | Filters by URL params                           |
+| `/products/[handle]`                                  | Medusa + Sanity (`productContent`)       | Static shell + dynamic price/stock | —                | Quick view via intercepting route               |
+| `/journal`                                            | Sanity (`journalArticle` list)           | ISR                                | —                | Pagination via URL                              |
+| `/journal/[slug]`                                     | Sanity (`journalArticle`)                | ISR                                | —                | Long-form Portable Text                         |
+| `/lookbook`                                           | Sanity (`lookbook` list)                 | ISR                                | —                | Visual-first                                    |
+| `/lookbook/[slug]`                                    | Sanity + Mux                             | ISR                                | —                | Heavy media lazy below fold                     |
+| `/capsules`                                           | Sanity (`capsulePage` list)              | ISR                                | —                |                                                 |
+| `/capsules/[slug]`                                    | Sanity + Medusa product refs             | ISR                                | —                |                                                 |
+| `/about`                                              | Sanity (`aboutPage`)                     | Static                             | —                |                                                 |
+| `/press`                                              | Sanity (`pressPage`)                     | ISR                                | —                | Downloadable assets                             |
+| `/wholesale`                                          | Sanity (`wholesalePage`) + form          | Static + Server Action             | —                | Inquiry form                                    |
+| `/search`                                             | Search service / Medusa                  | Dynamic                            | —                | Phase 1: native; Phase 2: Meilisearch/Typesense |
+| `/cart`                                               | Medusa cart                              | `no-store`                         | optional         | Cart ID via cookie                              |
+| `/checkout`                                           | Medusa + Stripe                          | `no-store`                         | optional (guest) | Isolated layout                                 |
+| `/thank-you/[orderId]`                                | Medusa order                             | `no-store`                         | session/token    | Token-gated                                     |
+| `/account`                                            | Medusa customer                          | `no-store`                         | required         |                                                 |
+| `/account/orders`                                     | Medusa                                   | `no-store`                         | required         |                                                 |
+| `/account/orders/[orderId]`                           | Medusa                                   | `no-store`                         | required         |                                                 |
+| `/account/addresses`                                  | Medusa                                   | `no-store`                         | required         |                                                 |
+| `/account/profile`                                    | Medusa customer                          | `no-store`                         | required         | Email edit deferred until verification flow     |
+| `/account/wishlist`                                   | `@alphabite/medusa-wishlist` plugin      | `no-store`                         | required         | PDP heart redirects guests to sign in           |
+| `/account/marketing-preferences`                      | Medusa `marketing-consent` Server Action | `no-store`                         | required         | Persists durable consent via custom Store API   |
+| `/privacy`, `/terms`, `/returns`, `/shipping`, `/faq` | Sanity (`legalPage`)                     | ISR                                | —                |                                                 |
+| `/studio`                                             | Sanity Studio                            | Static + client                    | Sanity auth      | Embedded                                        |
+| `404`, `500`                                          | —                                        | Static / static error shell        | —                | Branded                                         |
 
 ---
 
@@ -1288,11 +1290,11 @@ Medusa v2 ships a Commerce Module suite. Our policy: **never disable core module
 
 We add **two** custom modules and adopt one community plugin. All live inline under `apps/medusa/src/modules/` (custom) or installed via npm (plugin).
 
-| Module              | Source                                                                                       | Purpose                                                                     | Models                                                                                      | Links                        |
-| ------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------- |
-| `marketing-consent` | Custom (this repo)                                                                           | Newsletter opt-in + GDPR consent log                                        | `MarketingConsent` (current state, keyed by email + customer), `ConsentEvent` (append-only) | `customer-marketing-consent` |
-| `sanity-sync`       | Custom (this repo)                                                                           | Tracking for Medusa↔Sanity product sync                                     | `SyncRecord` (productId, lastSyncedAt, lastHash, status, lastError)                         | `product-sanity-sync`        |
-| Wishlist            | **`@alphabite/medusa-wishlist@0.5.9`** ([ADR-013](#adr-013-adopt-community-wishlist-plugin)) | Authenticated + guest wishlists, transfer-on-login, multiple wishlists, SDK | (provided by plugin)                                                                        | (provided by plugin)         |
+| Module                                                  | Source                                                                                       | Purpose                                                                     | Models                                                              | Links                        |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------- |
+| `marketing-consent` (service token `marketing_consent`) | Custom (this repo)                                                                           | Newsletter opt-in + GDPR consent log                                        | `ConsentRecord` append-only log; latest row is current state        | `customer-marketing-consent` |
+| `sanity-sync`                                           | Custom (this repo)                                                                           | Tracking for Medusa↔Sanity product sync                                     | `SyncRecord` (productId, lastSyncedAt, lastHash, status, lastError) | `product-sanity-sync`        |
+| Wishlist                                                | **`@alphabite/medusa-wishlist@0.5.9`** ([ADR-013](#adr-013-adopt-community-wishlist-plugin)) | Authenticated + guest wishlists, transfer-on-login, multiple wishlists, SDK | (provided by plugin)                                                | (provided by plugin)         |
 
 Additional **official Medusa plugins** ([ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)):
 
@@ -1314,8 +1316,7 @@ Rules:
 ```
 apps/medusa/src/modules/
 ├── marketing-consent/
-│   ├── models/marketing-consent.ts
-│   ├── models/consent-event.ts
+│   ├── models/consent-record.ts
 │   ├── service.ts
 │   ├── migrations/
 │   └── index.ts
@@ -1369,8 +1370,7 @@ Build only if Cloud Emails proves insufficient for a specific template (e.g. nee
 - Free tier (250 profiles / 500 sends) covers initial signups; upgrade when list grows.
 - Triggers: Medusa subscribers push events to Klaviyo via `klaviyo-api` Node SDK:
   - `customer.created` → `Customer Created` event + profile create
-  - `marketing-consent.opted_in` → consent property on profile
-  - `marketing-consent.opted_out` → suppression update
+  - `marketing-consent.updated` → consent property + suppression state on profile
   - `cart.updated` (with email) → `Started Checkout` flow trigger
   - `order.placed` → `Placed Order` event with line items + revenue
   - `order.fulfillment_created` → `Order Shipped` event
@@ -1442,7 +1442,7 @@ Located at `apps/medusa/src/subscribers/`.
 | Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                              |
 | Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                            |
 | Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                |
-| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.opted_in`, `marketing-consent.opted_out`   | Update Klaviyo profile consent + suppression                                                                           |
+| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                           |
 | PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                |
 | Shippo label purchase    | `purchase-shipping-label.ts`                | `order.placed` (gated by config)                              | Calls Shippo via `shipping-shippo` service; stores tracking number on order                                            |
 
@@ -1466,13 +1466,14 @@ Standard workflows we use **as-shipped**:
 
 #### 6.3.3 Custom API Routes
 
-| Route                           | File                                       | Purpose                                                             |
-| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------- |
-| `POST /store/marketing-consent` | `src/api/store/marketing-consent/route.ts` | Update opt-in state; logs `ConsentEvent`; pushes consent to Klaviyo |
-| `POST /admin/sanity/resync`     | `src/api/admin/sanity/resync/route.ts`     | Trigger single-product resync workflow                              |
-| `POST /admin/sanity/resync-all` | `src/api/admin/sanity/resync-all/route.ts` | Trigger batch resync workflow                                       |
+| Route                                        | File                                                    | Purpose                                                                  |
+| -------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `GET /store/customers/me/marketing-consent`  | `src/api/store/customers/me/marketing-consent/route.ts` | Return latest authenticated customer consent state                       |
+| `POST /store/customers/me/marketing-consent` | `src/api/store/customers/me/marketing-consent/route.ts` | Append consent record; emit `marketing-consent.updated` for Klaviyo sync |
+| `POST /admin/sanity/resync`                  | `src/api/admin/sanity/resync/route.ts`                  | Trigger single-product resync workflow                                   |
+| `POST /admin/sanity/resync-all`              | `src/api/admin/sanity/resync-all/route.ts`              | Trigger batch resync workflow                                            |
 
-> Storefront note: `/account/marketing-preferences` uses a temporary Server Action stub that records non-PII intent only. Agent 20 wires the durable `POST /store/marketing-consent` backend route before launch consent can be considered stored.
+> Storefront note: `/account/marketing-preferences` calls the authenticated custom Store API route and must include the customer bearer token plus publishable API key. Durable consent is stored only in Medusa.
 
 > Wishlist API routes are provided by `@alphabite/medusa-wishlist` per [ADR-013](#adr-013-adopt-community-wishlist-plugin) — no custom implementation needed. Published `0.5.9` routes are plural: `GET /store/wishlists`, `POST /store/wishlists`, `GET /store/wishlists/:id/items`, `POST /store/wishlists/:id/add-item`, `DELETE /store/wishlists/:id/items/:item_id`, and `POST /store/wishlists/:id/transfer`.
 
@@ -1912,26 +1913,26 @@ This is enforced by the Medusa helpers — calls without region context fail lou
 
 #### 8.1.5 Endpoint Map
 
-| Storefront Action          | Medusa Endpoint                             | Method        |
-| -------------------------- | ------------------------------------------- | ------------- |
-| List products              | `GET /store/products`                       | server        |
-| Get product by handle      | `GET /store/products?handle={h}`            | server        |
-| Get collections            | `GET /store/collections`                    | server        |
-| Create cart                | `POST /store/carts`                         | Server Action |
-| Add line item              | `POST /store/carts/{id}/line-items`         | Server Action |
-| Update line item           | `PATCH /store/carts/{id}/line-items/{lid}`  | Server Action |
-| Remove line item           | `DELETE /store/carts/{id}/line-items/{lid}` | Server Action |
-| Set address                | `POST /store/carts/{id}`                    | Server Action |
-| List shipping options      | `GET /store/shipping-options`               | server        |
-| Set shipping method        | `POST /store/carts/{id}/shipping-methods`   | Server Action |
-| Init payment session       | `POST /store/payment-collections`           | server        |
-| Complete cart              | `POST /store/carts/{id}/complete`           | Server Action |
-| Customer login             | `POST /auth/customer/emailpass`             | Server Action |
-| Customer register          | `POST /auth/customer/emailpass/register`    | Server Action |
-| Customer profile           | `GET /store/customers/me`                   | server        |
-| Wishlist (custom)          | `GET/POST /store/wishlist`                  | mixed         |
-| Wishlist merge (custom)    | `POST /store/wishlist/merge`                | Server Action |
-| Marketing consent (custom) | `POST /store/marketing-consent`             | Server Action |
+| Storefront Action          | Medusa Endpoint                                  | Method        |
+| -------------------------- | ------------------------------------------------ | ------------- |
+| List products              | `GET /store/products`                            | server        |
+| Get product by handle      | `GET /store/products?handle={h}`                 | server        |
+| Get collections            | `GET /store/collections`                         | server        |
+| Create cart                | `POST /store/carts`                              | Server Action |
+| Add line item              | `POST /store/carts/{id}/line-items`              | Server Action |
+| Update line item           | `PATCH /store/carts/{id}/line-items/{lid}`       | Server Action |
+| Remove line item           | `DELETE /store/carts/{id}/line-items/{lid}`      | Server Action |
+| Set address                | `POST /store/carts/{id}`                         | Server Action |
+| List shipping options      | `GET /store/shipping-options`                    | server        |
+| Set shipping method        | `POST /store/carts/{id}/shipping-methods`        | Server Action |
+| Init payment session       | `POST /store/payment-collections`                | server        |
+| Complete cart              | `POST /store/carts/{id}/complete`                | Server Action |
+| Customer login             | `POST /auth/customer/emailpass`                  | Server Action |
+| Customer register          | `POST /auth/customer/emailpass/register`         | Server Action |
+| Customer profile           | `GET /store/customers/me`                        | server        |
+| Wishlist (custom)          | `GET/POST /store/wishlist`                       | mixed         |
+| Wishlist merge (custom)    | `POST /store/wishlist/merge`                     | Server Action |
+| Marketing consent (custom) | `GET/POST /store/customers/me/marketing-consent` | Server Action |
 
 ### 8.2 Storefront ↔ Sanity
 
@@ -2089,10 +2090,10 @@ Sender identity:
 
 #### 8.5.4 Bounce & Complaint Handling
 
-| Source       | Channel                                       | Action                                                                                                                       |
-| ------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Cloud Emails | Medusa Cloud dashboard alerts on hard bounces | Mark customer `email_invalid` in Medusa metadata; future sends skip                                                          |
-| Klaviyo      | Built-in suppression list                     | Klaviyo handles automatically; webhook to Medusa updates `marketing-consent.optedIn = false` for hard bounces and complaints |
+| Source       | Channel                                       | Action                                                                                                                   |
+| ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Cloud Emails | Medusa Cloud dashboard alerts on hard bounces | Mark customer `email_invalid` in Medusa metadata; future sends skip                                                      |
+| Klaviyo      | Built-in suppression list                     | Klaviyo handles automatically; webhook to Medusa appends an unsubscribed `ConsentRecord` for hard bounces and complaints |
 
 ### 8.6 Webhooks & Events
 
@@ -4158,6 +4159,7 @@ This is the canonical record of architectural decisions. Each entry captures **c
 - **Decision (current):**
   - All custom code lives inline in `apps/medusa/src/{modules,subscribers,workflows,api,admin}/`. No private npm packages for vaïvae-specific code.
   - Custom modules: ~~`wishlist`~~ (superseded by [ADR-013](#adr-013-adopt-community-wishlist-plugin) — community plugin), `marketing-consent`, `sanity-sync`, `shipping-shippo`, ~~`resend-notification`~~ (superseded by [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) — Cloud Emails primary, Resend fallback only).
+  - `marketing-consent` is implemented as an append-only `ConsentRecord` log linked 1:N to `Customer`; the Medusa service token is `marketing_consent`, the authenticated Store API is `GET/POST /store/customers/me/marketing-consent`, and changes emit `marketing-consent.updated`.
   - Email: ~~custom Resend Notification Module Provider~~ → **Medusa Cloud Emails** primary + **Klaviyo** for marketing (per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)).
   - Shipping at launch: manual fulfillment provider with flat-rate options + subscriber-driven Shippo label generation. A full v2 Shippo fulfillment provider is deferred until live rates become valuable.
   - Tax: Stripe Tax via Medusa for US region.
@@ -4279,7 +4281,7 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - **Data retention**:
     - Customer data: retained until deletion request; anonymized after 3 years of inactivity.
     - Orders: retained **7 years** (US tax compliance) regardless of customer deletion (orders pseudonymized when customer is deleted).
-    - Marketing data: deleted on unsubscribe + 30 days.
+    - Marketing data: deleted on unsubscribe + 30 days. Medusa `marketing-consent` unsubscribe records set `expires_at` to mark the suppression-retention cutoff; cleanup automation is deferred until the retention workflow is implemented.
     - Logs: vendor defaults (~90 days).
   - **Off-provider backups**: **SimpleBackups** (~$49/mo) — daily encrypted Postgres dumps to private S3-compatible storage; 7 daily / 4 weekly / 3 monthly retention; quarterly restore drill. Medusa Cloud PITR remains the primary mechanism; SimpleBackups is the off-provider safety net.
 - **Consequences:**

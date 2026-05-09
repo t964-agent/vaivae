@@ -1,15 +1,16 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
+import { getPublicEnv } from "@/lib/env";
 import { isUsStateCode } from "@/lib/us-states";
 import { addLineItemAction } from "@/medusa/actions";
+import { getAuthToken } from "@/medusa/auth-cookie";
 import {
   createAddress,
   deleteAddress,
-  getCurrentCustomer,
+  getCustomerAuthHeaders,
   retrieveOrder,
   updateAddress,
 } from "@/medusa/customer";
@@ -78,6 +79,32 @@ function getActionError(error: unknown, fallback: string): { error: string; ok: 
 function revalidateAccountTags(tags: readonly string[]): void {
   for (const tag of tags) {
     revalidateTag(tag, { expire: 0 });
+  }
+}
+
+function getMedusaBaseUrl(): string {
+  return getPublicEnv().NEXT_PUBLIC_MEDUSA_BACKEND_URL.replace(/\/+$/, "");
+}
+
+async function requestMarketingPreferenceUpdate(token: string, subscribed: boolean): Promise<void> {
+  const { NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY } = getPublicEnv();
+  const response = await fetch(`${getMedusaBaseUrl()}/store/customers/me/marketing-consent`, {
+    body: JSON.stringify({
+      source: "account_settings",
+      subscribed,
+    }),
+    cache: "no-store",
+    headers: {
+      accept: "application/json",
+      Authorization: getCustomerAuthHeaders(token).Authorization,
+      "content-type": "application/json",
+      "x-publishable-api-key": NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to save your marketing preferences.");
   }
 }
 
@@ -245,25 +272,21 @@ export async function updateMarketingPreferencesAction(
     return getValidationError(parsed.error);
   }
 
-  const customer = await getCurrentCustomer();
+  const token = await getAuthToken();
 
-  if (!customer) {
+  if (!token) {
     return { error: "Sign in to save your preferences.", ok: false };
   }
 
-  Sentry.addBreadcrumb({
-    category: "marketing-consent",
-    data: {
-      source: "account-marketing-preferences",
-      subscribed: parsed.data.subscribed,
-    },
-    level: "info",
-    message: "Marketing preference intent captured for Agent 20 backend wiring.",
-  });
+  try {
+    await requestMarketingPreferenceUpdate(token, parsed.data.subscribed);
 
-  revalidateAccountTags(["customer"]);
+    revalidateAccountTags(["customer"]);
 
-  return { ok: true };
+    return { ok: true };
+  } catch (error) {
+    return getActionError(error, "Unable to save your marketing preferences.");
+  }
 }
 
 export async function reorderAction(

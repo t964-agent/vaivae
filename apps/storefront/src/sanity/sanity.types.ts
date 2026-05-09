@@ -15,14 +15,179 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: src/sanity/schema.json
+export type Address = {
+  _type: "address";
+  line1?: string;
+  line2?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+};
+
+export type SocialLink = {
+  _type: "socialLink";
+  platform?: "instagram" | "tiktok" | "pinterest" | "youtube" | "linkedin" | "facebook" | "x";
+  handle?: string;
+  url?: string;
+};
+
+export type Cta = {
+  _type: "cta";
+  label?: string;
+  link?: Link;
+  style?: "primary" | "ghost" | "underline";
+};
+
+export type SiteSettingsReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "siteSettings";
+};
+
+export type NavigationReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "navigation";
+};
+
+export type FooterReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "footer";
+};
+
+export type Link = {
+  _type: "link";
+  type?: "internal" | "external";
+  label?: string;
+  internal?: SiteSettingsReference | NavigationReference | FooterReference;
+  href?: string;
+  targetBlank?: boolean;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type VaivaeImage = {
+  _type: "vaivaeImage";
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  caption?: string;
+};
+
+export type Footer = {
+  _id: string;
+  _type: "footer";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  columns?: Array<{
+    title?: string;
+    links?: Array<
+      {
+        _key: string;
+      } & Link
+    >;
+    _type: "footerColumn";
+    _key: string;
+  }>;
+  newsletterEnabled?: boolean;
+  newsletterHeading?: string;
+  newsletterDescription?: string;
+  newsletterCtaLabel?: string;
+  legalLinks?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  copyrightText?: string;
+  paymentMethods?: Array<"visa" | "mastercard" | "amex" | "applepay" | "googlepay" | "paypal">;
+};
+
+export type Navigation = {
+  _id: string;
+  _type: "navigation";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  headerLinks?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  secondaryLinks?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  mobileMenuExtras?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  promoBannerEnabled?: boolean;
+  promoBannerText?: string;
+  promoBannerLink?: Link;
+};
+
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  siteName?: string;
+  tagline?: string;
+  logo?: VaivaeImage;
+  favicon?: VaivaeImage;
+  defaultSeo?: Seo;
+  defaultRegion?: string;
+  defaultCurrency?: string;
+  contactEmail?: string;
+  pressEmail?: string;
+  wholesaleEmail?: string;
+  address?: Address;
+  socialLinks?: Array<
+    {
+      _key: string;
+    } & SocialLink
+  >;
+};
+
+export type Seo = {
+  _type: "seo";
   title?: string;
   description?: string;
+  noindex?: boolean;
+  ogImage?: VaivaeImage;
+  keywords?: Array<string>;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type Code = {
@@ -69,22 +234,6 @@ export type SanityImageMetadata = {
   thumbHash?: string;
   hasAlpha?: boolean;
   isOpaque?: boolean;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
 };
 
 export type SanityFileAsset = {
@@ -153,14 +302,26 @@ export type Slug = {
 };
 
 export type AllSanitySchemaTypes =
+  | Address
+  | SocialLink
+  | Cta
+  | SiteSettingsReference
+  | NavigationReference
+  | FooterReference
+  | Link
+  | SanityImageAssetReference
+  | VaivaeImage
+  | Footer
+  | Navigation
   | SiteSettings
+  | Seo
+  | SanityImageCrop
+  | SanityImageHotspot
   | Code
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
   | SanityImageMetadata
-  | SanityImageHotspot
-  | SanityImageCrop
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
@@ -169,21 +330,691 @@ export type AllSanitySchemaTypes =
 
 // Source: src/sanity/queries.ts
 // Variable: siteSettingsQuery
-// Query: *[_type == "siteSettings"][0]
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  siteName,  tagline,  logo{    _type,    asset->{      _id,      _type,      url,      metadata{        lqip,        dimensions{          width,          height,          aspectRatio        }      }    },    hotspot,    crop,    alt,    caption  },  favicon{    _type,    asset->{      _id,      _type,      url,      metadata{        lqip,        dimensions{          width,          height,          aspectRatio        }      }    },    hotspot,    crop,    alt,    caption  },  defaultSeo{    _type,    title,    description,    noindex,    ogImage{      _type,      asset->{        _id,        _type,        url,        metadata{          lqip,          dimensions{            width,            height,            aspectRatio          }        }      },      hotspot,      crop,      alt,      caption    },    keywords  },  defaultRegion,  defaultCurrency,  contactEmail,  pressEmail,  wholesaleEmail,  address{    _type,    line1,    line2,    city,    region,    postalCode,    country  },  socialLinks[]{    _key,    _type,    platform,    handle,    url  }}
 export type SiteSettingsQueryResult = {
-  _id: string;
+  _id: "siteSettings";
   _type: "siteSettings";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: string;
-  description?: string;
+  siteName: string | null;
+  tagline: string | null;
+  logo: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  favicon: {
+    _type: "vaivaeImage";
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number | null;
+          height: number | null;
+          aspectRatio: number | null;
+        } | null;
+      } | null;
+    } | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+    alt: string | null;
+    caption: string | null;
+  } | null;
+  defaultSeo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  defaultRegion: string | null;
+  defaultCurrency: string | null;
+  contactEmail: string | null;
+  pressEmail: string | null;
+  wholesaleEmail: string | null;
+  address: {
+    _type: "address";
+    line1: string | null;
+    line2: string | null;
+    city: string | null;
+    region: string | null;
+    postalCode: string | null;
+    country: string | null;
+  } | null;
+  socialLinks: Array<{
+    _key: string;
+    _type: "socialLink";
+    platform:
+      | "facebook"
+      | "instagram"
+      | "linkedin"
+      | "pinterest"
+      | "tiktok"
+      | "x"
+      | "youtube"
+      | null;
+    handle: string | null;
+    url: string | null;
+  }> | null;
 } | null;
+
+// Source: src/sanity/queries.ts
+// Variable: navigationQuery
+// Query: *[_type == "navigation" && _id == "navigation"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  headerLinks[]{    _key,    _type,    type,    label,    internal{      _ref,      _type,      _weak    },    "internalTarget": internal->{      _id,      _type,      "title": coalesce(siteName, title, name),      "slug": slug.current    },    href,    targetBlank  },  secondaryLinks[]{    _key,    _type,    type,    label,    internal{      _ref,      _type,      _weak    },    "internalTarget": internal->{      _id,      _type,      "title": coalesce(siteName, title, name),      "slug": slug.current    },    href,    targetBlank  },  mobileMenuExtras[]{    _key,    _type,    type,    label,    internal{      _ref,      _type,      _weak    },    "internalTarget": internal->{      _id,      _type,      "title": coalesce(siteName, title, name),      "slug": slug.current    },    href,    targetBlank  },  promoBannerEnabled,  promoBannerText,  promoBannerLink{    _type,    type,    label,    internal{      _ref,      _type,      _weak    },    "internalTarget": internal->{      _id,      _type,      "title": coalesce(siteName, title, name),      "slug": slug.current    },    href,    targetBlank  }}
+export type NavigationQueryResult = {
+  _id: "navigation";
+  _type: "navigation";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  headerLinks: Array<{
+    _key: string;
+    _type: "link";
+    type: "external" | "internal" | null;
+    label: string | null;
+    internal: {
+      _ref: string;
+      _type: "reference";
+      _weak: boolean | null;
+    } | null;
+    internalTarget:
+      | {
+          _id: string;
+          _type: "footer";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "navigation";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "siteSettings";
+          title: string | null;
+          slug: null;
+        }
+      | null;
+    href: string | null;
+    targetBlank: boolean | null;
+  }> | null;
+  secondaryLinks: Array<{
+    _key: string;
+    _type: "link";
+    type: "external" | "internal" | null;
+    label: string | null;
+    internal: {
+      _ref: string;
+      _type: "reference";
+      _weak: boolean | null;
+    } | null;
+    internalTarget:
+      | {
+          _id: string;
+          _type: "footer";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "navigation";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "siteSettings";
+          title: string | null;
+          slug: null;
+        }
+      | null;
+    href: string | null;
+    targetBlank: boolean | null;
+  }> | null;
+  mobileMenuExtras: Array<{
+    _key: string;
+    _type: "link";
+    type: "external" | "internal" | null;
+    label: string | null;
+    internal: {
+      _ref: string;
+      _type: "reference";
+      _weak: boolean | null;
+    } | null;
+    internalTarget:
+      | {
+          _id: string;
+          _type: "footer";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "navigation";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "siteSettings";
+          title: string | null;
+          slug: null;
+        }
+      | null;
+    href: string | null;
+    targetBlank: boolean | null;
+  }> | null;
+  promoBannerEnabled: boolean | null;
+  promoBannerText: string | null;
+  promoBannerLink: {
+    _type: "link";
+    type: "external" | "internal" | null;
+    label: string | null;
+    internal: {
+      _ref: string;
+      _type: "reference";
+      _weak: boolean | null;
+    } | null;
+    internalTarget:
+      | {
+          _id: string;
+          _type: "footer";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "navigation";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "siteSettings";
+          title: string | null;
+          slug: null;
+        }
+      | null;
+    href: string | null;
+    targetBlank: boolean | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: footerQuery
+// Query: *[_type == "footer" && _id == "footer"][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  columns[]{    _key,    _type,    title,    links[]{      _key,      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    }  },  newsletterEnabled,  newsletterHeading,  newsletterDescription,  newsletterCtaLabel,  legalLinks[]{    _key,    _type,    type,    label,    internal{      _ref,      _type,      _weak    },    "internalTarget": internal->{      _id,      _type,      "title": coalesce(siteName, title, name),      "slug": slug.current    },    href,    targetBlank  },  copyrightText,  paymentMethods}
+export type FooterQueryResult = {
+  _id: "footer";
+  _type: "footer";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  columns: Array<{
+    _key: string;
+    _type: "footerColumn";
+    title: string | null;
+    links: Array<{
+      _key: string;
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    }> | null;
+  }> | null;
+  newsletterEnabled: boolean | null;
+  newsletterHeading: string | null;
+  newsletterDescription: string | null;
+  newsletterCtaLabel: string | null;
+  legalLinks: Array<{
+    _key: string;
+    _type: "link";
+    type: "external" | "internal" | null;
+    label: string | null;
+    internal: {
+      _ref: string;
+      _type: "reference";
+      _weak: boolean | null;
+    } | null;
+    internalTarget:
+      | {
+          _id: string;
+          _type: "footer";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "navigation";
+          title: null;
+          slug: null;
+        }
+      | {
+          _id: string;
+          _type: "siteSettings";
+          title: string | null;
+          slug: null;
+        }
+      | null;
+    href: string | null;
+    targetBlank: boolean | null;
+  }> | null;
+  copyrightText: string | null;
+  paymentMethods: Array<
+    "amex" | "applepay" | "googlepay" | "mastercard" | "paypal" | "visa"
+  > | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: globalQuery
+// Query: {  "siteSettings": *[_type == "siteSettings" && _id == "siteSettings"][0]{    _id,    _type,    _createdAt,    _updatedAt,    _rev,    siteName,    tagline,    logo{      _type,      asset->{        _id,        _type,        url,        metadata{          lqip,          dimensions{            width,            height,            aspectRatio          }        }      },      hotspot,      crop,      alt,      caption    },    favicon{      _type,      asset->{        _id,        _type,        url,        metadata{          lqip,          dimensions{            width,            height,            aspectRatio          }        }      },      hotspot,      crop,      alt,      caption    },    defaultSeo{      _type,      title,      description,      noindex,      ogImage{        _type,        asset->{          _id,          _type,          url,          metadata{            lqip,            dimensions{              width,              height,              aspectRatio            }          }        },        hotspot,        crop,        alt,        caption      },      keywords    },    defaultRegion,    defaultCurrency,    contactEmail,    pressEmail,    wholesaleEmail,    address{      _type,      line1,      line2,      city,      region,      postalCode,      country    },    socialLinks[]{      _key,      _type,      platform,      handle,      url    }  },  "navigation": *[_type == "navigation" && _id == "navigation"][0]{    _id,    _type,    _createdAt,    _updatedAt,    _rev,    headerLinks[]{      _key,      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    },    secondaryLinks[]{      _key,      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    },    mobileMenuExtras[]{      _key,      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    },    promoBannerEnabled,    promoBannerText,    promoBannerLink{      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    }  },  "footer": *[_type == "footer" && _id == "footer"][0]{    _id,    _type,    _createdAt,    _updatedAt,    _rev,    columns[]{      _key,      _type,      title,      links[]{        _key,        _type,        type,        label,        internal{          _ref,          _type,          _weak        },        "internalTarget": internal->{          _id,          _type,          "title": coalesce(siteName, title, name),          "slug": slug.current        },        href,        targetBlank      }    },    newsletterEnabled,    newsletterHeading,    newsletterDescription,    newsletterCtaLabel,    legalLinks[]{      _key,      _type,      type,      label,      internal{        _ref,        _type,        _weak      },      "internalTarget": internal->{        _id,        _type,        "title": coalesce(siteName, title, name),        "slug": slug.current      },      href,      targetBlank    },    copyrightText,    paymentMethods  }}
+export type GlobalQueryResult = {
+  siteSettings: {
+    _id: "siteSettings";
+    _type: "siteSettings";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    siteName: string | null;
+    tagline: string | null;
+    logo: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    favicon: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    defaultSeo: {
+      _type: "seo";
+      title: string | null;
+      description: string | null;
+      noindex: boolean | null;
+      ogImage: {
+        _type: "vaivaeImage";
+        asset: {
+          _id: string;
+          _type: "sanity.imageAsset";
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number | null;
+              height: number | null;
+              aspectRatio: number | null;
+            } | null;
+          } | null;
+        } | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        caption: string | null;
+      } | null;
+      keywords: Array<string> | null;
+    } | null;
+    defaultRegion: string | null;
+    defaultCurrency: string | null;
+    contactEmail: string | null;
+    pressEmail: string | null;
+    wholesaleEmail: string | null;
+    address: {
+      _type: "address";
+      line1: string | null;
+      line2: string | null;
+      city: string | null;
+      region: string | null;
+      postalCode: string | null;
+      country: string | null;
+    } | null;
+    socialLinks: Array<{
+      _key: string;
+      _type: "socialLink";
+      platform:
+        | "facebook"
+        | "instagram"
+        | "linkedin"
+        | "pinterest"
+        | "tiktok"
+        | "x"
+        | "youtube"
+        | null;
+      handle: string | null;
+      url: string | null;
+    }> | null;
+  } | null;
+  navigation: {
+    _id: "navigation";
+    _type: "navigation";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    headerLinks: Array<{
+      _key: string;
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    }> | null;
+    secondaryLinks: Array<{
+      _key: string;
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    }> | null;
+    mobileMenuExtras: Array<{
+      _key: string;
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    }> | null;
+    promoBannerEnabled: boolean | null;
+    promoBannerText: string | null;
+    promoBannerLink: {
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    } | null;
+  } | null;
+  footer: {
+    _id: "footer";
+    _type: "footer";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    columns: Array<{
+      _key: string;
+      _type: "footerColumn";
+      title: string | null;
+      links: Array<{
+        _key: string;
+        _type: "link";
+        type: "external" | "internal" | null;
+        label: string | null;
+        internal: {
+          _ref: string;
+          _type: "reference";
+          _weak: boolean | null;
+        } | null;
+        internalTarget:
+          | {
+              _id: string;
+              _type: "footer";
+              title: null;
+              slug: null;
+            }
+          | {
+              _id: string;
+              _type: "navigation";
+              title: null;
+              slug: null;
+            }
+          | {
+              _id: string;
+              _type: "siteSettings";
+              title: string | null;
+              slug: null;
+            }
+          | null;
+        href: string | null;
+        targetBlank: boolean | null;
+      }> | null;
+    }> | null;
+    newsletterEnabled: boolean | null;
+    newsletterHeading: string | null;
+    newsletterDescription: string | null;
+    newsletterCtaLabel: string | null;
+    legalLinks: Array<{
+      _key: string;
+      _type: "link";
+      type: "external" | "internal" | null;
+      label: string | null;
+      internal: {
+        _ref: string;
+        _type: "reference";
+        _weak: boolean | null;
+      } | null;
+      internalTarget:
+        | {
+            _id: string;
+            _type: "footer";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "navigation";
+            title: null;
+            slug: null;
+          }
+        | {
+            _id: string;
+            _type: "siteSettings";
+            title: string | null;
+            slug: null;
+          }
+        | null;
+      href: string | null;
+      targetBlank: boolean | null;
+    }> | null;
+    copyrightText: string | null;
+    paymentMethods: Array<
+      "amex" | "applepay" | "googlepay" | "mastercard" | "paypal" | "visa"
+    > | null;
+  } | null;
+};
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "siteSettings"][0]': SiteSettingsQueryResult;
+    '*[_type == "siteSettings" && _id == "siteSettings"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  siteName,\n  tagline,\n  logo{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  favicon{\n    _type,\n    asset->{\n      _id,\n      _type,\n      url,\n      metadata{\n        lqip,\n        dimensions{\n          width,\n          height,\n          aspectRatio\n        }\n      }\n    },\n    hotspot,\n    crop,\n    alt,\n    caption\n  },\n  defaultSeo{\n    _type,\n    title,\n    description,\n    noindex,\n    ogImage{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    keywords\n  },\n  defaultRegion,\n  defaultCurrency,\n  contactEmail,\n  pressEmail,\n  wholesaleEmail,\n  address{\n    _type,\n    line1,\n    line2,\n    city,\n    region,\n    postalCode,\n    country\n  },\n  socialLinks[]{\n    _key,\n    _type,\n    platform,\n    handle,\n    url\n  }\n}': SiteSettingsQueryResult;
+    '*[_type == "navigation" && _id == "navigation"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  headerLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  secondaryLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  mobileMenuExtras[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  promoBannerEnabled,\n  promoBannerText,\n  promoBannerLink{\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  }\n}': NavigationQueryResult;
+    '*[_type == "footer" && _id == "footer"][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  columns[]{\n    _key,\n    _type,\n    title,\n    links[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  newsletterEnabled,\n  newsletterHeading,\n  newsletterDescription,\n  newsletterCtaLabel,\n  legalLinks[]{\n    _key,\n    _type,\n    type,\n    label,\n    internal{\n      _ref,\n      _type,\n      _weak\n    },\n    "internalTarget": internal->{\n      _id,\n      _type,\n      "title": coalesce(siteName, title, name),\n      "slug": slug.current\n    },\n    href,\n    targetBlank\n  },\n  copyrightText,\n  paymentMethods\n}': FooterQueryResult;
+    '{\n  "siteSettings": *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    siteName,\n    tagline,\n    logo{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    favicon{\n      _type,\n      asset->{\n        _id,\n        _type,\n        url,\n        metadata{\n          lqip,\n          dimensions{\n            width,\n            height,\n            aspectRatio\n          }\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    defaultSeo{\n      _type,\n      title,\n      description,\n      noindex,\n      ogImage{\n        _type,\n        asset->{\n          _id,\n          _type,\n          url,\n          metadata{\n            lqip,\n            dimensions{\n              width,\n              height,\n              aspectRatio\n            }\n          }\n        },\n        hotspot,\n        crop,\n        alt,\n        caption\n      },\n      keywords\n    },\n    defaultRegion,\n    defaultCurrency,\n    contactEmail,\n    pressEmail,\n    wholesaleEmail,\n    address{\n      _type,\n      line1,\n      line2,\n      city,\n      region,\n      postalCode,\n      country\n    },\n    socialLinks[]{\n      _key,\n      _type,\n      platform,\n      handle,\n      url\n    }\n  },\n  "navigation": *[_type == "navigation" && _id == "navigation"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    headerLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    secondaryLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    mobileMenuExtras[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    promoBannerEnabled,\n    promoBannerText,\n    promoBannerLink{\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    }\n  },\n  "footer": *[_type == "footer" && _id == "footer"][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    columns[]{\n      _key,\n      _type,\n      title,\n      links[]{\n        _key,\n        _type,\n        type,\n        label,\n        internal{\n          _ref,\n          _type,\n          _weak\n        },\n        "internalTarget": internal->{\n          _id,\n          _type,\n          "title": coalesce(siteName, title, name),\n          "slug": slug.current\n        },\n        href,\n        targetBlank\n      }\n    },\n    newsletterEnabled,\n    newsletterHeading,\n    newsletterDescription,\n    newsletterCtaLabel,\n    legalLinks[]{\n      _key,\n      _type,\n      type,\n      label,\n      internal{\n        _ref,\n        _type,\n        _weak\n      },\n      "internalTarget": internal->{\n        _id,\n        _type,\n        "title": coalesce(siteName, title, name),\n        "slug": slug.current\n      },\n      href,\n      targetBlank\n    },\n    copyrightText,\n    paymentMethods\n  }\n}': GlobalQueryResult;
   }
 }

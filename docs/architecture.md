@@ -559,12 +559,12 @@ A separate **staging** environment is deferred until business operations require
 
 ##### Commerce / Payments / Media
 
-| Package                   | Version       | Type | Notes                               |
-| ------------------------- | ------------- | ---- | ----------------------------------- |
-| `@medusajs/js-sdk`        | `2.14.2`      | dep  | Pin to backend version.             |
-| `@stripe/stripe-js`       | latest stable | dep  | Browser-side Stripe.js loader.      |
-| `@stripe/react-stripe-js` | latest stable | dep  | React bindings for Payment Element. |
-| `@mux/mux-player-react`   | latest stable | dep  | Editorial video player.             |
+| Package                   | Version  | Type | Notes                                                                                            |
+| ------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------ |
+| `@medusajs/js-sdk`        | `2.14.2` | dep  | Pin to backend version.                                                                          |
+| `@stripe/stripe-js`       | `9.4.0`  | dep  | Browser-side Stripe.js loader; npm `latest` tag as of 2026-05-09.                                |
+| `@stripe/react-stripe-js` | `6.3.0`  | dep  | React bindings for Payment Element; peers require `@stripe/stripe-js >=9.3.1 <10.0.0`, React 19. |
+| `@mux/mux-player-react`   | `3.13.0` | dep  | Editorial video player; peers include React 19.                                                  |
 
 ##### Observability & Analytics
 
@@ -581,41 +581,42 @@ A separate **staging** environment is deferred until business operations require
 
 > **Pin every `@medusajs/*` package to `2.14.2`** in lockstep. Mismatched versions produce silent runtime errors.
 
-| Package                       | Version  | Type | Notes                                                                                                                                                                |
-| ----------------------------- | -------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@medusajs/medusa`            | `2.14.2` | dep  |                                                                                                                                                                      |
-| `@medusajs/framework`         | `2.14.2` | dep  |                                                                                                                                                                      |
-| `@medusajs/types`             | `2.14.2` | dep  |                                                                                                                                                                      |
-| `@medusajs/utils`             | `2.14.2` | dep  |                                                                                                                                                                      |
-| `@medusajs/cli`               | `2.14.2` | dev  |                                                                                                                                                                      |
-| `@medusajs/admin-vite-plugin` | `2.14.2` | dev  |                                                                                                                                                                      |
-| `@medusajs/admin-shared`      | `2.14.2` | dev  | For custom admin extensions.                                                                                                                                         |
-| `@medusajs/admin-sdk`         | `2.14.2` | dev  |                                                                                                                                                                      |
-| `@medusajs/payment-stripe`    | `2.14.2` | dep  | Bundled in `@medusajs/medusa`; pinning explicitly is a safety net.                                                                                                   |
-| `@medusajs/analytics-posthog` | `2.14.2` | dep  | Server-side PostHog event capture (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)).                                                        |
-| `@medusajs/loyalty-plugin`    | `2.14.2` | dep  | **Deferred.** Available for adoption when gift cards / store credit / loyalty are needed (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)). |
-| **`@medusajs/medusa-cli`**    | —        | —    | **Not used.** Legacy v1 CLI.                                                                                                                                         |
-| **`@medusajs/cache-redis`**   | —        | —    | **Not used.** Replaced by `@medusajs/caching` + `@medusajs/caching-redis` (Cloud auto-configures these).                                                             |
+| Package                       | Version  | Type | Notes                                                                                                                                                                                           |
+| ----------------------------- | -------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@medusajs/medusa`            | `2.14.2` | dep  |                                                                                                                                                                                                 |
+| `@medusajs/framework`         | `2.14.2` | dep  |                                                                                                                                                                                                 |
+| `@medusajs/types`             | `2.14.2` | dep  |                                                                                                                                                                                                 |
+| `@medusajs/utils`             | `2.14.2` | dep  |                                                                                                                                                                                                 |
+| `@medusajs/cli`               | `2.14.2` | dev  |                                                                                                                                                                                                 |
+| `@medusajs/admin-vite-plugin` | `2.14.2` | dev  |                                                                                                                                                                                                 |
+| `@medusajs/admin-shared`      | `2.14.2` | dev  | For custom admin extensions.                                                                                                                                                                    |
+| `@medusajs/admin-sdk`         | `2.14.2` | dev  |                                                                                                                                                                                                 |
+| `@medusajs/payment-stripe`    | `2.14.2` | dep  | Bundled in `@medusajs/medusa`; pinning explicitly is a safety net.                                                                                                                              |
+| `@medusajs/analytics-posthog` | `2.14.2` | dep  | Server-side PostHog event capture (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)).                                                                                   |
+| `@medusajs/loyalty-plugin`    | `2.14.2` | dep  | **Deferred.** Published at this version; available for adoption when gift cards / store credit / loyalty are needed (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)). |
+| **`@medusajs/medusa-cli`**    | —        | —    | **Not used.** Legacy v1 CLI.                                                                                                                                                                    |
+| **`@medusajs/cache-redis`**   | —        | —    | **Not used.** Replaced by `@medusajs/caching` + `@medusajs/caching-redis` (Cloud auto-configures these).                                                                                        |
 
 ##### Community Plugins
 
-| Package                             | Version | Type         | Notes                                                                                                                            |
-| ----------------------------------- | ------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `@alphabite/medusa-wishlist`        | `0.5.9` | dep          | Wishlist module (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)). MIT, active. Replaces planned custom wishlist module. |
-| `@stackd-solutions/medusa-wishlist` | `0.1.6` | — (fallback) | Documented fallback if `@alphabite/medusa-wishlist` v2.14 compatibility issues arise.                                            |
+| Package                             | Version | Type         | Notes                                                                                                                                                                       |
+| ----------------------------------- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@alphabite/medusa-wishlist`        | `0.5.9` | dep          | Wishlist module (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)). Published; peer deps pin Medusa `2.13.6`, so keep fallback / fork path if 2.14.2 issues surface. |
+| `@stackd-solutions/medusa-wishlist` | `0.1.6` | — (fallback) | Documented fallback if `@alphabite/medusa-wishlist` v2.14 compatibility issues arise; peers allow Medusa `^2.13.5`.                                                         |
 
 ##### Custom Module Dependencies
 
-| Package               | Version       | Type | Notes                                                                                                                                                                       |
-| --------------------- | ------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `klaviyo-api`         | latest stable | dep  | Node SDK for Klaviyo (per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)). Used in subscribers to push events + profile updates.              |
-| `posthog-node`        | `5.33.4`      | dep  | Used by `@medusajs/analytics-posthog`; pinning explicitly.                                                                                                                  |
-| `shippo`              | `2.18.0`      | dep  | For custom shipping label module.                                                                                                                                           |
-| `@mux/mux-node`       | `14.0.1`      | dep  | Server-side Mux ops only if needed.                                                                                                                                         |
-| `jose`                | `6.2.3`       | dep  | JWT verification (use over `jsonwebtoken`).                                                                                                                                 |
-| `pino`                | `10.3.1`      | dep  | Server logger.                                                                                                                                                              |
-| `pino-pretty`         | `13.1.3`      | dev  | Dev only.                                                                                                                                                                   |
-| **`stripe`** (direct) | `22.1.1`      | —    | **Do not pin directly in Medusa app.** `@medusajs/payment-stripe` brings its own Stripe SDK (`stripe@^15.5.0`, API version `2024-04-10`). Override only with strong reason. |
+| Package               | Version  | Type | Notes                                                                                                                                                                       |
+| --------------------- | -------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `klaviyo-api`         | `22.0.1` | dep  | Node SDK for Klaviyo (per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch)). npm `latest` tag as of 2026-05-09; SDK revision `2026-04-15`.      |
+| `posthog-node`        | `5.33.4` | dep  | Used by `@medusajs/analytics-posthog`; explicit pin satisfies the provider's `posthog-node@^5.11.0` dependency.                                                             |
+| `shippo`              | `2.18.0` | dep  | For custom shipping label module. npm `latest` tag as of 2026-05-09; no Medusa peer dependency.                                                                             |
+| `@mux/mux-node`       | `14.0.1` | dep  | Server-side Mux ops only if needed; npm `latest` tag as of 2026-05-09.                                                                                                      |
+| `jose`                | `6.2.3`  | dep  | JWT verification (use over `jsonwebtoken`).                                                                                                                                 |
+| `pino`                | `10.3.1` | dep  | Server logger.                                                                                                                                                              |
+| `pino-pretty`         | `13.1.3` | dev  | Dev only.                                                                                                                                                                   |
+| `awilix`              | `8.0.1`  | dep  | Direct pin matching `@medusajs/deps@2.14.2` (`awilix@^8.0.1`) and wishlist peer deps; do not upgrade to latest `13.x` without Medusa validation.                            |
+| **`stripe`** (direct) | `22.1.1` | —    | **Do not pin directly in Medusa app.** `@medusajs/payment-stripe` brings its own Stripe SDK (`stripe@^15.5.0`, API version `2024-04-10`). Override only with strong reason. |
 
 ##### Email Fallback Dependencies (Conditional)
 
@@ -4035,6 +4036,8 @@ This is the canonical record of architectural decisions. Each entry captures **c
 | ADR-013 | Adopt Community Wishlist Plugin                                                | Accepted                                            |
 | ADR-014 | Adopt Official Medusa Plugins — Analytics, Loyalty                             | Accepted                                            |
 | ADR-015 | Compliance Foundation — Termly Pro+, Global GDPR Posture, Off-Provider Backups | Accepted                                            |
+
+**Note (post-bootstrap remediation, 2026-05-09):** During Agent 1B registry remediation, the following clerical version corrections were applied: `@stripe/stripe-js` `8.0.0` -> `9.4.0`, `@stripe/react-stripe-js` `5.5.0` -> `6.3.0`, `@mux/mux-player-react` `3.10.0` -> `3.13.0`, and `klaviyo-api` `26.0.0` -> `22.0.1`. The manifest also documents `awilix@8.0.1` as a direct pin matching Medusa's `@medusajs/deps@2.14.2` and records that `@alphabite/medusa-wishlist@0.5.9` publishes exact Medusa `2.13.6` peer deps. These are registry-truth corrections, not architectural decision changes.
 
 ---
 

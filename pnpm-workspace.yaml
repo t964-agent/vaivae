@@ -2,6 +2,16 @@ packages:
   - "apps/*"
   - "packages/*"
 
+allowBuilds:
+  "@medusajs/telemetry": true
+  "@sentry/cli": true
+  core-js: true
+  esbuild: true
+  msgpackr-extract: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+
 # Catalogs centralize shared dependency versions.
 # When a package depends on `react` it can reference `catalog:` instead of pinning the version twice.
 catalog:

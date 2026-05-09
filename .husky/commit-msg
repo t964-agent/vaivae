@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-pnpm --config.verify-deps-before-run=false exec commitlint --edit "$1"
+pnpm exec commitlint --edit "$1"

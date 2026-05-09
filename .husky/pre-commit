@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-pnpm --config.verify-deps-before-run=false lint-staged
+pnpm lint-staged
 
 if command -v gitleaks >/dev/null 2>&1; then
   if ! gitleaks protect --staged --redact -v; then

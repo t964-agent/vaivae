@@ -34,7 +34,7 @@
     "@alphabite/medusa-wishlist": "0.5.9",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "klaviyo-api": "26.0.0",
+    "klaviyo-api": "22.0.1",
     "posthog-node": "5.33.4",
     "shippo": "2.18.0",
     "@mux/mux-node": "14.0.1",

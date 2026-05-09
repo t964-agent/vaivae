@@ -20,6 +20,8 @@ const buildDefaults = {
   STRIPE_API_KEY: "sk_test_medusa_build_placeholder",
   STRIPE_WEBHOOK_SECRET: "whsec_medusa_build_placeholder",
   POSTHOG_API_KEY: "phc_medusa_build_placeholder",
+  SANITY_PROJECT_ID: "medusa-build-sanity-project",
+  SANITY_WRITE_TOKEN: "medusa-build-sanity-write-token",
 } as const;
 
 type BuildDefaultKey = keyof typeof buildDefaults;
@@ -91,10 +93,9 @@ const envSchema = z.object({
   MUX_TOKEN_ID: z.preprocess(optionalString, z.string().optional()),
   MUX_TOKEN_SECRET: z.preprocess(optionalString, z.string().optional()),
 
-  SANITY_PROJECT_ID: z.preprocess(optionalString, z.string().optional()),
-  SANITY_DATASET: z.preprocess(optionalString, z.string().optional()),
-  SANITY_API_VERSION: z.preprocess(optionalString, z.string().optional()),
-  SANITY_API_TOKEN: z.preprocess(optionalString, z.string().optional()),
+  SANITY_PROJECT_ID: requiredString("SANITY_PROJECT_ID"),
+  SANITY_DATASET: z.preprocess(optionalString, z.string().default("production")),
+  SANITY_WRITE_TOKEN: requiredString("SANITY_WRITE_TOKEN"),
   SANITY_STUDIO_URL: z.preprocess(optionalString, z.string().optional()),
 
   MEDUSA_REVALIDATE_SECRET: z.preprocess(optionalString, z.string().optional()),
@@ -137,10 +138,9 @@ const rawEnv = {
   MUX_TOKEN_ID: process.env["MUX_TOKEN_ID"],
   MUX_TOKEN_SECRET: process.env["MUX_TOKEN_SECRET"],
 
-  SANITY_PROJECT_ID: process.env["SANITY_PROJECT_ID"],
+  SANITY_PROJECT_ID: valueOrBuildDefault("SANITY_PROJECT_ID"),
   SANITY_DATASET: process.env["SANITY_DATASET"],
-  SANITY_API_VERSION: process.env["SANITY_API_VERSION"],
-  SANITY_API_TOKEN: process.env["SANITY_API_TOKEN"],
+  SANITY_WRITE_TOKEN: valueOrBuildDefault("SANITY_WRITE_TOKEN"),
   SANITY_STUDIO_URL: process.env["SANITY_STUDIO_URL"],
 
   MEDUSA_REVALIDATE_SECRET: process.env["MEDUSA_REVALIDATE_SECRET"],
@@ -164,10 +164,6 @@ const optionalRuntimeWarnings = [
   { key: "SHIPPO_API_KEY", consumer: "future Shippo label workflows" },
   { key: "MUX_TOKEN_ID", consumer: "future Mux video operations" },
   { key: "MUX_TOKEN_SECRET", consumer: "future Mux video operations" },
-  { key: "SANITY_PROJECT_ID", consumer: "future Medusa-to-Sanity sync subscribers" },
-  { key: "SANITY_DATASET", consumer: "future Medusa-to-Sanity sync subscribers" },
-  { key: "SANITY_API_VERSION", consumer: "future Medusa-to-Sanity sync subscribers" },
-  { key: "SANITY_API_TOKEN", consumer: "future Medusa-to-Sanity sync subscribers" },
   { key: "SANITY_STUDIO_URL", consumer: "future Medusa Admin Sanity links" },
   { key: "MEDUSA_REVALIDATE_SECRET", consumer: "future storefront revalidation subscribers" },
 ] as const;

@@ -20,6 +20,12 @@ const redactPaths = [
   "card.*",
   "*.card",
   "*.card.*",
+  "token",
+  "*.token",
+  "authorization",
+  "*.authorization",
+  "secret",
+  "*.secret",
 ];
 
 const loggerOptions: LoggerOptions = {

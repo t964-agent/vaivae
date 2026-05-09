@@ -835,21 +835,21 @@ vaïvae uses Medusa v2's standard modules. We do not fork core entities; extensi
 
 Document types planned for Phase 1. Each schema is fully defined in code in `apps/storefront/sanity/schemas/`.
 
-| Schema                | Type      | Purpose                                                                                                                                                                                     |
-| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `productContent`      | document  | Editorial enrichment of one Medusa product. Fields: `medusaProductId` (immutable, indexed), read-only Medusa snapshot, gallery, story copy, fit & care, model specs, related products, SEO. |
-| `homePage`            | singleton | Composable homepage with modular sections (hero, capsule rail, editorial excerpt, brand promise, CTA).                                                                                      |
-| `capsulePage`         | document  | Seasonal capsule / collection landing page with hero, story, product rail.                                                                                                                  |
-| `lookbook`            | document  | Visual-first editorial story with galleries, hotspots, product references, season metadata.                                                                                                 |
-| `journalArticle`      | document  | Long-form essays / brand notes / behind-the-scenes; Portable Text body, author, publish date, tags, product embeds.                                                                         |
-| `landingPage`         | document  | Flexible campaign / SEO landing page with modular blocks.                                                                                                                                   |
-| `campaignLandingPage` | document  | Standalone paid-traffic campaign pages with conversion-optimized layout.                                                                                                                    |
-| `aboutPage`           | singleton | Brand story, founder note, craft & production.                                                                                                                                              |
-| `pressPage`           | singleton | Press kit, mentions, downloadable assets.                                                                                                                                                   |
-| `wholesalePage`       | singleton | Inquiry CTA + line-sheet download link.                                                                                                                                                     |
-| `legalPage`           | document  | Privacy, terms, returns policy, shipping policy, FAQ — managed in CMS, not hardcoded.                                                                                                       |
-| `sizeGuide`           | document  | Reusable size charts referenced by `productContent`.                                                                                                                                        |
-| `globalSettings`      | singleton | Navigation, footer, social links, announcement bar, default SEO, brand contacts.                                                                                                            |
+| Schema                | Type      | Purpose                                                                                                                                                                                                                                            |
+| --------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `product`             | document  | Editorial enrichment of one Medusa product. Sanity `_id === medusaProductId`; mirror fields (`medusaProductId`, `title`, `handle`, `mirrorMaterials`) are read-only, while gallery, story copy, fit & care, model specs, and SEO are Sanity-owned. |
+| `homePage`            | singleton | Composable homepage with modular sections (hero, capsule rail, editorial excerpt, brand promise, CTA).                                                                                                                                             |
+| `capsulePage`         | document  | Seasonal capsule / collection landing page with hero, story, product rail.                                                                                                                                                                         |
+| `lookbook`            | document  | Visual-first editorial story with galleries, hotspots, product references, season metadata.                                                                                                                                                        |
+| `journalArticle`      | document  | Long-form essays / brand notes / behind-the-scenes; Portable Text body, author, publish date, tags, product embeds.                                                                                                                                |
+| `landingPage`         | document  | Flexible campaign / SEO landing page with modular blocks.                                                                                                                                                                                          |
+| `campaignLandingPage` | document  | Standalone paid-traffic campaign pages with conversion-optimized layout.                                                                                                                                                                           |
+| `aboutPage`           | singleton | Brand story, founder note, craft & production.                                                                                                                                                                                                     |
+| `pressPage`           | singleton | Press kit, mentions, downloadable assets.                                                                                                                                                                                                          |
+| `wholesalePage`       | singleton | Inquiry CTA + line-sheet download link.                                                                                                                                                                                                            |
+| `legalPage`           | document  | Privacy, terms, returns policy, shipping policy, FAQ — managed in CMS, not hardcoded.                                                                                                                                                              |
+| `sizeGuide`           | document  | Reusable size charts referenced by `product`.                                                                                                                                                                                                      |
+| `globalSettings`      | singleton | Navigation, footer, social links, announcement bar, default SEO, brand contacts.                                                                                                                                                                   |
 
 **Reusable objects (not standalone documents):**
 
@@ -880,9 +880,9 @@ Implementation note: `marketing-consent` stores `ConsentRecord` rows as an appen
 
 | Event                     | Direction                             | Trigger                            | Action                                                                                                                                     |
 | ------------------------- | ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Product created in Medusa | Medusa → Sanity                       | `product.created` subscriber       | Create Sanity `productContent` skeleton with `medusaProductId`, snapshot of title/handle/thumbnail/status                                  |
-| Product updated in Medusa | Medusa → Sanity                       | `product.updated` subscriber       | Patch only Medusa-owned snapshot fields; never touch editor-owned fields                                                                   |
-| Product deleted in Medusa | Medusa → Sanity                       | `product.deleted` subscriber       | Mark Sanity doc as `archived`. **Do not delete.** Preserves editorial references.                                                          |
+| Product created in Medusa | Medusa → Sanity                       | `product.created` subscriber       | Create Sanity `product` stub with deterministic `_id`, `medusaProductId`, `title`, `handle`, and `mirrorMaterials`                         |
+| Product updated in Medusa | Medusa → Sanity                       | `product.updated` subscriber       | Patch only Medusa-owned mirror fields; never touch editor-owned fields                                                                     |
+| Product deleted in Medusa | Medusa → Sanity                       | `product.deleted` subscriber       | Delete the Sanity `product` document keyed by the Medusa product ID                                                                        |
 | Sanity content published  | Sanity → Vercel                       | Sanity webhook → `/api/revalidate` | `revalidateTag("product:{id}")` or relevant content tag                                                                                    |
 | Medusa product changed    | Medusa → Vercel                       | Subscriber → revalidate webhook    | `revalidateTag("product:{id}")` so storefront refreshes                                                                                    |
 | Stripe payment events     | Stripe → Medusa                       | Stripe webhook → Medusa            | Reconciles payment state on `Order`                                                                                                        |
@@ -897,30 +897,40 @@ Implementation note: `marketing-consent` stores `ConsentRecord` rows as an appen
 | Concern                                                      | Convention                                                                              |
 | ------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
 | Medusa IDs (`prod_*`, `variant_*`, `cus_*`, `order_*`, etc.) | Immutable system identifiers — stored verbatim                                          |
-| Sanity `productContent._id`                                  | `productContent.{medusaProductId}` (deterministic, prevents duplicates)                 |
+| Sanity `product._id`                                         | Exactly `medusaProductId` (deterministic, prevents duplicates)                          |
 | Sanity `medusaProductId` field                               | Always present and indexed, even when encoded into `_id` (eases queries and migrations) |
 | URL slugs                                                    | Medusa `handle` for PDPs; Sanity slugs for editorial content                            |
-| Drafts                                                       | Sync patches both published and draft Sanity documents to keep previews consistent      |
+| Drafts                                                       | Sanity drafts are editor-owned overlays; Medusa sync never reads draft data back        |
 
 #### 4.3.3 Idempotency & Reliability
 
 - All sync subscribers are **idempotent**. They re-fetch authoritative state from Medusa inside the handler rather than trusting event payloads.
-- Each Sanity `productContent` carries a `lastSyncedAt` timestamp and an optional content hash. Stale events (older than the watermark) are dropped.
-- Failed sync jobs are retried with exponential backoff. After max retries, they are surfaced in Sentry and dropped to a manual replay queue.
-- A **manual resync job** (admin-only Medusa workflow) is provided to repair drift in bulk.
+- Sanity product sync is idempotent through deterministic `_id`, `createIfNotExists`, and `patch().set()` of mirror fields only.
+- Failed transient sync jobs are retried by Medusa Cloud's event infrastructure with backoff; permanent data errors are logged and skipped.
+- A future **manual resync job** (admin-only Medusa workflow) can repair drift in bulk.
 
-#### 4.3.4 Pitfalls Explicitly Avoided
+#### 4.3.4 Agent 21 `sanity-sync` Module
 
-| Pitfall                                                         | Mitigation                                                            |
-| --------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Editing commerce fields in Sanity                               | Mirrored fields are read-only in the Studio UI                        |
-| Using Sanity for price/inventory                                | Always fetched from Medusa at render or checkout                      |
-| Treating Medusa `ProductCollection` as editorial campaign pages | Keep commerce collections and Sanity capsule pages separate           |
-| Wishlist in customer `metadata`                                 | Use a dedicated module (lists are not metadata)                       |
-| Sync race conditions                                            | Deterministic IDs + upserts + watermarks + re-fetch on event          |
-| Deleting Sanity docs on Medusa delete                           | Archive only — preserves editorial history and references             |
-| Variant label drift                                             | Option values stay in Medusa; Sanity enriches by reference only       |
-| Forgetting region / sales-channel context                       | All product/cart fetches in storefront include region + sales channel |
+- Medusa module token: `sanity_sync`; module path: `apps/medusa/src/modules/sanity-sync/`.
+- Subscribers listen to `product.created`, `product.updated`, and `product.deleted` in `apps/medusa/src/subscribers/`.
+- Direction is Medusa → Sanity only. Sanity `_id === medusaProductId` for `product` documents.
+- Mirror fields written by Medusa: `medusaProductId`, `title`, `handle`, and `mirrorMaterials`.
+- Editorial fields such as `editorialReady`, `heroImage`, `narrative`, `pdpStorytelling`, `materials`, `careNotes`, and `seo` are preserved. `editorialReady` is seeded only when the document is first created.
+- Sanity API version is pinned to `2026-03-01` in Medusa code. It is not read from env and must never use `new Date()`.
+- There is no reverse sync. Sanity webhooks only call storefront cache revalidation; they never mutate Medusa.
+
+#### 4.3.5 Pitfalls Explicitly Avoided
+
+| Pitfall                                                         | Mitigation                                                               |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Editing commerce fields in Sanity                               | Mirrored fields are read-only in the Studio UI                           |
+| Using Sanity for price/inventory                                | Always fetched from Medusa at render or checkout                         |
+| Treating Medusa `ProductCollection` as editorial campaign pages | Keep commerce collections and Sanity capsule pages separate              |
+| Wishlist in customer `metadata`                                 | Use a dedicated module (lists are not metadata)                          |
+| Sync race conditions                                            | Deterministic IDs + idempotent patches + re-fetch on event               |
+| Reverse-sync loops                                              | Sanity webhooks revalidate storefront caches only; Medusa is not mutated |
+| Variant label drift                                             | Option values stay in Medusa; Sanity enriches by reference only          |
+| Forgetting region / sales-channel context                       | All product/cart fetches in storefront include region + sales channel    |
 
 ---
 
@@ -1220,7 +1230,7 @@ Rules:
 | `/`                                                   | Sanity (`homePage`) + Medusa (featured)  | ISR, tags                          | —                | Hero is LCP — static                            |
 | `/shop`                                               | Medusa                                   | ISR                                | —                | Default sort + filters via URL                  |
 | `/shop/[collection]`                                  | Medusa collection                        | ISR                                | —                | Filters by URL params                           |
-| `/products/[handle]`                                  | Medusa + Sanity (`productContent`)       | Static shell + dynamic price/stock | —                | Quick view via intercepting route               |
+| `/products/[handle]`                                  | Medusa + Sanity (`product`)              | Static shell + dynamic price/stock | —                | Quick view via intercepting route               |
 | `/journal`                                            | Sanity (`journalArticle` list)           | ISR                                | —                | Pagination via URL                              |
 | `/journal/[slug]`                                     | Sanity (`journalArticle`)                | ISR                                | —                | Long-form Portable Text                         |
 | `/lookbook`                                           | Sanity (`lookbook` list)                 | ISR                                | —                | Visual-first                                    |
@@ -1290,11 +1300,11 @@ Medusa v2 ships a Commerce Module suite. Our policy: **never disable core module
 
 We add **two** custom modules and adopt one community plugin. All live inline under `apps/medusa/src/modules/` (custom) or installed via npm (plugin).
 
-| Module                                                  | Source                                                                                       | Purpose                                                                     | Models                                                              | Links                        |
-| ------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------- |
-| `marketing-consent` (service token `marketing_consent`) | Custom (this repo)                                                                           | Newsletter opt-in + GDPR consent log                                        | `ConsentRecord` append-only log; latest row is current state        | `customer-marketing-consent` |
-| `sanity-sync`                                           | Custom (this repo)                                                                           | Tracking for Medusa↔Sanity product sync                                     | `SyncRecord` (productId, lastSyncedAt, lastHash, status, lastError) | `product-sanity-sync`        |
-| Wishlist                                                | **`@alphabite/medusa-wishlist@0.5.9`** ([ADR-013](#adr-013-adopt-community-wishlist-plugin)) | Authenticated + guest wishlists, transfer-on-login, multiple wishlists, SDK | (provided by plugin)                                                | (provided by plugin)         |
+| Module                                                  | Source                                                                                       | Purpose                                                                     | Models                                                       | Links                        |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------- |
+| `marketing-consent` (service token `marketing_consent`) | Custom (this repo)                                                                           | Newsletter opt-in + GDPR consent log                                        | `ConsentRecord` append-only log; latest row is current state | `customer-marketing-consent` |
+| `sanity-sync` (service token `sanity_sync`)             | Custom (this repo)                                                                           | One-way Medusa → Sanity product mirror                                      | None; idempotency uses deterministic Sanity `_id`            | None                         |
+| Wishlist                                                | **`@alphabite/medusa-wishlist@0.5.9`** ([ADR-013](#adr-013-adopt-community-wishlist-plugin)) | Authenticated + guest wishlists, transfer-on-login, multiple wishlists, SDK | (provided by plugin)                                         | (provided by plugin)         |
 
 Additional **official Medusa plugins** ([ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)):
 
@@ -1431,20 +1441,20 @@ Medusa v2 distinguishes **subscribers** (asynchronous, at-least-once side effect
 
 Located at `apps/medusa/src/subscribers/`.
 
-| Subscriber               | File                                        | Events                                                        | Action                                                                                                                 |
-| ------------------------ | ------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Sanity product sync      | `sanity-product-sync.ts`                    | `product.created`, `product.updated`, `product.deleted`       | Upsert/archive Sanity `productContent` skeleton; refetch product by id; idempotent via deterministic id + content hash |
-| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                                | Trigger Cloud Emails `order_placed` template; log to notification log                                                  |
-| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                            | Cloud Emails `order_shipped` with tracking                                                                             |
-| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                            | Cloud Emails `order_refunded`                                                                                          |
-| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                         | Cloud Emails `password_reset`                                                                                          |
-| Welcome                  | `welcome-email.ts`                          | `customer.created`                                            | Cloud Emails `welcome`                                                                                                 |
-| Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                              |
-| Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                            |
-| Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                |
-| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                           |
-| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                |
-| Shippo label purchase    | `purchase-shipping-label.ts`                | `order.placed` (gated by config)                              | Calls Shippo via `shipping-shippo` service; stores tracking number on order                                            |
+| Subscriber               | File                                        | Events                                                        | Action                                                                                                                   |
+| ------------------------ | ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Sanity product sync      | `sanity-sync-product-*.ts`                  | `product.created`, `product.updated`, `product.deleted`       | Create/patch/delete Sanity `product` docs; refetch product by id; idempotent via deterministic `_id === medusaProductId` |
+| Order confirmation email | `order-placed-email.ts`                     | `order.placed`                                                | Trigger Cloud Emails `order_placed` template; log to notification log                                                    |
+| Shipment email           | `shipment-created-email.ts`                 | `shipment.created`                                            | Cloud Emails `order_shipped` with tracking                                                                               |
+| Refund email             | `refund-issued-email.ts`                    | `payment.refunded`                                            | Cloud Emails `order_refunded`                                                                                            |
+| Password reset           | `password-reset-email.ts`                   | `auth.password_reset`                                         | Cloud Emails `password_reset`                                                                                            |
+| Welcome                  | `welcome-email.ts`                          | `customer.created`                                            | Cloud Emails `welcome`                                                                                                   |
+| Klaviyo profile sync     | `klaviyo-customer-sync.ts`                  | `customer.created`, `customer.updated`                        | Upsert Klaviyo profile with consent state                                                                                |
+| Klaviyo order sync       | `klaviyo-order-sync.ts`                     | `order.placed`, `order.fulfillment_created`, `order.canceled` | Push `Placed Order` / `Order Shipped` / `Cancelled Order` events to Klaviyo                                              |
+| Klaviyo cart sync        | `klaviyo-cart-sync.ts`                      | `cart.updated` (when email present)                           | Trigger Klaviyo `Started Checkout` flow                                                                                  |
+| Klaviyo consent sync     | `klaviyo-consent-sync.ts`                   | `marketing-consent.updated`                                   | Update Klaviyo profile consent + suppression                                                                             |
+| PostHog purchase event   | _Provided by `@medusajs/analytics-posthog`_ | `order.placed`                                                | Server-side `purchase` event (resilient to ad-blockers)                                                                  |
+| Shippo label purchase    | `purchase-shipping-label.ts`                | `order.placed` (gated by config)                              | Calls Shippo via `shipping-shippo` service; stores tracking number on order                                              |
 
 All subscribers are **idempotent**: they re-fetch authoritative state from Medusa, use upserts/notification-log keys, and tolerate replays.
 
@@ -1523,19 +1533,19 @@ featureFlags: []
 
 #### 6.5.2 Environment Variables
 
-| Category                   | Variables                                                                                                    | Notes                                                                                                                          |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Cloud-managed**          | `DATABASE_URL`, `REDIS_URL`, `NODE_ENV`, `PORT`, `MEDUSA_WORKER_MODE`                                        | Do not set manually on Medusa Cloud                                                                                            |
-| **Auth**                   | `JWT_SECRET`, `COOKIE_SECRET`                                                                                | Strong random; rotate per environment                                                                                          |
-| **CORS / URLs**            | `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `MEDUSA_BACKEND_URL`, `MEDUSA_STOREFRONT_URL`                       | Per environment                                                                                                                |
-| **Stripe**                 | `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`                                                                    | Live in production, test in dev                                                                                                |
-| **Sanity**                 | `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_VERSION`, `SANITY_API_TOKEN` (write), `SANITY_STUDIO_URL` | Write token kept server-side only                                                                                              |
-| **Cloud Emails**           | _Auto-configured by Medusa Cloud_                                                                            | Verified sender domain set in Cloud dashboard                                                                                  |
-| **Klaviyo**                | `KLAVIYO_PRIVATE_API_KEY`, `KLAVIYO_PUBLIC_API_KEY`                                                          | Private key server-only; public key for storefront onsite tracking                                                             |
-| **PostHog (server)**       | `POSTHOG_API_KEY`, `POSTHOG_HOST`                                                                            | Used by `@medusajs/analytics-posthog`                                                                                          |
-| **Shippo**                 | `SHIPPO_API_KEY`                                                                                             | Test token in dev                                                                                                              |
-| **Resend (fallback only)** | `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`                                                     | Set only if custom Resend provider is enabled per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
-| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                                                | Toggle subscriber-driven label purchase                                                                                        |
+| Category                   | Variables                                                                              | Notes                                                                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Cloud-managed**          | `DATABASE_URL`, `REDIS_URL`, `NODE_ENV`, `PORT`, `MEDUSA_WORKER_MODE`                  | Do not set manually on Medusa Cloud                                                                                            |
+| **Auth**                   | `JWT_SECRET`, `COOKIE_SECRET`                                                          | Strong random; rotate per environment                                                                                          |
+| **CORS / URLs**            | `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `MEDUSA_BACKEND_URL`, `MEDUSA_STOREFRONT_URL` | Per environment                                                                                                                |
+| **Stripe**                 | `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET`                                              | Live in production, test in dev                                                                                                |
+| **Sanity**                 | `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_WRITE_TOKEN`, `SANITY_STUDIO_URL`       | Write token kept server-side only; API version pinned in code to `2026-03-01`                                                  |
+| **Cloud Emails**           | _Auto-configured by Medusa Cloud_                                                      | Verified sender domain set in Cloud dashboard                                                                                  |
+| **Klaviyo**                | `KLAVIYO_PRIVATE_API_KEY`, `KLAVIYO_PUBLIC_API_KEY`                                    | Private key server-only; public key for storefront onsite tracking                                                             |
+| **PostHog (server)**       | `POSTHOG_API_KEY`, `POSTHOG_HOST`                                                      | Used by `@medusajs/analytics-posthog`                                                                                          |
+| **Shippo**                 | `SHIPPO_API_KEY`                                                                       | Test token in dev                                                                                                              |
+| **Resend (fallback only)** | `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_REPLY_TO`                               | Set only if custom Resend provider is enabled per [ADR-012](#adr-012-email-strategy--medusa-cloud-emails--klaviyo-from-launch) |
+| **Feature flags**          | `SHIPPING_LABEL_AUTOPURCHASE`                                                          | Toggle subscriber-driven label purchase                                                                                        |
 
 Secrets live in Medusa Cloud's environment manager (per environment) and are never committed. Local development uses `apps/medusa/.env.local`, which is `.gitignore`d.
 
@@ -1566,7 +1576,7 @@ sanity/
 │   ├── live.ts                 defineLive for Live Content API
 │   └── queries.ts              defineQuery exports for TypeGen
 ├── schemas/
-│   ├── documents/              productContent, capsulePage, lookbook,
+│   ├── documents/              product, capsulePage, lookbook,
 │   │                            journalArticle, landingPage,
 │   │                            campaignLandingPage, legalPage,
 │   │                            sizeGuide
@@ -1589,7 +1599,7 @@ sanity/
 #### 7.1.2 Conventions
 
 - **Always** use `defineType`, `defineField`, `defineArrayMember`. Required for TypeGen quality and editor-tool affordances.
-- Document/object names are **singular and semantic** (`productContent`, not `productContents` or `product_pages`).
+- Document/object names are **singular and semantic** (`product`, not `products` or `product_pages`).
 - Every document and major object has `icon`, `preview`, and `groups` for editor UX.
 - Reusable structures live as **named object types**, never anonymous inline objects.
 - Field names are content-meaningful (`heroMedia`, not `image1`).
@@ -1597,19 +1607,19 @@ sanity/
 
 #### 7.1.3 Document Types — Field Summary
 
-| Type                                      | Key Fields                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `productContent`                          | `medusaProductId` (immutable, required, unique), `medusa` snapshot object (read-only: title, handle, thumbnail, status, variantSummary, syncedAt), `gallery` (array of `imageWithHotspot`), `story` (Portable Text), `fitAndCare` (Portable Text), `modelSpecs` (object), `relatedProducts` (array of `productReference`), `sizeGuide` (reference), `seo`, `sections` (sections array constrained to a small subset for PDP storytelling) |
-| `capsulePage`                             | `title`, `slug`, `season`, `launchDate`, `hero` (`heroFilm` or `imagePair`), `story` (Portable Text), `productRail`, optional `sections`, `seo`                                                                                                                                                                                                                                                                                           |
-| `lookbook`                                | `title`, `slug`, `campaign`, `season`, `coverMedia`, `blocks` (visual blocks: `imagePair`, `videoChapter`, `editorialSpread`, `productHotspot`), `credits`, `seo`                                                                                                                                                                                                                                                                         |
-| `journalArticle`                          | `title`, `slug`, `author`, `tags`, `publishedAt`, `heroMedia`, `body` (Portable Text with custom marks for product embeds), `relatedArticles`, `relatedProducts`, `seo`                                                                                                                                                                                                                                                                   |
-| `landingPage`                             | `title`, `slug`, `sections` (broad set), `seo`                                                                                                                                                                                                                                                                                                                                                                                            |
-| `campaignLandingPage`                     | `campaignName`, `slug`, conversion-focused module set, UTM defaults, `seo`                                                                                                                                                                                                                                                                                                                                                                |
-| `legalPage`                               | `policyType` (privacy/terms/returns/shipping/faq), `slug`, `currentVersion` (object: effectiveDate, body), `revisions` (array of past versions — never overwrite)                                                                                                                                                                                                                                                                         |
-| `sizeGuide`                               | `category`, `gender`, `unit`, `tables` (array of `measurementTable` rows), `fitNotes`, `diagramImage`, `revisedAt`                                                                                                                                                                                                                                                                                                                        |
-| `homePage`                                | singleton; `sections` constrained to home-safe modules; required `seo`; max one hero                                                                                                                                                                                                                                                                                                                                                      |
-| `aboutPage`, `pressPage`, `wholesalePage` | singletons; `hero`, `body`, `sections` (curated), `assets` (for press downloads), `seo`                                                                                                                                                                                                                                                                                                                                                   |
-| `globalSettings`                          | singleton; `nav` (array of `link`), `footer` (columns, links, legal, social), `announcementBar`, `brand` (contact, social), default `seo`, default share image                                                                                                                                                                                                                                                                            |
+| Type                                      | Key Fields                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `product`                                 | `medusaProductId` (immutable, required, unique), read-only mirror fields (`title`, `handle`, `mirrorMaterials`), `editorialReady`, `heroImage`, `gallery`, `narrative`, `pdpStorytelling`, `modelSpecs`, `materials`, `colorSwatches`, `sizeGuide`, `careNotes`, sustainability fields, and `seo` |
+| `capsulePage`                             | `title`, `slug`, `season`, `launchDate`, `hero` (`heroFilm` or `imagePair`), `story` (Portable Text), `productRail`, optional `sections`, `seo`                                                                                                                                                   |
+| `lookbook`                                | `title`, `slug`, `campaign`, `season`, `coverMedia`, `blocks` (visual blocks: `imagePair`, `videoChapter`, `editorialSpread`, `productHotspot`), `credits`, `seo`                                                                                                                                 |
+| `journalArticle`                          | `title`, `slug`, `author`, `tags`, `publishedAt`, `heroMedia`, `body` (Portable Text with custom marks for product embeds), `relatedArticles`, `relatedProducts`, `seo`                                                                                                                           |
+| `landingPage`                             | `title`, `slug`, `sections` (broad set), `seo`                                                                                                                                                                                                                                                    |
+| `campaignLandingPage`                     | `campaignName`, `slug`, conversion-focused module set, UTM defaults, `seo`                                                                                                                                                                                                                        |
+| `legalPage`                               | `policyType` (privacy/terms/returns/shipping/faq), `slug`, `currentVersion` (object: effectiveDate, body), `revisions` (array of past versions — never overwrite)                                                                                                                                 |
+| `sizeGuide`                               | `category`, `gender`, `unit`, `tables` (array of `measurementTable` rows), `fitNotes`, `diagramImage`, `revisedAt`                                                                                                                                                                                |
+| `homePage`                                | singleton; `sections` constrained to home-safe modules; required `seo`; max one hero                                                                                                                                                                                                              |
+| `aboutPage`, `pressPage`, `wholesalePage` | singletons; `hero`, `body`, `sections` (curated), `assets` (for press downloads), `seo`                                                                                                                                                                                                           |
+| `globalSettings`                          | singleton; `nav` (array of `link`), `footer` (columns, links, legal, social), `announcementBar`, `brand` (contact, social), default `seo`, default share image                                                                                                                                    |
 
 #### 7.1.4 Reusable Objects
 
@@ -1659,7 +1669,7 @@ We ship a **constrained, brand-safe palette** of 10-12 modules. Editors compose 
 | `videoChapter`     | Single Mux video chapter with optional caption + product hotspots          | Lookbook, journal, capsule            |
 | `quote`            | Editorial pull quote, attribution                                          | Journal, about, capsule               |
 | `cta-section`      | Standalone CTA band with link                                              | Home, landing, campaign, wholesale    |
-| `pdpStorytelling`  | PDP-specific section subset (story, fit, materials)                        | productContent only                   |
+| `pdpStorytelling`  | PDP-specific section subset (story, fit, materials)                        | `product` only                        |
 
 #### 7.2.2 Per-Page Module Sets
 
@@ -1672,7 +1682,7 @@ Each document type allows **only** the modules listed above. We do **not** use a
 | `lookbook`                           | `videoChapter`, `imagePair`, `editorialSpread`, `productHotspot`                                                        |
 | `journalArticle`                     | Portable Text body + minimal embed modules (no full page-builder freedom)                                               |
 | `landingPage`, `campaignLandingPage` | Broader subset for marketing flexibility                                                                                |
-| `productContent`                     | `pdpStorytelling`, `imagePair`, `quote`, `videoChapter`                                                                 |
+| `product`                            | `pdpStorytelling`, `imagePair`, `quote`, `videoChapter`                                                                 |
 
 #### 7.2.3 Module Naming & Validation
 
@@ -1725,7 +1735,7 @@ Stega encoding rules:
 
 - **Phase 1: English-only.** No localization plugins installed. Schemas use neutral field names (`title`, never `titleEn`).
 - **Future:** When a second language is introduced:
-  - Document-level localization for `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `productContent` (where storytelling differs by market).
+  - Document-level localization for `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `product` (where storytelling differs by market).
   - Field-level localization via `sanity-plugin-internationalized-array` for `globalSettings`, nav labels, announcement bar copy, and product microcopy.
   - Sanity's `@sanity/document-internationalization` for top-level locale fanout.
 - Schema fields are **already namable for localization**; no rewrite required.
@@ -1749,14 +1759,14 @@ Stega encoding rules:
 The canonical link between Medusa products and Sanity content is `medusaProductId`. It is:
 
 - **Immutable** — never edited after creation.
-- **Required and unique** on `productContent`.
+- **Required and unique** on `product`.
 - **Validated** at schema level via custom validation rule (regex check `prod_*`).
-- **Used as the deterministic Sanity `_id`** (e.g. `productContent.prod_01ABC...`) to prevent duplicates.
+- **Used as the deterministic Sanity `_id`** (e.g. `_id = prod_01ABC...`) to prevent duplicates.
 
 ```mermaid
 graph LR
   M[Medusa Product<br/>id = prod_01ABC]
-  SC[Sanity productContent<br/>_id = productContent.prod_01ABC<br/>medusaProductId = prod_01ABC]
+  SC[Sanity product<br/>_id = prod_01ABC<br/>medusaProductId = prod_01ABC]
   PC[Sanity productCard block<br/>medusaProductId ref]
   PR[Sanity productRail block<br/>list of medusaProductId refs]
 
@@ -1765,35 +1775,31 @@ graph LR
   PR -.->|GROQ join<br/>+ Medusa fetch| M
 ```
 
-#### 7.4.2 Snapshot Fields
+#### 7.4.2 Mirror Fields
 
-To keep the Studio editor experience usable, `productContent` carries a **read-only** `medusa` object containing snapshot fields:
+To keep the Studio editor experience usable, `product` carries a **read-only** mirror group containing Medusa-owned fields:
 
-| Field               | Source                        | Purpose                                               |
-| ------------------- | ----------------------------- | ----------------------------------------------------- |
-| `title`             | Medusa `product.title`        | Editor preview                                        |
-| `handle`            | Medusa `product.handle`       | URL preview, deep link                                |
-| `thumbnail`         | Medusa `product.thumbnail`    | Studio list/grid preview                              |
-| `status`            | Medusa `product.status`       | Show "Published"/"Draft" badge                        |
-| `variantSummary`    | Computed (size+color summary) | Editor at-a-glance                                    |
-| `priceRangePreview` | Computed                      | Editor sanity check (read-only, not used for display) |
-| `medusaUpdatedAt`   | Medusa                        | Drift detection                                       |
-| `syncedAt`          | Sync subscriber               | Drift detection                                       |
+| Field             | Source                    | Purpose                                         |
+| ----------------- | ------------------------- | ----------------------------------------------- |
+| `medusaProductId` | Medusa `product.id`       | Deterministic identity and storefront join key  |
+| `title`           | Medusa `product.title`    | Editor preview                                  |
+| `handle`          | Medusa `product.handle`   | URL preview, deep link                          |
+| `mirrorMaterials` | Medusa `product.metadata` | Filterable material labels for editor reference |
 
 These fields are:
 
 - Marked `readOnly: true` in schema so editors can't change them.
-- Hidden in groups (`Medusa snapshot`) to keep the editing UI focused.
+- Grouped under `Mirror` to keep the editing UI focused.
 - **Never** rendered as live commerce data on the storefront — runtime always fetches from Medusa.
 
-A Sanity Studio document widget shows a warning if `medusaUpdatedAt > syncedAt` for more than 5 minutes (drift indicator).
+Medusa never writes editorial-owned fields such as `heroImage`, `narrative`, `pdpStorytelling`, `materials`, `careNotes`, or `seo`.
 
 #### 7.4.3 Product References in Page-Builder Blocks
 
-`productCard` and `productRail` modules reference Medusa products by `medusaProductId`, not by Sanity reference to `productContent`. Reasons:
+`productCard` and `productRail` modules reference Medusa products by `medusaProductId`, not by Sanity reference to `product`. Reasons:
 
-- A product can be referenced in editorial content even before its `productContent` skeleton is fully filled in.
-- Avoids broken references when `productContent` is archived.
+- A product can be referenced in editorial content even before its `product` stub is fully enriched.
+- Avoids hard coupling page-builder content to Sanity document lifecycle.
 - Single hop at fetch time: GROQ returns the product IDs; storefront fetches the live Medusa data.
 
 Optional editorial overrides per reference:
@@ -1806,34 +1812,34 @@ Optional editorial overrides per reference:
 
 (Detailed sync flow is in [§4.3](#43-sync-strategy). Recap:)
 
-- **Direction:** Medusa → Sanity, one-way, only for snapshot fields.
+- **Direction:** Medusa → Sanity, one-way, only for mirror fields.
 - **Trigger:** Medusa subscriber on `product.created`, `product.updated`, `product.deleted`.
-- **Idempotency:** deterministic `_id`, content hash, `lastSyncedAt` watermark.
-- **Delete behavior:** Sanity doc archived (`medusa.status = "deleted"`), never hard-deleted.
-- **Recovery:** Admin route `POST /admin/sanity/resync(-all)` triggers `sanity-sync-products` workflow.
+- **Idempotency:** deterministic `_id === medusaProductId`, `createIfNotExists`, and `patch().set()` of mirror fields only.
+- **Delete behavior:** Sanity `product` doc is deleted by deterministic `_id` when Medusa emits `product.deleted`.
+- **Recovery:** a future admin-only resync workflow may replay Medusa products into Sanity if drift is detected.
 
 #### 7.4.5 Pitfalls Explicitly Avoided
 
-| Pitfall                                        | Mitigation                                                                                                  |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Editor edits Medusa snapshot fields            | `readOnly: true` + grouped under "Medusa snapshot"                                                          |
-| Sanity used to render live price/inventory     | Storefront always fetches Medusa at request time                                                            |
-| Stale snapshot misleads editor                 | Drift indicator (`medusaUpdatedAt > syncedAt`)                                                              |
-| Broken product references in editorial         | `medusaProductId` is a string, not a Sanity ref; storefront degrades gracefully if product no longer exists |
-| Snapshot loops (subscriber re-triggers itself) | Sync subscriber writes only `medusa.*` fields; product subscriber checks hash before re-syncing             |
-| Stega leaking into SEO/JSON-LD                 | `stegaClean()` applied to all metadata payloads                                                             |
+| Pitfall                                    | Mitigation                                                                                                  |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Editor edits Medusa mirror fields          | `readOnly: true` + grouped under `Mirror`                                                                   |
+| Sanity used to render live price/inventory | Storefront always fetches Medusa at request time                                                            |
+| Stale mirror fields mislead editor         | Product events re-patch deterministic Sanity docs; manual smoke/resync can repair drift                     |
+| Broken product references in editorial     | `medusaProductId` is a string, not a Sanity ref; storefront degrades gracefully if product no longer exists |
+| Sync loops                                 | Sanity webhooks revalidate Next.js caches only; they never mutate Medusa                                    |
+| Stega leaking into SEO/JSON-LD             | `stegaClean()` applied to all metadata payloads                                                             |
 
 #### 7.4.1 Reference Mechanics
 
-| Concept                | Pattern                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Identity               | `medusaProductId` (string, indexed, immutable). Stored on `productContent._id` deterministically: `productContent.{medusaProductId}` |
-| Direction              | Medusa → Sanity only. Sanity never writes commerce fields back.                                                                      |
-| Snapshot fields        | `productContent.medusa.*` is read-only in Studio (UI fieldset disabled / hidden). Editors cannot edit them.                          |
-| `productCard` block    | Stores `medusaProductId` + optional editorial overrides (`displayTitle`, `eyebrow`, `imageOverride`, `merchCopy`)                    |
-| `productRail` block    | Stores ordered array of `medusaProductId` + display options (layout, max items)                                                      |
-| Live data              | Storefront fetches price, stock, availability, calculated price from Medusa **at request time** — never from Sanity                  |
-| Stale snapshot warning | If `medusa.medusaUpdatedAt > medusa.syncedAt + threshold`, Studio shows a warning banner and "Resync" button                         |
+| Concept             | Pattern                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Identity            | `medusaProductId` (string, indexed, immutable). Stored on `product._id` deterministically: `_id === medusaProductId`   |
+| Direction           | Medusa → Sanity only. Sanity never writes commerce fields back.                                                        |
+| Mirror fields       | `product.medusaProductId`, `title`, `handle`, and `mirrorMaterials` are read-only in Studio. Editors cannot edit them. |
+| `productCard` block | Stores `medusaProductId` + optional editorial overrides (`displayTitle`, `eyebrow`, `imageOverride`, `merchCopy`)      |
+| `productRail` block | Stores ordered array of `medusaProductId` + display options (layout, max items)                                        |
+| Live data           | Storefront fetches price, stock, availability, calculated price from Medusa **at request time** — never from Sanity    |
+| Stale mirror repair | A future admin-only replay can call the same Sanity sync service for all Medusa products                               |
 
 #### 7.4.2 Custom Inputs
 
@@ -1846,7 +1852,7 @@ Optional editorial overrides per reference:
 - Studio v5+ used for TypeGen GA + automatic generation during `sanity dev`/`sanity build`.
 - All GROQ queries authored with `defineQuery` and assigned to named exports in `apps/storefront/sanity/lib/queries.ts`.
 - Generated `sanity.types.ts` checked in and referenced by `tsconfig.json`.
-- Centralized projections for module shapes and Medusa snapshots reduce drift.
+- Centralized projections for module shapes and Medusa mirror fields reduce drift.
 
 #### 7.4.4 Webhooks & Revalidation
 
@@ -1856,16 +1862,16 @@ Optional editorial overrides per reference:
 
 #### 7.4.5 Pitfalls Avoided
 
-| Pitfall                                 | Mitigation                                                                                         |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Sanity becomes commerce source of truth | Snapshot fields are read-only; storefront always fetches commerce data from Medusa at request time |
-| Stale snapshots                         | `medusaUpdatedAt` vs `syncedAt` watermark + manual resync button                                   |
-| Page-builder bloat                      | Capped module palette, validation rules, deprecation policy                                        |
-| Singleton duplicates                    | Deterministic ids + Structure Tool + action filtering + duplicate-audit script                     |
-| Public dataset exposure                 | Embargoed content only on private `production` dataset                                             |
-| Stega leaking into metadata             | `stega: false` per query; `stegaClean()` on derived strings                                        |
-| Webhook spoofing                        | Signature validation + shared secret + raw body                                                    |
-| TypeGen drift                           | TypeGen runs in CI; missing/changed types fail the build                                           |
+| Pitfall                                 | Mitigation                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Sanity becomes commerce source of truth | Mirror fields are read-only; storefront always fetches commerce data from Medusa at request time |
+| Stale mirror fields                     | Deterministic ids allow safe replay through the Medusa `sanity-sync` service                     |
+| Page-builder bloat                      | Capped module palette, validation rules, deprecation policy                                      |
+| Singleton duplicates                    | Deterministic ids + Structure Tool + action filtering + duplicate-audit script                   |
+| Public dataset exposure                 | Embargoed content only on private `production` dataset                                           |
+| Stega leaking into metadata             | `stega: false` per query; `stegaClean()` on derived strings                                      |
+| Webhook spoofing                        | Signature validation + shared secret + raw body                                                  |
+| TypeGen drift                           | TypeGen runs in CI; missing/changed types fail the build                                         |
 
 #### 7.4.6 Agent 8 Schema Alignment
 
@@ -1964,7 +1970,7 @@ This is enforced by the Medusa helpers — calls without region context fail lou
 - Endpoint: `POST /api/revalidate` in storefront.
 - Validates Sanity webhook signature (shared secret, signature header).
 - Body indicates document type + ID; route maps to revalidation tags:
-  - `productContent` → `revalidateTag("product:{medusaProductId}")`
+  - `product` → `revalidateTag("product:{medusaProductId}")`
   - `homePage` → `revalidateTag("sanity:home")`
   - `capsulePage` → `revalidateTag("sanity:capsule:{slug}")`
   - `journalArticle` → `revalidateTag("sanity:journal:{slug}")`
@@ -2310,7 +2316,7 @@ Medusa v2 has a single Admin role at launch (no granular RBAC out of the box). F
 | **Customer authenticated API calls**        | Medusa JWT in HttpOnly cookie `vaivae_session`                  | Per-customer              | Cookie                                                |
 | **Storefront → Sanity (server, read)**      | Sanity read token (Viewer perms)                                | Project + dataset         | Server-side env (`SANITY_API_READ_TOKEN`)             |
 | **Storefront → Sanity (browser, public)**   | None (or public token)                                          | Project + public dataset  | None for free; pub token for Growth                   |
-| **Medusa subscribers → Sanity (write)**     | Sanity write token (Editor perms)                               | Project + dataset         | Medusa Cloud env (`SANITY_API_TOKEN`)                 |
+| **Medusa subscribers → Sanity (write)**     | Sanity write token (Editor perms)                               | Project + dataset         | Medusa Cloud env (`SANITY_WRITE_TOKEN`)               |
 | **Storefront → Stripe (browser)**           | Stripe publishable key                                          | Account                   | Public env                                            |
 | **Medusa → Stripe (server)**                | Stripe secret key                                               | Account                   | Medusa Cloud env (`STRIPE_API_KEY`)                   |
 | **Stripe → Medusa webhooks**                | Stripe signature (`Stripe-Signature` header + `whsec_*` secret) | Webhook endpoint          | Medusa Cloud env (`STRIPE_WEBHOOK_SECRET`)            |
@@ -2353,7 +2359,7 @@ VIP gated drops are **deferred to Phase 2**. We design now so the future impleme
 | Element                | Approach                                                                                                                       |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Eligibility marker     | `Customer.metadata.tier = "vip"` (or Medusa Customer Group `vip`)                                                              |
-| Product/page gating    | Sanity `productContent.access = "vip"` flag; storefront middleware checks customer tier on PDP / capsule routes                |
+| Product/page gating    | Future Sanity `product.access = "vip"` flag; storefront middleware checks customer tier on PDP / capsule routes                |
 | Storefront enforcement | Server Component checks tier; non-VIP gets a "Members only" gate page with newsletter signup                                   |
 | Cart-level enforcement | **Not** enforced at launch of Phase 2. A determined attacker could add a VIP variant via API. Acceptable risk for soft gating. |
 
@@ -2877,13 +2883,13 @@ vaïvae launches with a **single market** (US, USD, English). The architecture i
 
 When a second language is added:
 
-| Surface                             | Approach                                                                                                                                                                                                                                           |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sanity content                      | `sanity-plugin-internationalized-array` for short shared fields (nav, labels, announcement bar); `@sanity/document-internationalization` for top-level locale fanout on `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `productContent` |
-| Medusa product fields               | Translation Module (deferred; not used at launch)                                                                                                                                                                                                  |
-| Storefront routing                  | `[locale]` route segment becomes optional top-level (e.g. `/fr/products/[handle]`)                                                                                                                                                                 |
-| Locale detection                    | Cloudflare geo + browser `Accept-Language`; user override saved to cookie                                                                                                                                                                          |
-| Date / number / currency formatting | `Intl` APIs (already in use, nothing to rewrite)                                                                                                                                                                                                   |
+| Surface                             | Approach                                                                                                                                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sanity content                      | `sanity-plugin-internationalized-array` for short shared fields (nav, labels, announcement bar); `@sanity/document-internationalization` for top-level locale fanout on `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `product` |
+| Medusa product fields               | Translation Module (deferred; not used at launch)                                                                                                                                                                                           |
+| Storefront routing                  | `[locale]` route segment becomes optional top-level (e.g. `/fr/products/[handle]`)                                                                                                                                                          |
+| Locale detection                    | Cloudflare geo + browser `Accept-Language`; user override saved to cookie                                                                                                                                                                   |
+| Date / number / currency formatting | `Intl` APIs (already in use, nothing to rewrite)                                                                                                                                                                                            |
 
 #### 12.1.3 Right-to-Left
 
@@ -4010,7 +4016,7 @@ This section tracks known risks to the platform and the mitigations in place. Se
 | R6  | **Sanity Free dataset is public** ([§9.3](#93-cms-authentication-sanity), [§7.3.5](#735-roles--access)) | Medium     | Lead dev                | Upgrade to Growth before any embargoed content lands. Documented in launch checklist.                                                                                                                                                    |
 | R7  | **Medusa v2 community ecosystem still maturing**                                                        | Medium     | Lead dev                | Stay close to Medusa team; use only official providers; avoid abandoned community plugins; contribute fixes upstream when found. Community plugin dependencies (`@alphabite/medusa-wishlist`) reviewed quarterly for maintenance signal. |
 | R8  | **Single founder + lead developer for ops coverage**                                                    | Medium     | Founder                 | At launch, accept best-effort out-of-hours response. No SEV1 SLA. Monitor for incidents that require on-call rotation; introduce when justified.                                                                                         |
-| R9  | **Cross-system sync drift (Medusa↔Sanity)**                                                             | Medium     | Lead dev                | Idempotent subscribers, content hash, watermark, drift indicator in Studio, manual `resync-all` workflow, weekly synthetic check.                                                                                                        |
+| R9  | **Cross-system sync drift (Medusa↔Sanity)**                                                             | Medium     | Lead dev                | Idempotent subscribers keyed by deterministic Sanity `_id`, Medusa Cloud event retries for transient failures, manual smoke test, future `resync-all` workflow, weekly synthetic check.                                                  |
 | R10 | **Stripe webhook delivery failure**                                                                     | Medium     | Lead dev                | Stripe retries automatically; Medusa is idempotent; unprocessed events visible in Stripe Dashboard for manual replay; alert on > 5 webhook validation failures/hour.                                                                     |
 | R11 | **Vendor lock-in (Vercel, Medusa Cloud, Sanity)**                                                       | Low        | Founder                 | Code is portable: Next.js runs anywhere; Medusa OSS core can be self-hosted; Sanity supports full dataset export. Migration would take effort but is not blocked.                                                                        |
 | R12 | **AI-agent-generated code quality / consistency**                                                       | Medium     | Lead dev                | Strict TypeScript, Zod runtime validation, ESLint + Prettier in CI, mandatory PR review, ADR-driven decisions, documented patterns in this architecture doc, AI agents prompted with this doc as context.                                |
@@ -4182,8 +4188,8 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - Visual Editing wired for home, PDP, capsule, lookbook, journal, about/press/wholesale; stega cleaned from metadata.
   - Single-language launch with localization-friendly schema design (no `titleEn`-style fields).
   - Roles: Admin + Editor only at launch.
-  - Sanity↔Medusa link via `medusaProductId` string (deterministic Sanity `_id`); read-only Medusa snapshot object on `productContent`.
-  - Page-builder product references store `medusaProductId` directly, not Sanity references to `productContent`, to avoid broken references.
+  - Sanity↔Medusa link via `medusaProductId` string (deterministic Sanity `_id === medusaProductId`); read-only mirror fields on `product`.
+  - Page-builder product references store `medusaProductId` directly, not Sanity references to `product`, to avoid broken references.
 - **Consequences:**
   - Editors get a constrained, brand-safe palette; freeform layout is intentionally not supported.
   - Sanity Growth subscription becomes a launch-blocker (must upgrade before first embargoed asset upload).

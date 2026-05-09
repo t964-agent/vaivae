@@ -143,6 +143,9 @@ importers:
       '@mux/mux-node':
         specifier: 14.0.1
         version: 14.0.1
+      '@sanity/client':
+        specifier: 7.22.0
+        version: 7.22.0
       awilix:
         specifier: 8.0.1
         version: 8.0.1
@@ -242,7 +245,7 @@ importers:
         version: 2.14.2
       '@medusajs/types':
         specifier: 'catalog:'
-        version: 2.14.2(ioredis@5.10.1)(vite@5.4.21(@types/node@24.12.3)(lightningcss@1.32.0)(terser@5.47.1))
+        version: 2.14.2(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))
       '@mux/mux-player-react':
         specifier: 3.13.0
         version: 3.13.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -16678,6 +16681,13 @@ snapshots:
     optionalDependencies:
       ioredis: 5.10.1
       vite: 5.4.21(@types/node@24.12.3)(lightningcss@1.32.0)(terser@5.47.1)
+
+  '@medusajs/types@2.14.2(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))':
+    dependencies:
+      bignumber.js: 9.3.1
+    optionalDependencies:
+      ioredis: 5.10.1
+      vite: 7.3.3(@types/node@24.12.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4)
 
   '@medusajs/ui@4.1.9(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@6.0.3)':
     dependencies:

@@ -32,6 +32,7 @@
     "@medusajs/analytics-posthog": "catalog:",
     "@medusajs/loyalty-plugin": "catalog:",
     "@alphabite/medusa-wishlist": "0.5.9",
+    "@sanity/client": "7.22.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "klaviyo-api": "22.0.1",

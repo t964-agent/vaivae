@@ -92,6 +92,9 @@ const modules: InputConfigModules = [
   {
     resolve: "./src/modules/marketing-consent",
   },
+  {
+    resolve: "./src/modules/sanity-sync",
+  },
   ...redisModules,
 ];
 

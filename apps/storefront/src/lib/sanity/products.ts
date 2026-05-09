@@ -1,10 +1,11 @@
 import "server-only";
 
-import { productsByMedusaIdsQuery } from "@/sanity/queries";
+import { productByMedusaIdQuery, productsByMedusaIdsQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
-import type { ProductListQueryResult } from "@/sanity/types";
+import type { ProductByHandleQueryResult, ProductListQueryResult } from "@/sanity/types";
 
 export type ProductEditorialFragment = ProductListQueryResult[number];
+export type EditorialProduct = ProductByHandleQueryResult;
 
 function normalizeIds(ids: readonly string[]): string[] {
   return Array.from(new Set(ids.map((id) => id.trim()).filter(Boolean))).sort();
@@ -42,4 +43,25 @@ export async function listEditorialProducts(
   }
 
   return editorialByMedusaId;
+}
+
+export async function getEditorialProduct(medusaProductId: string): Promise<EditorialProduct> {
+  const normalizedId = medusaProductId.trim();
+
+  if (!normalizedId) {
+    return null;
+  }
+
+  try {
+    const { data } = await sanityFetch({
+      params: { medusaProductId: normalizedId },
+      query: productByMedusaIdQuery,
+      tags: [`product:${normalizedId}`, "product", "products"],
+    });
+
+    return data as EditorialProduct;
+  } catch {
+    // PDPs should keep rendering commerce facts if editorial overlay is not ready.
+    return null;
+  }
 }

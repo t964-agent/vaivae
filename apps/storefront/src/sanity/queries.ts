@@ -580,9 +580,7 @@ export const pageBySlugQuery = defineQuery(`*[_type == "page" && slug.current ==
   }
 }`);
 
-export const productByHandleQuery =
-  defineQuery(`*[_type == "product" && handle.current == $handle][0]{
-  _id,
+const productDetailFragment = `_id,
   _type,
   _createdAt,
   _updatedAt,
@@ -646,6 +644,16 @@ export const productByHandleQuery =
   seo{
     ${seoFragment}
   }
+}`;
+
+export const productByHandleQuery =
+  defineQuery(`*[_type == "product" && handle.current == $handle][0]{
+  ${productDetailFragment}
+}`);
+
+export const productByMedusaIdQuery =
+  defineQuery(`*[_type == "product" && _id == $medusaProductId][0]{
+  ${productDetailFragment}
 }`);
 
 export const productListQuery = defineQuery(`*[_type == "product"] | order(title asc){

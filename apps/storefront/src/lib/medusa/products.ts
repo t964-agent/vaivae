@@ -15,9 +15,10 @@ import type {
 const PRODUCT_LIST_FIELDS =
   "id,title,handle,thumbnail,status,created_at,*variants,+variants.inventory_quantity,*variants.calculated_price";
 const PRODUCT_DETAIL_FIELDS =
-  "id,title,handle,subtitle,description,thumbnail,status,created_at,updated_at,*options,*images,*variants,+variants.inventory_quantity,*variants.calculated_price,*categories,*collection";
+  "id,title,handle,subtitle,description,thumbnail,status,material,origin_country,created_at,updated_at,metadata,*options,*options.values,*images,*variants,*variants.options,+variants.inventory_quantity,*variants.calculated_price,*categories,*collection";
 const DEFAULT_PRODUCT_LIMIT = 12;
 const MAX_POST_FILTER_PRODUCTS = 100;
+const DEFAULT_RECOMMENDATION_LIMIT = 4;
 
 type ProductListQuery = NonNullable<
   Parameters<ReturnType<typeof getMedusaClient>["store"]["product"]["list"]>[0]
@@ -40,6 +41,12 @@ export type ProductListResult = {
   count: number;
   hasMore: boolean;
   products: StoreProduct[];
+};
+
+export type ProductRecommendationsInput = {
+  limit?: number | undefined;
+  productId: string;
+  regionId: string;
 };
 
 function normalizeStrings(values: readonly string[] | undefined): string[] {
@@ -327,6 +334,49 @@ const getCachedProductList = unstable_cache(fetchProductList, ["medusa-products-
   tags: ["products"],
 });
 
+async function fetchProductRecommendations(
+  productId: string,
+  regionId: string,
+  limit: number,
+): Promise<StoreProduct[]> {
+  const normalizedProductId = productId.trim();
+  const normalizedRegionId = regionId.trim();
+
+  if (!normalizedProductId || !normalizedRegionId) {
+    return [];
+  }
+
+  const { product } = await getMedusaClient().store.product.retrieve(normalizedProductId, {
+    fields: "id,*categories",
+    region_id: normalizedRegionId,
+  });
+  const categoryIds = (product.categories ?? [])
+    .map((category) => category.id)
+    .filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+
+  if (categoryIds.length === 0) {
+    return [];
+  }
+
+  const { products } = await getMedusaClient().store.product.list({
+    category_id: categoryIds,
+    fields: PRODUCT_DETAIL_FIELDS,
+    limit: limit + 1,
+    region_id: normalizedRegionId,
+  });
+
+  return products.filter((product) => product.id !== normalizedProductId).slice(0, limit);
+}
+
+const getCachedProductRecommendations = unstable_cache(
+  fetchProductRecommendations,
+  ["medusa-product-recommendations"],
+  {
+    revalidate: 60,
+    tags: ["product", "products"],
+  },
+);
+
 export async function listProducts(input: ListProductsInput): Promise<ProductListResult> {
   const sort = input.sort ?? "newest";
   const priceMin = Math.max(0, input.priceMin ?? 0);
@@ -353,19 +403,22 @@ export async function listProductCategories(): Promise<StoreProductCategory[]> {
   return getCachedProductCategories();
 }
 
-async function fetchProductByHandle(handle: string): Promise<StoreProduct | null> {
+async function fetchProductByHandle(
+  handle: string,
+  regionId: string | undefined,
+): Promise<StoreProduct | null> {
   const normalizedHandle = handle.trim();
 
   if (!normalizedHandle) {
     return null;
   }
 
-  const region = await getDefaultRegion();
+  const resolvedRegionId = regionId?.trim() || (await getDefaultRegion()).id;
   const { products } = await getMedusaClient().store.product.list({
     fields: PRODUCT_DETAIL_FIELDS,
     handle: normalizedHandle,
     limit: 1,
-    region_id: region.id,
+    region_id: resolvedRegionId,
   });
 
   return products[0] ?? null;
@@ -380,6 +433,21 @@ const getCachedProductByHandle = unstable_cache(
   },
 );
 
-export async function getProductByHandle(handle: string): Promise<StoreProduct | null> {
-  return getCachedProductByHandle(handle);
+export async function getProductByHandle(
+  handle: string,
+  regionId?: string | undefined,
+): Promise<StoreProduct | null> {
+  return getCachedProductByHandle(handle, regionId);
+}
+
+export async function getProductRecommendations({
+  limit,
+  productId,
+  regionId,
+}: ProductRecommendationsInput): Promise<StoreProduct[]> {
+  return getCachedProductRecommendations(
+    productId,
+    regionId,
+    normalizeLimit(limit ?? DEFAULT_RECOMMENDATION_LIMIT),
+  );
 }

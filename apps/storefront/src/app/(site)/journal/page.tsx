@@ -53,7 +53,16 @@ export async function generateMetadata({ searchParams }: JournalPageProps): Prom
       type: "website",
       url: getJournalPageHref(page),
     },
+    robots: {
+      follow: true,
+      index: true,
+    },
     title: page > 1 ? `Editorial Journal, page ${page}` : "Editorial Journal",
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title: "Editorial Journal — vaïvae",
+    },
   };
 }
 

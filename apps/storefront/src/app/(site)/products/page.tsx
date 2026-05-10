@@ -6,6 +6,7 @@ import { SectionBody, SectionEyebrow, SectionHeading } from "@/components/atoms/
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductsFilterPanel } from "@/components/products/filter-panel";
 import { Button, Container, HStack, Stack } from "@/components/ui";
+import { breadcrumbJsonLd, itemListJsonLd, jsonLdScriptProps } from "@/lib/seo/jsonld";
 import { listEditorialProducts } from "@/lib/sanity/products";
 import {
   PRODUCT_PRICE_MAX_CENTS,
@@ -159,6 +160,9 @@ async function getProductsData(filters: ProductsFilters): Promise<{
 export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
   const filters = normalizeProductsFilters(await loadProductsFiltersSearchParams(searchParams));
   const activeCategory = filters.categories.length === 1 ? filters.categories[0] : null;
+  const canonical = serializeProductsFilters("/products", filters);
+  const description =
+    "Explore the vaïvae collection, refined by category, availability, price, and sort.";
   const title = filters.q
     ? `Search "${filters.q}" | Products`
     : activeCategory
@@ -167,15 +171,25 @@ export async function generateMetadata({ searchParams }: ProductsPageProps): Pro
 
   return {
     alternates: {
-      canonical: serializeProductsFilters("/products", filters),
+      canonical,
     },
-    description:
-      "Explore the vaïvae collection, refined by category, availability, price, and sort.",
+    description,
+    openGraph: {
+      description,
+      title: `${title} — vaïvae`,
+      type: "website",
+      url: canonical,
+    },
     robots: {
       follow: true,
       index: filters.q.length === 0,
     },
     title,
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title: `${title} — vaïvae`,
+    },
   };
 }
 
@@ -188,67 +202,90 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     ...filters,
     page: filters.page + 1,
   });
+  const productItems = products.flatMap((product) => {
+    const handle = product.handle?.trim();
+
+    return handle
+      ? [
+          {
+            name: product.title?.trim() || handle,
+            url: `/products/${handle}`,
+          },
+        ]
+      : [];
+  });
 
   return (
-    <Container asChild variant="wide">
-      <section aria-labelledby="products-heading" className="pt-28 pb-20 md:pt-36 md:pb-28">
-        <Stack gap={12}>
-          <Stack className="max-w-4xl" gap={6}>
-            <SectionEyebrow>Shop</SectionEyebrow>
-            <SectionHeading as="h1" id="products-heading">
-              {getProductsTitle(filters)}
-            </SectionHeading>
-            <SectionBody>
-              A considered edit of pieces made for movement, restraint, and quiet presence.
-            </SectionBody>
-          </Stack>
+    <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Shop", url: "/products" },
+          ]),
+        )}
+      />
+      <script {...jsonLdScriptProps(itemListJsonLd(productItems, "vaïvae products"))} />
+      <Container asChild variant="wide">
+        <section aria-labelledby="products-heading" className="pt-28 pb-20 md:pt-36 md:pb-28">
+          <Stack gap={12}>
+            <Stack className="max-w-4xl" gap={6}>
+              <SectionEyebrow>Shop</SectionEyebrow>
+              <SectionHeading as="h1" id="products-heading">
+                {getProductsTitle(filters)}
+              </SectionHeading>
+              <SectionBody>
+                A considered edit of pieces made for movement, restraint, and quiet presence.
+              </SectionBody>
+            </Stack>
 
-          <Stack gap={6}>
-            <HStack align="start" className="gap-y-4" justify="between" wrap>
-              <p aria-atomic="true" className="text-sm text-on-light/55" role="status">
-                {products.length < count
-                  ? `${formatPieces(products.length)} of ${formatPieces(count)} shown`
-                  : `${formatPieces(count)} shown`}
-              </p>
-              {activeFilterPills.length > 0 ? (
-                <Button asChild size="sm" variant="underline">
-                  <Link href="/products">Clear all</Link>
-                </Button>
-              ) : null}
-            </HStack>
-
-            {activeFilterPills.length > 0 ? (
-              <HStack aria-label="Active filters" gap={2} wrap>
-                {activeFilterPills.map((pill) => (
-                  <Link
-                    key={`${pill.label}-${pill.href}`}
-                    className="inline-flex min-h-9 items-center gap-2 rounded-full border border-on-light/15 px-3 py-1 text-xs tracking-[0.12em] text-on-light/65 uppercase transition-colors hover:border-on-light/35 hover:text-on-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
-                    href={pill.href}
-                  >
-                    {pill.label}
-                    <span aria-hidden>x</span>
-                    <span className="sr-only">Remove filter</span>
-                  </Link>
-                ))}
-              </HStack>
-            ) : null}
-          </Stack>
-
-          <div className="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
-            <ProductsFilterPanel categories={categories} resultCount={count} />
-            <Stack gap={10}>
-              <ProductGrid editorial={editorial} products={products} />
-              {hasMore ? (
-                <div className="flex justify-center pt-4">
-                  <Button asChild variant="ghost">
-                    <Link href={loadMoreHref}>Load more</Link>
+            <Stack gap={6}>
+              <HStack align="start" className="gap-y-4" justify="between" wrap>
+                <p aria-atomic="true" className="text-sm text-on-light/55" role="status">
+                  {products.length < count
+                    ? `${formatPieces(products.length)} of ${formatPieces(count)} shown`
+                    : `${formatPieces(count)} shown`}
+                </p>
+                {activeFilterPills.length > 0 ? (
+                  <Button asChild size="sm" variant="underline">
+                    <Link href="/products">Clear all</Link>
                   </Button>
-                </div>
+                ) : null}
+              </HStack>
+
+              {activeFilterPills.length > 0 ? (
+                <HStack aria-label="Active filters" gap={2} wrap>
+                  {activeFilterPills.map((pill) => (
+                    <Link
+                      key={`${pill.label}-${pill.href}`}
+                      className="inline-flex min-h-9 items-center gap-2 rounded-full border border-on-light/15 px-3 py-1 text-xs tracking-[0.12em] text-on-light/65 uppercase transition-colors hover:border-on-light/35 hover:text-on-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
+                      href={pill.href}
+                    >
+                      {pill.label}
+                      <span aria-hidden>x</span>
+                      <span className="sr-only">Remove filter</span>
+                    </Link>
+                  ))}
+                </HStack>
               ) : null}
             </Stack>
-          </div>
-        </Stack>
-      </section>
-    </Container>
+
+            <div className="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
+              <ProductsFilterPanel categories={categories} resultCount={count} />
+              <Stack gap={10}>
+                <ProductGrid editorial={editorial} products={products} />
+                {hasMore ? (
+                  <div className="flex justify-center pt-4">
+                    <Button asChild variant="ghost">
+                      <Link href={loadMoreHref}>Load more</Link>
+                    </Button>
+                  </div>
+                ) : null}
+              </Stack>
+            </div>
+          </Stack>
+        </section>
+      </Container>
+    </>
   );
 }

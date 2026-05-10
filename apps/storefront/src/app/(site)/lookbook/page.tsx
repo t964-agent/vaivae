@@ -31,7 +31,16 @@ export function generateMetadata(): Metadata {
       type: "website",
       url: "/lookbook",
     },
+    robots: {
+      follow: true,
+      index: true,
+    },
     title: "Lookbook",
+    twitter: {
+      card: "summary_large_image",
+      description: "Seasonal vaïvae lookbooks, gathered as quiet studies in movement and form.",
+      title: "Lookbook — vaïvae",
+    },
   };
 }
 

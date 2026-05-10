@@ -1,4 +1,3 @@
-import type { SanityImageSource } from "@sanity/image-url";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -9,9 +8,8 @@ import type { StoreProduct, StoreRegion } from "@/medusa/types";
 import { getCurrentCustomer } from "@/medusa/customer";
 import { getWishlist } from "@/medusa/wishlist";
 import { getEditorialProduct, type EditorialProduct } from "@/lib/sanity/products";
+import { breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo/jsonld";
 import { getProductJsonLd } from "@/lib/seo/product-jsonld";
-import { urlFor } from "@/sanity/image";
-import type { SanityImage } from "@/sanity/types";
 
 type ProductPageProps = {
   params: Promise<{ handle: string }>;
@@ -38,27 +36,6 @@ function truncateDescription(value: string | null | undefined): string | undefin
   return description.length > 155 ? `${description.slice(0, 152).trim()}...` : description;
 }
 
-function getSanityImageUrl(image: SanityImage | null | undefined): string | undefined {
-  if (!image?.asset) {
-    return undefined;
-  }
-
-  return urlFor(image as SanityImageSource)
-    .width(1200)
-    .height(630)
-    .fit("crop")
-    .url();
-}
-
-function getOgImage(product: StoreProduct, editorial: EditorialProduct): string | undefined {
-  const editorialImage =
-    editorial?.editorialReady === true
-      ? (getSanityImageUrl(editorial.heroImage) ?? getSanityImageUrl(editorial.seo?.ogImage))
-      : undefined;
-
-  return editorialImage ?? product.images?.[0]?.url ?? product.thumbnail ?? undefined;
-}
-
 function getMetadataDescription(
   product: StoreProduct,
   editorial: EditorialProduct,
@@ -73,10 +50,6 @@ function getMetadataDescription(
 
 function getCanonicalUrl(handle: string): string {
   return new URL(`/products/${handle}`, getBaseUrl()).toString();
-}
-
-function serializeJsonLd(value: ReturnType<typeof getProductJsonLd>): string {
-  return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
 async function getPdpData(handle: string): Promise<PdpData | null> {
@@ -111,7 +84,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   }
 
   const description = getMetadataDescription(data.product, data.editorial);
-  const ogImage = getOgImage(data.product, data.editorial);
+  const ogImage = `/products/${data.product.handle}/opengraph-image`;
 
   return {
     alternates: {
@@ -120,7 +93,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     description,
     openGraph: {
       description,
-      images: ogImage ? [{ url: ogImage }] : undefined,
+      images: [{ alt: data.product.title, height: 630, url: ogImage, width: 1200 }],
       title: data.product.title,
       type: "website",
       url: `/products/${data.product.handle}`,
@@ -130,6 +103,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       index: data.editorial?.seo?.noindex === true ? false : true,
     },
     title: data.product.title,
+    twitter: {
+      card: "summary_large_image",
+      description,
+      images: [{ alt: data.product.title, url: ogImage }],
+      title: `${data.product.title} — vaïvae`,
+    },
   };
 }
 
@@ -154,9 +133,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
+      <script {...jsonLdScriptProps(jsonLd)} />
       <script
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-        type="application/ld+json"
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Shop", url: "/products" },
+            { name: data.product.title, url: canonicalUrl },
+          ]),
+        )}
       />
       <PdpLayout
         editorial={data.editorial}

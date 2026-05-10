@@ -31,7 +31,16 @@ export function generateMetadata(): Metadata {
       type: "website",
       url: "/capsule",
     },
+    robots: {
+      follow: true,
+      index: true,
+    },
     title: "Capsules",
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title: "Capsules — vaïvae",
+    },
   };
 }
 

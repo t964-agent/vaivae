@@ -20,6 +20,7 @@ import {
   uniqueProductReferences,
   type ProductRailProduct,
 } from "@/lib/editorial";
+import { breadcrumbJsonLd, creativeWorkJsonLd, jsonLdScriptProps } from "@/lib/seo/jsonld";
 import { lookbookByHandleQuery, lookbookListQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
 import type { LookbookByHandleQueryResult } from "@/sanity/types";
@@ -66,7 +67,7 @@ export async function generateMetadata({ params }: LookbookPageProps): Promise<M
     truncateText(lookbook.seo?.description) ??
     "A visual vaïvae lookbook tracing the season through fabric, light, and movement.";
   const canonicalPath = `/lookbook/${lookbook.slug ?? slug}`;
-  const image = getSanityImageUrl(lookbook.seo?.ogImage ?? lookbook.coverImage);
+  const image = `${canonicalPath}/opengraph-image`;
   const imageAlt =
     cleanText(lookbook.seo?.ogImage?.alt) ?? cleanText(lookbook.coverImage?.alt) ?? title;
 
@@ -116,9 +117,33 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
       })
     : null;
   const context = await resolvePageBuilderContext(productRail ? [productRail] : []);
+  const canonicalPath = `/lookbook/${lookbook.slug ?? slug}`;
+  const description =
+    cleanText(lookbook.seo?.description) ??
+    "A visual vaïvae lookbook tracing the season through fabric, light, and movement.";
 
   return (
     <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Lookbook", url: "/lookbook" },
+            { name: title, url: canonicalPath },
+          ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          creativeWorkJsonLd({
+            datePublished: lookbook.publishedAt,
+            description,
+            image: getSanityImageUrl(lookbook.coverImage),
+            name: title,
+            url: canonicalPath,
+          }),
+        )}
+      />
       <section className="relative isolate min-h-[88dvh] overflow-hidden bg-ink text-on-dark">
         {lookbook.coverVideo?.muxAssetId ? (
           <MuxVideo

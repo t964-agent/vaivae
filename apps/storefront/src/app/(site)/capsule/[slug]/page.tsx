@@ -20,6 +20,12 @@ import {
   uniqueProductReferences,
   type ProductRailProduct,
 } from "@/lib/editorial";
+import {
+  breadcrumbJsonLd,
+  collectionPageJsonLd,
+  itemListJsonLd,
+  jsonLdScriptProps,
+} from "@/lib/seo/jsonld";
 import { capsuleByHandleQuery, capsuleListQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
 import type { CapsuleByHandleQueryResult } from "@/sanity/types";
@@ -66,7 +72,7 @@ export async function generateMetadata({ params }: CapsuleDetailPageProps): Prom
     truncateText(capsule.seo?.description) ??
     "A seasonal vaïvae capsule landing with story, product, and visual notes.";
   const canonicalPath = `/capsule/${capsule.slug ?? slug}`;
-  const image = getSanityImageUrl(capsule.seo?.ogImage ?? capsule.coverImage);
+  const image = `${canonicalPath}/opengraph-image`;
   const imageAlt =
     cleanText(capsule.seo?.ogImage?.alt) ?? cleanText(capsule.coverImage?.alt) ?? title;
 
@@ -126,9 +132,45 @@ export default async function CapsuleDetailPage({ params }: CapsuleDetailPagePro
   const context = await resolvePageBuilderContext(
     productRail ? [...modules, productRail] : modules,
   );
+  const canonicalPath = `/capsule/${capsule.slug ?? slug}`;
+  const description =
+    cleanText(capsule.seo?.description) ??
+    "A seasonal vaïvae capsule landing with story, product, and visual notes.";
+  const productItems = products.flatMap((product) => {
+    const handle = product.handle?.trim();
+
+    return handle
+      ? [
+          {
+            name: product.title?.trim() || handle,
+            url: `/products/${handle}`,
+          },
+        ]
+      : [];
+  });
 
   return (
     <>
+      <script
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Capsules", url: "/capsule" },
+            { name: title, url: canonicalPath },
+          ]),
+        )}
+      />
+      <script
+        {...jsonLdScriptProps(
+          collectionPageJsonLd({
+            description,
+            image: getSanityImageUrl(capsule.coverImage),
+            name: title,
+            url: canonicalPath,
+          }),
+        )}
+      />
+      <script {...jsonLdScriptProps(itemListJsonLd(productItems, `${title} products`))} />
       <section className="relative isolate min-h-[88dvh] overflow-hidden bg-ink text-on-dark">
         {capsule.coverVideo?.muxAssetId ? (
           <MuxVideo

@@ -14,11 +14,11 @@ import {
   createProductRailModule,
   formatEditorialDate,
   getSanityImageUrl,
-  serializeJsonLd,
   truncateText,
   uniqueProductReferences,
   type ProductRailProduct,
 } from "@/lib/editorial";
+import { articleJsonLd, breadcrumbJsonLd, jsonLdScriptProps } from "@/lib/seo/jsonld";
 import { journalEntryQuery, journalListQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
 import type { JournalEntryQueryResult } from "@/sanity/types";
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: JournalEntryPageProps): Promi
     truncateText(entry.seo?.description ?? entry.excerpt ?? entry.subtitle) ??
     "An editorial field note from vaïvae.";
   const canonicalPath = `/journal/${entry.slug ?? slug}`;
-  const image = getSanityImageUrl(entry.seo?.ogImage ?? entry.coverImage);
+  const image = `${canonicalPath}/opengraph-image`;
   const imageAlt = cleanText(entry.seo?.ogImage?.alt) ?? cleanText(entry.coverImage?.alt) ?? title;
   const author = cleanText(entry.author);
 
@@ -129,35 +129,28 @@ export default async function JournalEntryPage({ params }: JournalEntryPageProps
     : null;
   const context = await resolvePageBuilderContext(productRail ? [productRail] : []);
   const canonicalUrl = new URL(`/journal/${entry.slug ?? slug}`, getBaseUrl()).toString();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    author: entry.author
-      ? {
-          "@type": "Person",
-          name: entry.author,
-        }
-      : undefined,
+  const articleLd = articleJsonLd({
+    author: entry.author,
     dateModified: entry._updatedAt,
-    datePublished: entry.publishedAt ?? undefined,
-    description: cleanText(entry.excerpt) ?? description ?? undefined,
+    datePublished: entry.publishedAt,
+    description: cleanText(entry.excerpt) ?? description,
     headline: title,
     image: getSanityImageUrl(entry.coverImage),
-    keywords: entry.tags?.join(", ") || undefined,
-    mainEntityOfPage: canonicalUrl,
-    publisher: {
-      "@type": "Organization",
-      name: "vaïvae",
-      url: getBaseUrl(),
-    },
+    keywords: entry.tags,
     url: canonicalUrl,
-  };
+  });
 
   return (
     <>
+      <script {...jsonLdScriptProps(articleLd)} />
       <script
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-        type="application/ld+json"
+        {...jsonLdScriptProps(
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Journal", url: "/journal" },
+            { name: title, url: canonicalUrl },
+          ]),
+        )}
       />
       <article>
         <Container asChild variant="wide">

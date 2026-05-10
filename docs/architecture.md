@@ -1,8 +1,8 @@
 # vaïvae — Architecture Document
 
-> Status: **Draft — sections 1-21 populated; pinned dependency manifest in §3.5; awaiting launch-blocker decisions in §19**
+> Status: **Draft — sections 1-22 populated; pinned dependency manifest in §3.5; awaiting launch-blocker decisions in §19**
 > Owner: Engineering
-> Last updated: 2026-05-09
+> Last updated: 2026-05-10
 
 This document is the single source of truth for the technical architecture of vaïvae.com. It captures decisions, rationale, and concrete patterns that any contributor — human or AI agent — should follow when building, extending, or operating the platform.
 
@@ -23,7 +23,7 @@ It is a living document. Every significant architectural change is reflected her
 
 **Part IV: Operations** 14. [Environments, DevOps & Infrastructure](#14-environments-devops--infrastructure) 15. [Testing Strategy](#15-testing-strategy) 16. [Operational Runbooks](#16-operational-runbooks)
 
-**Part V: Planning** 17. [Cost Model](#17-cost-model) 18. [Roadmap & Phasing](#18-roadmap--phasing) 19. [Risks & Mitigations](#19-risks--mitigations) 20. [Decision Log (ADRs)](#20-decision-log-adrs) 21. [Glossary](#21-glossary)
+**Part V: Planning** 17. [Cost Model](#17-cost-model) 18. [Roadmap & Phasing](#18-roadmap--phasing) 19. [Risks & Mitigations](#19-risks--mitigations) 20. [Decision Log (ADRs)](#20-decision-log-adrs) 21. [Glossary](#21-glossary) 22. [Launch](#22-launch)
 
 ---
 
@@ -4416,3 +4416,36 @@ This is the canonical record of architectural decisions. Each entry captures **c
 | **WCAG 2.1 AA**                   | Web Content Accessibility Guidelines, level AA. Compliance target for storefront. See [§11.5](#115-accessibility-wcag-aa).                                                                                                  |
 | **Webhook**                       | An HTTP callback fired by one system to notify another of an event (e.g. Stripe payment_intent.succeeded → Medusa). All vaïvae webhooks are signed and signature-validated.                                                 |
 | **Workflow (Medusa)**             | A composable, durable, retryable sequence of steps used for custom commerce operations. See [§6.3.2](#632-workflows).                                                                                                       |
+
+---
+
+## 22. Launch
+
+### 22.1 Drop 01 Seed Scripts
+
+Launch content is seeded by two operator-run scripts. They are authored to be idempotent and are not executed in local AI-agent environments without real Medusa and Sanity services.
+
+| Surface          | Script                                       | Invocation                                     | Notes                                                                                                                                                                                                              |
+| ---------------- | -------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Medusa commerce  | `apps/medusa/src/scripts/seed.ts`            | `pnpm --filter @vaivae/medusa db:seed`         | Creates the US/USD region, Storefront sales channel, stock location, manual fulfillment setup, shipping options, Drop 01 product category, deterministic Drop 01 products, variants, prices, and inventory levels. |
+| Sanity editorial | `apps/storefront/src/scripts/sanity-seed.ts` | `pnpm --filter @vaivae/storefront sanity:seed` | Creates launch singletons, materials, color swatches, size guides, capsule, lookbooks, journal entries, legal placeholders, and product editorial overlays. Requires `SANITY_WRITE_TOKEN`.                         |
+| Shared fixture   | `apps/medusa/src/scripts/drop-01.ts`         | Imported by both scripts                       | Defines the canonical Drop 01 product, material, color, size-guide, and editorial seed data. Sanity product `_id` values match deterministic Medusa product IDs.                                                   |
+
+### 22.2 Drop 01 Catalog
+
+Drop 01 is seeded as the May 2026 launch capsule, "The Living Runway." The commerce source of truth is Medusa; Sanity owns the editorial overlays only.
+
+| Medusa product ID           | Handle                                    | Title                                     | Source cue                                                                    |
+| --------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `prod_vaivae_drop01_w83935` | `terracotta-sparkly-waist-contouring-set` | Terracotta - Sparkly Waist Contouring Set | W83935 / Sparkly Waist Contouring Set; prototype hook "Earth, set in motion." |
+| `prod_vaivae_drop01_w83534` | `glacial-riviera-knit-set`                | Glacial - Riviera Knit Set                | W83534 / Riviera Knit Set; prototype hook "Cool intelligence."                |
+| `prod_vaivae_drop01_w83543` | `coral-short-net-set`                     | Coral - Short Net Set                     | W83543 / Short Net Set; prototype hook "Warmth without weight."               |
+| `prod_vaivae_drop01_kk100`  | `linen-bc-zip-sweater`                    | Linen - BC Zip Sweater                    | KK100 / Cover me up sweater; prototype hook "The last word."                  |
+| `prod_vaivae_drop01_kk101`  | `ecru-argente-halter-crop`                | Écru Argenté - Halter Crop                | KK101 / Halter Crop                                                           |
+| `prod_vaivae_drop01_kk102`  | `ecru-argente-obsession-pants`            | Écru Argenté - Obsession Pants            | KK102 / Pants / Obsession Pants                                               |
+
+### 22.3 Launch Checklist
+
+The operational launch runbook is tracked in `docs/launch-checklist.md`. It covers provider accounts, environment secrets, first migrations and seeds, manual vendor configuration, legal review, restore drill, smoke testing, and go-live cutover.
+
+The Sanity seed intentionally uses a reusable placeholder image asset and public Mux sample playback ID. Operators must replace placeholder media with vaïvae-owned campaign photography and video before publishing launch content.

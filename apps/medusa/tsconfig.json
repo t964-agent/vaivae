@@ -26,6 +26,12 @@
       "@/api/*": ["./src/api/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "instrumentation.ts", "medusa-config.ts"],
-  "exclude": ["node_modules", "dist", ".medusa", "**/*.test.ts", "**/*.spec.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "instrumentation.ts",
+    "medusa-config.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules", "dist", ".medusa"]
 }

@@ -87,6 +87,20 @@ pnpm lint
 
 See `AGENTS.md § 7` for the full verification checklist.
 
+## Testing
+
+```bash
+pnpm test
+pnpm test:coverage
+pnpm test:e2e
+```
+
+`pnpm test` runs the root Vitest workspace across storefront and Medusa unit/component tests. Storefront tests use Testing Library with `jsdom`; Medusa unit tests run in the Node environment with external services mocked.
+
+`pnpm test:e2e` runs Playwright specs from `e2e/`. Local browser execution is skipped unless `PLAYWRIGHT_INSTALLED=1` is set.
+
+Use `*.test.ts` / `*.test.tsx` for unit and component tests. Use `e2e/*.spec.ts` for Playwright smoke and accessibility tests.
+
 ## Documentation
 
 - **[`docs/architecture.md`](./docs/architecture.md)** — authoritative architecture doc (21 sections, 15 ADRs). Start here for anything non-trivial.

@@ -681,6 +681,7 @@ A separate **staging** environment is deferred until business operations require
 | `vitest`                      | `4.1.5`  | dev  |                                                                                                |
 | `@vitest/coverage-v8`         | `4.1.5`  | dev  |                                                                                                |
 | `@vitest/ui`                  | `4.1.5`  | dev  | Optional.                                                                                      |
+| `vite`                        | `7.3.3`  | dev  | Direct root peer for the Vitest 4 runner; Medusa Admin still resolves its own Vite 5 peer.     |
 | `@testing-library/react`      | `16.3.2` | dev  |                                                                                                |
 | `@testing-library/jest-dom`   | `6.9.1`  | dev  | Use `@testing-library/jest-dom/vitest`.                                                        |
 | `@testing-library/user-event` | `14.6.1` | dev  |                                                                                                |
@@ -2875,14 +2876,14 @@ WCAG 2.1 Level AA on all customer-facing routes (storefront, account, checkout).
 
 #### 11.5.7 Audits
 
-| Audit                                 | Frequency                                    | Tool                                                           |
-| ------------------------------------- | -------------------------------------------- | -------------------------------------------------------------- |
-| Automated a11y                        | Every PR                                     | `@axe-core/playwright` + `pa11y` in CI on representative pages |
-| Lighthouse Accessibility              | Every PR                                     | `lighthouse-ci`                                                |
-| Manual keyboard pass                  | Pre-launch + per major release               | Manual                                                         |
-| Screen reader pass (NVDA / VoiceOver) | Pre-launch + per major release               | Manual                                                         |
-| Color-contrast scan                   | Design review for any token / palette change | Stark / browser tools                                          |
-| Real-user a11y feedback               | Continuous                                   | `accessibility@vaivae.com` mailbox + form                      |
+| Audit                                 | Frequency                                    | Tool                                                 |
+| ------------------------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Automated a11y                        | Every PR                                     | `@axe-core/playwright` in CI on representative pages |
+| Lighthouse Accessibility              | Every PR                                     | `lighthouse-ci`                                      |
+| Manual keyboard pass                  | Pre-launch + per major release               | Manual                                               |
+| Screen reader pass (NVDA / VoiceOver) | Pre-launch + per major release               | Manual                                               |
+| Color-contrast scan                   | Design review for any token / palette change | Stark / browser tools                                |
+| Real-user a11y feedback               | Continuous                                   | `accessibility@vaivae.com` mailbox + form            |
 
 #### 11.5.8 Out-of-Scope
 
@@ -3423,6 +3424,17 @@ vaïvae's testing pyramid is **wide at the bottom (unit + integration), narrow a
 - React components: not measured by line coverage; measured by behavior coverage.
 - No global coverage gate at launch (avoids meaningless test bloat). Re-evaluated post-launch.
 
+#### 15.1.4 Test Runner Conventions
+
+| Concern                    | Convention                                                                                                                                                                                                                                                                                     |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace runner           | Root `vitest.workspace.ts` aggregates `apps/storefront/vitest.config.ts` and `apps/medusa/vitest.config.ts`.                                                                                                                                                                                   |
+| Storefront unit/components | `vitest` + `@testing-library/react` + `jsdom`; setup imports `@testing-library/jest-dom/vitest` and performs RTL cleanup after each test.                                                                                                                                                      |
+| Medusa unit tests          | `vitest` in `node` environment with globals enabled for the CommonJS Node16 backend, plus mocked containers, Medusa services, Sanity clients, and other external SDKs. Medusa's local package script delegates to the root runner to avoid the Medusa Admin Vite 5 / Vitest 4 runner mismatch. |
+| E2E and a11y               | `Playwright` specs live in `e2e/*.spec.ts`; `@axe-core/playwright` scans representative customer-facing routes for serious/critical WCAG 2.1 AA violations.                                                                                                                                    |
+| File naming                | Unit/component tests use `*.test.ts` or `*.test.tsx`; rare integration tests use `*.spec.ts`; Playwright smoke specs use `e2e/*.spec.ts`.                                                                                                                                                      |
+| Bootstrap coverage gates   | Storefront representative surfaces start at 60% lines/branches/functions/statements. Medusa representative service/lib surfaces start at 70%. These are not global launch gates.                                                                                                               |
+
 ### 15.2 Integration Testing
 
 #### 15.2.1 Medusa Integration Tests
@@ -3519,7 +3531,6 @@ Targets: per [§11.1](#111-performance-budgets). Regressions block merge unless 
 | Audit                                   | Frequency                      | Tool                   |
 | --------------------------------------- | ------------------------------ | ---------------------- |
 | `axe-core` automated                    | Every PR                       | `@axe-core/playwright` |
-| `pa11y` automated                       | Every PR                       | `pa11y-ci`             |
 | Lighthouse Accessibility                | Every PR                       | `lighthouse-ci`        |
 | Manual keyboard                         | Pre-launch + per major release | Manual                 |
 | Manual screen reader (NVDA + VoiceOver) | Pre-launch + per major release | Manual                 |

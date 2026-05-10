@@ -18,8 +18,7 @@ async function getCapsules(): Promise<CapsuleListQueryResult> {
 }
 
 export function generateMetadata(): Metadata {
-  const description =
-    "Seasonal vaïvae capsule landings, each composed as a small editorial world.";
+  const description = "Seasonal vaïvae capsule landings, each composed as a small editorial world.";
 
   return {
     alternates: {

@@ -67,7 +67,8 @@ export async function generateMetadata({ params }: CapsuleDetailPageProps): Prom
     "A seasonal vaïvae capsule landing with story, product, and visual notes.";
   const canonicalPath = `/capsule/${capsule.slug ?? slug}`;
   const image = getSanityImageUrl(capsule.seo?.ogImage ?? capsule.coverImage);
-  const imageAlt = cleanText(capsule.seo?.ogImage?.alt) ?? cleanText(capsule.coverImage?.alt) ?? title;
+  const imageAlt =
+    cleanText(capsule.seo?.ogImage?.alt) ?? cleanText(capsule.coverImage?.alt) ?? title;
 
   return {
     alternates: { canonical: canonicalPath },
@@ -122,7 +123,9 @@ export default async function CapsuleDetailPage({ params }: CapsuleDetailPagePro
         products,
       })
     : null;
-  const context = await resolvePageBuilderContext(productRail ? [...modules, productRail] : modules);
+  const context = await resolvePageBuilderContext(
+    productRail ? [...modules, productRail] : modules,
+  );
 
   return (
     <>
@@ -146,7 +149,10 @@ export default async function CapsuleDetailPage({ params }: CapsuleDetailPagePro
           />
         ) : null}
         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/30 to-ink/15" />
-        <Container className="relative flex min-h-[88dvh] items-end pt-40 pb-14 md:pb-20" variant="wide">
+        <Container
+          className="relative flex min-h-[88dvh] items-end pt-40 pb-14 md:pb-20"
+          variant="wide"
+        >
           <Stack className="max-w-5xl" gap={6}>
             <SectionEyebrow className="text-on-dark/65">
               {capsule.eyebrow ?? "Capsule"}
@@ -156,9 +162,13 @@ export default async function CapsuleDetailPage({ params }: CapsuleDetailPagePro
             </SectionHeading>
             {releaseDate || endDate ? (
               <HStack className="text-xs tracking-[0.16em] text-on-dark/65 uppercase" gap={3} wrap>
-                {releaseDate ? <time dateTime={capsule.releaseDate ?? undefined}>{releaseDate}</time> : null}
+                {releaseDate ? (
+                  <time dateTime={capsule.releaseDate ?? undefined}>{releaseDate}</time>
+                ) : null}
                 {releaseDate && endDate ? <span aria-hidden>·</span> : null}
-                {endDate ? <time dateTime={capsule.endDate ?? undefined}>Through {endDate}</time> : null}
+                {endDate ? (
+                  <time dateTime={capsule.endDate ?? undefined}>Through {endDate}</time>
+                ) : null}
               </HStack>
             ) : null}
           </Stack>

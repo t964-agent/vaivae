@@ -1,0 +1,91 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits", "group:monorepos", "group:recommended"],
+  "rangeStrategy": "pin",
+  "branchPrefix": "renovate/",
+  "schedule": ["before 6am on monday"],
+  "timezone": "America/New_York",
+  "labels": ["dependencies"],
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "packageRules": [
+    {
+      "description": "Keep all Medusa packages in lockstep.",
+      "matchPackageNames": ["/^@medusajs\\//"],
+      "groupName": "@medusajs lockstep",
+      "groupSlug": "medusajs-lockstep",
+      "rangeStrategy": "pin",
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "description": "Medusa major bumps require an ADR.",
+      "matchPackageNames": ["/^@medusajs\\//"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false,
+      "addLabels": ["major-bump-needs-adr"]
+    },
+    {
+      "description": "Group Radix primitive updates.",
+      "matchPackageNames": ["/^@radix-ui\\//"],
+      "groupName": "@radix-ui primitives",
+      "groupSlug": "radix-ui-primitives"
+    },
+    {
+      "description": "Group Sanity ecosystem updates.",
+      "matchPackageNames": ["sanity", "next-sanity", "/^@sanity\\//", "/^@portabletext\\//"],
+      "groupName": "Sanity stack",
+      "groupSlug": "sanity-stack"
+    },
+    {
+      "description": "Sanity major bumps require an ADR.",
+      "matchPackageNames": ["sanity", "next-sanity", "/^@sanity\\//"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false,
+      "addLabels": ["major-bump-needs-adr"]
+    },
+    {
+      "description": "Group Sentry SDK updates.",
+      "matchPackageNames": ["/^@sentry\\//"],
+      "groupName": "Sentry",
+      "groupSlug": "sentry"
+    },
+    {
+      "description": "Group Stripe frontend SDK updates.",
+      "matchPackageNames": ["/^@stripe\\//"],
+      "groupName": "Stripe",
+      "groupSlug": "stripe"
+    },
+    {
+      "description": "Next major bumps require an ADR.",
+      "matchPackageNames": ["next"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false,
+      "addLabels": ["major-bump-needs-adr"]
+    },
+    {
+      "description": "React core major bumps require an ADR.",
+      "matchPackageNames": ["react", "react-dom"],
+      "groupName": "React core",
+      "groupSlug": "react-core",
+      "matchUpdateTypes": ["major"],
+      "enabled": false,
+      "addLabels": ["major-bump-needs-adr"]
+    },
+    {
+      "description": "Automerge low-risk patch devDependency updates after CI passes.",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "automerge": false
+  },
+  "ignoreDeps": []
+}

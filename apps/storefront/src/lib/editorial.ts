@@ -13,7 +13,9 @@ export type EditorialSeo = {
   title?: string | null;
 };
 
-export type ProductRailProduct = NonNullable<PageBuilderModuleOf<"productRail">["products"]>[number];
+export type ProductRailProduct = NonNullable<
+  PageBuilderModuleOf<"productRail">["products"]
+>[number];
 
 type ProductRailOptions = {
   eyebrow?: string | null;
@@ -29,7 +31,10 @@ export function cleanText(value: string | null | undefined): string | null {
   return trimmed && trimmed.length > 0 ? trimmed : null;
 }
 
-export function truncateText(value: string | null | undefined, maxLength = 155): string | undefined {
+export function truncateText(
+  value: string | null | undefined,
+  maxLength = 155,
+): string | undefined {
   const text = cleanText(value);
 
   if (!text) {
@@ -61,7 +66,11 @@ export function getSanityImageUrl(image: SanityImage | null | undefined): string
     return undefined;
   }
 
-  return urlFor(image as SanityImageSource).width(1200).height(630).fit("crop").url();
+  return urlFor(image as SanityImageSource)
+    .width(1200)
+    .height(630)
+    .fit("crop")
+    .url();
 }
 
 export function serializeJsonLd(value: unknown): string {

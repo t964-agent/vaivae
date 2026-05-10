@@ -48,8 +48,8 @@ export default async function LookbookPage() {
               Lookbook
             </SectionHeading>
             <SectionBody>
-              Seasonal studies in fabric, light, and posture. Each lookbook is an edited field
-              note from the vaïvae world.
+              Seasonal studies in fabric, light, and posture. Each lookbook is an edited field note
+              from the vaïvae world.
             </SectionBody>
           </Stack>
 

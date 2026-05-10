@@ -167,10 +167,16 @@ export default async function JournalEntryPage({ params }: JournalEntryPageProps
                 <SectionEyebrow>{entry.eyebrow ?? "Journal"}</SectionEyebrow>
                 <SectionHeading as="h1">{title}</SectionHeading>
                 {description ? <SectionBody>{description}</SectionBody> : null}
-                <HStack className="text-xs tracking-[0.16em] text-on-light/45 uppercase" gap={3} wrap>
+                <HStack
+                  className="text-xs tracking-[0.16em] text-on-light/45 uppercase"
+                  gap={3}
+                  wrap
+                >
                   {entry.author ? <span>{entry.author}</span> : null}
                   {entry.author && publishedAt ? <span aria-hidden>·</span> : null}
-                  {publishedAt ? <time dateTime={entry.publishedAt ?? undefined}>{publishedAt}</time> : null}
+                  {publishedAt ? (
+                    <time dateTime={entry.publishedAt ?? undefined}>{publishedAt}</time>
+                  ) : null}
                 </HStack>
               </Stack>
               {entry.coverImage?.asset ? (
@@ -201,7 +207,11 @@ export default async function JournalEntryPage({ params }: JournalEntryPageProps
             <Stack gap={10}>
               <Stack className="max-w-3xl" gap={4}>
                 <SectionEyebrow>Continue</SectionEyebrow>
-                <SectionHeading as="h2" className="text-5xl md:text-7xl" id="related-lookbooks-heading">
+                <SectionHeading
+                  as="h2"
+                  className="text-5xl md:text-7xl"
+                  id="related-lookbooks-heading"
+                >
                   Related lookbooks
                 </SectionHeading>
               </Stack>

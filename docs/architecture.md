@@ -3247,31 +3247,29 @@ Scope optional but encouraged: `feat(checkout): ...`, `fix(medusa-sync): ...`.
 
 #### 14.3.1 GitHub Actions Workflows
 
-| Workflow            | Trigger           | Jobs                                                                                     |
-| ------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| `ci.yml`            | PR + push to main | lint, typecheck, unit tests, sanity TypeGen check, build verification, bundle-size check |
-| `e2e.yml`           | PR + push to main | Playwright E2E against preview deploy                                                    |
-| `lighthouse.yml`    | PR + nightly      | `lighthouse-ci` against representative routes                                            |
-| `accessibility.yml` | PR                | `axe-core` + `pa11y` against representative routes                                       |
-| `secrets-scan.yml`  | PR                | `gitleaks`                                                                               |
-| `sync-test.yml`     | Nightly           | Synthetic Medusa→Sanity sync test                                                        |
-| `release.yml`       | Tag push          | Storefront + Medusa version bump + changelog                                             |
+| Workflow         | Trigger                                  | Jobs                                                                                                     |
+| ---------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `ci.yml`         | PR + push to main + manual               | format check, lint, typecheck, unit coverage, storefront + Medusa build, PR gitleaks, Sentry source maps |
+| `lighthouse.yml` | Vercel preview deployment + manual       | `lighthouse-ci` against representative preview routes (`/`, `/products`, `/capsule`, `/journal`)         |
+| `e2e.yml`        | PR path-gated to storefront/E2E + manual | Playwright Chromium smoke run, with failure reports and traces uploaded as artifacts                     |
+| `gitleaks.yml`   | push to main + manual                    | Full-history `gitleaks` scan using `.gitleaks.toml`                                                      |
 
-All workflows run on GitHub-hosted runners. Caches: pnpm store, Turborepo remote cache (Vercel-hosted), Sentry release artifacts.
+All workflows run on GitHub-hosted runners. Caches: pnpm store via `actions/setup-node`, Turborepo remote cache via `TURBO_TOKEN` / `TURBO_TEAM`, and Vercel/Medusa provider build caches in their deployment pipelines.
+
+There is intentionally no Vercel or Medusa Cloud deployment workflow. Vercel auto-deploys the storefront from its GitHub integration, and Medusa Cloud auto-deploys the backend from its configured branch.
 
 #### 14.3.2 Required Status Checks for `main`
 
-| Check           | Tool                               |
-| --------------- | ---------------------------------- |
-| Lint            | `eslint` + `prettier --check`      |
-| Typecheck       | `tsc --noEmit`                     |
-| Unit tests      | `vitest`                           |
-| E2E (smoke set) | `playwright` against preview       |
-| Bundle size     | `@next/bundle-analyzer` thresholds |
-| Lighthouse      | `lighthouse-ci` against preview    |
-| Accessibility   | `@axe-core/playwright`             |
-| Sanity TypeGen  | `pnpm sanity typegen` clean diff   |
-| Secrets scan    | `gitleaks`                         |
+| Check           | Tool                                                     |
+| --------------- | -------------------------------------------------------- |
+| Lint            | `eslint` + `prettier --check`                            |
+| Typecheck       | `tsc --noEmit`                                           |
+| Unit tests      | `vitest`                                                 |
+| Build           | `next build` + `medusa build`                            |
+| E2E (smoke set) | `playwright` Chromium path-gated PR workflow             |
+| Lighthouse      | `lighthouse-ci` against Vercel preview                   |
+| Accessibility   | Lighthouse accessibility + `@axe-core/playwright` in E2E |
+| Secrets scan    | `gitleaks`                                               |
 
 #### 14.3.3 Deploy Triggers
 
@@ -3289,6 +3287,15 @@ All workflows run on GitHub-hosted runners. Caches: pnpm store, Turborepo remote
 - Migration failures **block deploy** and surface in Medusa Cloud's deploy log.
 - Local dev: developers run `pnpm --filter @vaivae/medusa medusa migrations run` after pulling.
 - Sanity schema changes deploy with the storefront; no separate migration step.
+
+#### 14.3.5 Sentry Source Maps, Renovate, And Secrets
+
+- Storefront Sentry source-map upload runs in the `ci.yml` `sourcemap-upload` job after the normal build job succeeds on `main`.
+- The source-map job intentionally runs `pnpm --filter @vaivae/storefront build` directly instead of through Turbo so a Turbo cache hit cannot skip the upload side effect.
+- `SENTRY_RELEASE` is set to the Git SHA so storefront errors are tagged to the same release value used for source maps.
+- Renovate is configured in `renovate.json` with `rangeStrategy: "pin"`, weekly lock-file maintenance, and lockstep groups for `@medusajs/*`, `@radix-ui/*`, the Sanity stack, Sentry, and Stripe.
+- Major bumps for Next, React, Medusa, and Sanity remain disabled until an ADR approves the upgrade window.
+- Required GitHub secrets, repository variables, and platform runtime variables are documented in `.github/SECRETS.md`.
 
 ### 14.4 Deployment Strategy
 

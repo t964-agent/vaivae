@@ -97,7 +97,9 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
                     Page {boundedPage} of {pageCount}
                   </span>
                   <Button asChild disabled={boundedPage >= pageCount} variant="underline">
-                    <Link href={getJournalPageHref(Math.min(pageCount, boundedPage + 1))}>Next</Link>
+                    <Link href={getJournalPageHref(Math.min(pageCount, boundedPage + 1))}>
+                      Next
+                    </Link>
                   </Button>
                 </HStack>
               ) : null}

@@ -67,7 +67,8 @@ export async function generateMetadata({ params }: LookbookPageProps): Promise<M
     "A visual vaïvae lookbook tracing the season through fabric, light, and movement.";
   const canonicalPath = `/lookbook/${lookbook.slug ?? slug}`;
   const image = getSanityImageUrl(lookbook.seo?.ogImage ?? lookbook.coverImage);
-  const imageAlt = cleanText(lookbook.seo?.ogImage?.alt) ?? cleanText(lookbook.coverImage?.alt) ?? title;
+  const imageAlt =
+    cleanText(lookbook.seo?.ogImage?.alt) ?? cleanText(lookbook.coverImage?.alt) ?? title;
 
   return {
     alternates: { canonical: canonicalPath },
@@ -126,7 +127,9 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
             controls={false}
             metadata={{ video_title: title }}
             playbackId={lookbook.coverVideo.muxAssetId}
-            {...(lookbook.coverImage?.asset?.url ? { posterUrl: lookbook.coverImage.asset.url } : {})}
+            {...(lookbook.coverImage?.asset?.url
+              ? { posterUrl: lookbook.coverImage.asset.url }
+              : {})}
           />
         ) : lookbook.coverImage?.asset ? (
           <VaivaeImage
@@ -138,7 +141,10 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
           />
         ) : null}
         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/30 to-ink/15" />
-        <Container className="relative flex min-h-[88dvh] items-end pt-40 pb-14 md:pb-20" variant="wide">
+        <Container
+          className="relative flex min-h-[88dvh] items-end pt-40 pb-14 md:pb-20"
+          variant="wide"
+        >
           <Stack className="max-w-5xl" gap={6}>
             <SectionEyebrow className="text-on-dark/65">
               {lookbook.eyebrow ?? "Lookbook"}
@@ -200,7 +206,9 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
                           )}
                           <figcaption className="mt-4 flex items-start justify-between gap-6 font-body text-xs tracking-[0.16em] text-on-light/50 uppercase">
                             <span>{String(index + 1).padStart(2, "0")}</span>
-                            {look.caption ? <span className="max-w-md text-right">{look.caption}</span> : null}
+                            {look.caption ? (
+                              <span className="max-w-md text-right">{look.caption}</span>
+                            ) : null}
                           </figcaption>
                         </figure>
 

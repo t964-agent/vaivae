@@ -1,6 +1,6 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    /* Module / runtime */
     "target": "ES2024",
     "lib": ["ES2024"],
     "module": "Node16",
@@ -9,15 +9,40 @@
     "rootDir": ".",
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
+
+    /* Emit */
     "noEmit": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
+
+    /* Resolution */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "incremental": true,
+
+    /* Strictness — keep in sync with ../../tsconfig.base.json. */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedSideEffectImports": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitOverride": true,
+
+    /* Quality of life */
+    "allowJs": false,
+    "checkJs": false,
+    "downlevelIteration": false,
+    "removeComments": false,
+
     "paths": {
       "@/*": ["./src/*"],
       "@/modules/*": ["./src/modules/*"],

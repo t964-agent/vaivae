@@ -25,10 +25,6 @@
     "prepare": "husky || true",
     "clean": "turbo run clean && rm -rf node_modules .turbo"
   },
-  "dependencies": {
-    "@medusajs/cli": "2.14.2",
-    "@medusajs/medusa": "2.14.2"
-  },
   "devDependencies": {
     "turbo": "2.9.12",
     "typescript": "6.0.3",

@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "!apps/medusa/.medusa/**"
 
 allowBuilds:
   "@medusajs/telemetry": true

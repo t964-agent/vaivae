@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "medusa develop",
-    "build": "medusa build",
+    "build": "rm -rf .medusa/server && medusa build && test -f .medusa/server/package.json && test -f .medusa/server/medusa-config.js",
     "start": "medusa start",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",

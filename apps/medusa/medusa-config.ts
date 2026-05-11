@@ -23,13 +23,27 @@ const { defineConfig, loadEnv } = require("@medusajs/framework/utils") as typeof
 loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd());
 
 const isMedusaBuildCommand = process.argv.includes("build");
+const placeholderPattern = /^(?:<.*>|.*(?:PASTE|YOUR-PROJECT).*)$/;
+
+function usableEnvValue(value: string | undefined): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || placeholderPattern.test(trimmed)) {
+    return undefined;
+  }
+
+  return trimmed;
+}
 
 // During `medusa build` (which runs in CI/CD without real env vars), substitute
 // safe placeholder values so the build can complete. Runtime config still
 // requires real values via the same env keys.
 function envOrBuildDefault(key: string, buildDefault: string): string {
-  const value = process.env[key];
-  if (value && value.trim() !== "") {
+  const value = usableEnvValue(process.env[key]);
+  if (value) {
     return value;
   }
   if (isMedusaBuildCommand) {
@@ -41,8 +55,7 @@ function envOrBuildDefault(key: string, buildDefault: string): string {
 }
 
 function envOptional(key: string): string | undefined {
-  const value = process.env[key];
-  return value && value.trim() !== "" ? value : undefined;
+  return usableEnvValue(process.env[key]);
 }
 
 const redisUrl = envOptional("REDIS_URL");

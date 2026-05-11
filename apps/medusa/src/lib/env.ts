@@ -26,10 +26,16 @@ const buildDefaults = {
 
 type BuildDefaultKey = keyof typeof buildDefaults;
 
-const placeholderPattern = /^<.*>$/;
+const placeholderPattern = /^(?:<.*>|.*(?:PASTE|YOUR-PROJECT).*)$/;
 
 function valueOrBuildDefault(key: BuildDefaultKey): string | undefined {
-  return process.env[key] ?? (isMedusaBuildCommand ? buildDefaults[key] : undefined);
+  const value = process.env[key];
+
+  if (isMedusaBuildCommand) {
+    return optionalString(value) ?? buildDefaults[key];
+  }
+
+  return typeof value === "string" ? value.trim() : undefined;
 }
 
 function optionalString(value: unknown): string | undefined {

@@ -28,6 +28,5 @@ const config: SubscriberConfig = {
   event: "product.deleted",
 };
 
-module.exports = sanitySyncProductDeleted;
-module.exports.default = sanitySyncProductDeleted;
-module.exports.config = config;
+exports.default = sanitySyncProductDeleted;
+exports.config = config;

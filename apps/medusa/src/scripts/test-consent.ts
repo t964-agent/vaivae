@@ -39,5 +39,4 @@ async function testConsent({ container }: ExecArgs): Promise<void> {
   logger.info(`Marketing consent smoke test wrote and read ${record.id}.`);
 }
 
-module.exports = testConsent;
-module.exports.default = testConsent;
+exports.default = testConsent;

@@ -44,6 +44,5 @@ const config: SubscriberConfig = {
   event: "order.canceled",
 };
 
-module.exports = klaviyoOrderCancelled;
-module.exports.default = klaviyoOrderCancelled;
-module.exports.config = config;
+exports.default = klaviyoOrderCancelled;
+exports.config = config;

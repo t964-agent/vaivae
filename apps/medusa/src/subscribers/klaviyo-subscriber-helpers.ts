@@ -1,4 +1,5 @@
 import type { Logger } from "pino";
+import type * as MedusaUtils from "@medusajs/framework/utils";
 import KlaviyoModule = require("../modules/klaviyo");
 
 type LoggerModule = {
@@ -41,8 +42,11 @@ type ErrorLogDetails = {
   statusCode?: number;
 };
 
+const { defineFileConfig } = require("@medusajs/framework/utils") as typeof MedusaUtils;
 const { child } = require("../lib/logger") as LoggerModule;
 const { KLAVIYO_MODULE } = KlaviyoModule;
+
+defineFileConfig({ isDisabled: () => true });
 
 const logger = child("klaviyo-subscriber");
 

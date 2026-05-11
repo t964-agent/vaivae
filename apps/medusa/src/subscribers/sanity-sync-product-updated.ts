@@ -39,6 +39,5 @@ const config: SubscriberConfig = {
   event: "product.updated",
 };
 
-module.exports = sanitySyncProductUpdated;
-module.exports.default = sanitySyncProductUpdated;
-module.exports.config = config;
+exports.default = sanitySyncProductUpdated;
+exports.config = config;

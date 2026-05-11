@@ -51,6 +51,5 @@ const config: SubscriberConfig = {
   event: "order.fulfillment_created",
 };
 
-module.exports = klaviyoOrderShipped;
-module.exports.default = klaviyoOrderShipped;
-module.exports.config = config;
+exports.default = klaviyoOrderShipped;
+exports.config = config;

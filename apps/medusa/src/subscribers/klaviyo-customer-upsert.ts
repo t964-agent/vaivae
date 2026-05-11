@@ -87,6 +87,5 @@ const config: SubscriberConfig = {
   event: ["customer.created", "customer.updated"],
 };
 
-module.exports = klaviyoCustomerUpsert;
-module.exports.default = klaviyoCustomerUpsert;
-module.exports.config = config;
+exports.default = klaviyoCustomerUpsert;
+exports.config = config;

@@ -243,6 +243,5 @@ const config: SubscriberConfig = {
   event: "order.fulfillment_created",
 };
 
-module.exports = shippoCreateLabel;
-module.exports.default = shippoCreateLabel;
-module.exports.config = config;
+exports.default = shippoCreateLabel;
+exports.config = config;

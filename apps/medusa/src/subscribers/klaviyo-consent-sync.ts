@@ -63,6 +63,5 @@ const config: SubscriberConfig = {
   event: "marketing-consent.updated",
 };
 
-module.exports = klaviyoConsentSync;
-module.exports.default = klaviyoConsentSync;
-module.exports.config = config;
+exports.default = klaviyoConsentSync;
+exports.config = config;

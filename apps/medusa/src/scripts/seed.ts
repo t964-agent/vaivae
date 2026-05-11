@@ -766,5 +766,4 @@ async function seed({ container }: ExecArgs): Promise<void> {
   ctx.logger.info("Drop 01 seed complete.");
 }
 
-module.exports = seed;
-module.exports.default = seed;
+exports.default = seed;

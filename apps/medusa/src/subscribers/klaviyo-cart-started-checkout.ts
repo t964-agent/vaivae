@@ -97,6 +97,5 @@ const config: SubscriberConfig = {
   event: "cart.updated",
 };
 
-module.exports = klaviyoCartStartedCheckout;
-module.exports.default = klaviyoCartStartedCheckout;
-module.exports.config = config;
+exports.default = klaviyoCartStartedCheckout;
+exports.config = config;

@@ -3,7 +3,7 @@ import type * as MedusaUtils from "@medusajs/framework/utils";
 import type { Logger } from "pino";
 import SanitySyncModule = require("../modules/sanity-sync");
 
-const { Modules } = require("@medusajs/framework/utils") as typeof MedusaUtils;
+const { defineFileConfig, Modules } = require("@medusajs/framework/utils") as typeof MedusaUtils;
 const { SANITY_SYNC_MODULE } = SanitySyncModule;
 
 type ProductEventPayload = {
@@ -51,6 +51,8 @@ type SyncErrorLogDetails = {
 };
 
 const { child } = require("../lib/logger") as LoggerModule;
+
+defineFileConfig({ isDisabled: () => true });
 
 const logger = child("sanity-sync-subscriber");
 const transientErrorCodes = new Set([

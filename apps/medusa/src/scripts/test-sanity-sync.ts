@@ -28,5 +28,4 @@ async function testSanitySync({ container }: ExecArgs): Promise<void> {
   logger.info("Sanity sync smoke test wrote test_prod_001.");
 }
 
-module.exports = testSanitySync;
-module.exports.default = testSanitySync;
+exports.default = testSanitySync;

@@ -39,6 +39,5 @@ const config: SubscriberConfig = {
   event: "product.created",
 };
 
-module.exports = sanitySyncProductCreated;
-module.exports.default = sanitySyncProductCreated;
-module.exports.config = config;
+exports.default = sanitySyncProductCreated;
+exports.config = config;

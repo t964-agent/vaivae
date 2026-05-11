@@ -44,6 +44,5 @@ const config: SubscriberConfig = {
   event: "order.placed",
 };
 
-module.exports = klaviyoOrderPlaced;
-module.exports.default = klaviyoOrderPlaced;
-module.exports.config = config;
+exports.default = klaviyoOrderPlaced;
+exports.config = config;

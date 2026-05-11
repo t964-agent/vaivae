@@ -41,5 +41,4 @@ async function testKlaviyo({ container }: ExecArgs): Promise<void> {
   logger.info(`Klaviyo smoke test completed for smoke_test_id ${unique}.`);
 }
 
-module.exports = testKlaviyo;
-module.exports.default = testKlaviyo;
+exports.default = testKlaviyo;

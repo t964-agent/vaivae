@@ -66,5 +66,4 @@ async function testShippoLabel({ container }: ExecArgs): Promise<void> {
   );
 }
 
-module.exports = testShippoLabel;
-module.exports.default = testShippoLabel;
+exports.default = testShippoLabel;

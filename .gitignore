@@ -82,6 +82,8 @@ lerna-debug.log*
 # Local AI agent / IDE state (do not commit personal session state)
 # ─────────────────────────────────────────────────────────────────────────────
 .claude/
+.agents/
+skills-lock.json
 .cursor/cache/
 .aider*
 

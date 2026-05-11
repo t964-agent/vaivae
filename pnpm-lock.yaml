@@ -101,9 +101,27 @@ importers:
       '@alphabite/medusa-wishlist':
         specifier: 0.5.9
         version: 0.5.9(18b0e426f99794b218bc174b9de5c54b)
+      '@medusajs/admin-sdk':
+        specifier: 2.14.2
+        version: 2.14.2
+      '@medusajs/admin-shared':
+        specifier: 2.14.2
+        version: 2.14.2
+      '@medusajs/admin-vite-plugin':
+        specifier: 2.14.2
+        version: 2.14.2(picomatch@4.0.4)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))
       '@medusajs/analytics-posthog':
         specifier: 2.14.2
         version: 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))(posthog-node@5.33.4(rxjs@7.8.2))
+      '@medusajs/cli':
+        specifier: 2.14.2
+        version: 2.14.2(@types/node@24.12.3)
+      '@medusajs/dashboard':
+        specifier: 2.14.2
+        version: 2.14.2(@emotion/is-prop-valid@1.4.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(typescript@6.0.3)
+      '@medusajs/draft-order':
+        specifier: 2.14.2
+        version: 2.14.2(@medusajs/admin-sdk@2.14.2)(@medusajs/cli@2.14.2(@types/node@24.12.3))(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react-router-dom@6.30.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
       '@medusajs/framework':
         specifier: 2.14.2
         version: 2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3)
@@ -156,24 +174,6 @@ importers:
         specifier: 2.18.0
         version: 2.18.0
     devDependencies:
-      '@medusajs/admin-sdk':
-        specifier: 2.14.2
-        version: 2.14.2
-      '@medusajs/admin-shared':
-        specifier: 2.14.2
-        version: 2.14.2
-      '@medusajs/admin-vite-plugin':
-        specifier: 2.14.2
-        version: 2.14.2(picomatch@4.0.4)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))
-      '@medusajs/cli':
-        specifier: 2.14.2
-        version: 2.14.2(@types/node@24.12.3)
-      '@medusajs/dashboard':
-        specifier: 2.14.2
-        version: 2.14.2(@emotion/is-prop-valid@1.4.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(typescript@6.0.3)
-      '@medusajs/draft-order':
-        specifier: 2.14.2
-        version: 2.14.2(@medusajs/admin-sdk@2.14.2)(@medusajs/cli@2.14.2(@types/node@24.12.3))(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react-router-dom@6.30.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
       '@types/node':
         specifier: 24.12.3
         version: 24.12.3

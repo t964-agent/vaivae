@@ -1,6 +1,6 @@
 import type { InferEntityType } from "@medusajs/framework/types";
 import MedusaUtils = require("@medusajs/framework/utils");
-import ConsentRecord = require("./models/consent-record.js");
+import ConsentRecord = require("./models/consent-record");
 
 const { MedusaService } = MedusaUtils;
 

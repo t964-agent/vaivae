@@ -82,7 +82,7 @@ async function loadService(): Promise<MarketingConsentServiceShape> {
       };
     }
 
-    if (request === "./models/consent-record.js") {
+    if (request === "./models/consent-record") {
       return {};
     }
 

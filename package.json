@@ -22,7 +22,7 @@
     "test:e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "clean": "turbo run clean && rm -rf node_modules .turbo"
   },
   "devDependencies": {

@@ -4361,6 +4361,27 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - Stronger compliance posture day-one; EU traffic safe to accept from launch.
   - Termly's branded styling must be reviewed to maintain luxury aesthetic.
 
+### ADR-016: Medusa Config-Load Time Constraints
+
+- **Status:** Accepted (corrects assumptions in [§3.5.11](#3511-critical-compatibility-gotchas))
+- **Context:** During the first Medusa Cloud deployment (May 2026), `medusa build` crashed with `TypeError: Cannot read properties of null (reading 'admin')` in `ConfigManager.loadConfig`. Investigation revealed Medusa's `getConfigFile` wraps the config load in a try/catch and silently returns `{ configModule: null }` when any error is thrown. With `throwOnError: false` (the default for `medusa build`), the null propagates to `loadConfig` which then crashes opaquely. Multiple distinct triggers were found, each masquerading as the same "null.admin" error.
+- **Decision:** Codify the following rules for the Medusa backend:
+  1. **`medusa-config.ts` must not import from `./src/*` at the top level.** Medusa's CLI loads the config via plain CJS `require()` BEFORE ts-node has fully wired path resolution for `.ts` files inside `src/`. Read `process.env` directly; substitute build-time placeholders when `process.argv.includes("build")`.
+  2. **`@medusajs/cli` and admin-build packages (`@medusajs/admin-vite-plugin`, `@medusajs/admin-shared`, `@medusajs/admin-sdk`, `@medusajs/dashboard`, `@medusajs/draft-order`) must live in `dependencies`, not `devDependencies`.** Medusa Cloud's project validator only inspects `dependencies` (production-install behavior) and reports them missing otherwise.
+  3. **`apps/medusa/package.json` must NOT use pnpm `catalog:` references.** Medusa Cloud's validator parses package.json statically and treats `"catalog:"` as the literal version string. Inline real versions in this one file; the storefront keeps catalog refs (Vercel + pnpm handle them).
+  4. **Relative imports inside the Medusa backend source must NOT use `.js` extensions** (e.g. write `require("./models/consent-record")` not `require("./models/consent-record.js")`). Medusa's `defineConfig` recursively requires each declared module at config-load time via ts-node, which only resolves `.ts` files for bare paths — an explicit `.js` extension causes "Cannot find module" failures.
+  5. **`apps/medusa/tsconfig.json` must include a `ts-node` override block** with `transpileOnly: true`, `module: "commonjs"`, `moduleResolution: "node"`, and `verbatimModuleSyntax: false`. The base tsconfig's strict ESM-style settings break ts-node's CJS require hook used by Medusa CLI at config-load time. (The Medusa starter uses `"ts-node": { "swc": true }` for the same purpose; we use plain transpileOnly because we don't ship `@swc/core` in this app.)
+  6. **The root `package.json` `prepare` script must be tolerant of missing devDependencies:** use `"prepare": "husky || true"`. Medusa Cloud's build performs a `pnpm install --prod` pass after the build step which strips devDeps; the unguarded `husky` invocation otherwise crashes the build.
+- **Alternatives considered:**
+  - _Move env validation into medusa-config.ts inline:_ rejected because the Zod schema is reused by every module/route/subscriber; duplicating it would be error-prone.
+  - _Use ESM `import` in medusa-config.ts:_ rejected because the file must use CJS `module.exports = defineConfig(...)` (Medusa's loader does `require()`, not `import()`), and `verbatimModuleSyntax` forbids mixing ESM imports with `module.exports`.
+  - _Switch `module` to `commonjs` repo-wide:_ rejected because the storefront benefits from the stricter `Node16` mode; the `ts-node` override block is scoped to Medusa's config-load runtime only.
+- **Consequences:**
+  - All five distinct failure modes are eliminated. `medusa build` succeeds locally and on Medusa Cloud.
+  - Future contributors must remember that `medusa-config.ts` is a special boundary: it runs under a stripped-down runtime that is far less forgiving than the rest of the app.
+  - The `src/lib/env.ts` Zod validator still protects modules/routes/workflows at runtime — just not the config file itself.
+  - `apps/medusa/package.json` deliberately diverges from the rest of the monorepo (no `catalog:`). This is documented above so it won't be "fixed" by a future cleanup PR.
+
 ---
 
 ## 21. Glossary

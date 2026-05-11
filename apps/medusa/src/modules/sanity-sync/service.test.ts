@@ -53,7 +53,7 @@ async function loadService() {
   const originalLoad = moduleLoader._load;
 
   vi.spyOn(moduleLoader, "_load").mockImplementation((request, parent, isMain) => {
-    if (request === "../../lib/env.js") {
+    if (request === "../../lib/env") {
       return {
         env: {
           SANITY_DATASET: "development",
@@ -63,11 +63,11 @@ async function loadService() {
       };
     }
 
-    if (request === "../../lib/logger.js") {
+    if (request === "../../lib/logger") {
       return { child };
     }
 
-    if (request === "./client.js") {
+    if (request === "./client") {
       return { createSanityClient };
     }
 

@@ -32,11 +32,11 @@ type SanitySyncProductInput = {
   materials?: string[] | null;
 };
 
-const { env } = require("../../lib/env.js") as {
+const { env } = require("../../lib/env") as {
   env: Pick<MedusaEnv, "SANITY_DATASET" | "SANITY_PROJECT_ID" | "SANITY_WRITE_TOKEN">;
 };
-const { child } = require("../../lib/logger.js") as LoggerModule;
-const { createSanityClient } = require("./client.js") as SanityClientFactory;
+const { child } = require("../../lib/logger") as LoggerModule;
+const { createSanityClient } = require("./client") as SanityClientFactory;
 
 const logger = child("sanity-sync");
 

@@ -1,16 +1,81 @@
 import type { InputConfigModules, ProjectConfigOptions } from "@medusajs/framework/types";
 import type * as MedusaUtils from "@medusajs/framework/utils";
-import type { MedusaEnv } from "./src/lib/env";
+
+// IMPORTANT: medusa-config.ts is loaded by Medusa's `getConfigFile` via a plain
+// `require()` BEFORE Medusa's TypeScript runtime is set up for the rest of the
+// codebase. That means relative imports from this file (e.g. "./src/lib/env")
+// can't resolve `.ts` files at runtime — Node only sees `.js`. If anything in
+// this file throws, Medusa's loader silently returns `null` (with
+// `throwOnError: false` during `medusa build`) and then crashes downstream
+// with "Cannot read properties of null (reading 'admin')".
+//
+// Therefore: read `process.env` directly here. Do not import from src/.
+// Heavyweight env validation (Zod) lives in src/lib/env.ts and is used by
+// modules, subscribers, workflows, and API routes — all of which are loaded
+// AFTER the TS runtime is ready.
+//
+// We use `require()` for runtime values because the file uses CJS
+// `module.exports = defineConfig(...)` (matching Medusa's official starter).
+// Pure ESM imports + module.exports is rejected by `verbatimModuleSyntax`.
 
 const { defineConfig, loadEnv } = require("@medusajs/framework/utils") as typeof MedusaUtils;
-const { env } = require("./src/lib/env") as { env: MedusaEnv };
 
 loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd());
 
-const redisUrl = env.REDIS_URL;
+const isMedusaBuildCommand = process.argv.includes("build");
 
+// During `medusa build` (which runs in CI/CD without real env vars), substitute
+// safe placeholder values so the build can complete. Runtime config still
+// requires real values via the same env keys.
+function envOrBuildDefault(key: string, buildDefault: string): string {
+  const value = process.env[key];
+  if (value && value.trim() !== "") {
+    return value;
+  }
+  if (isMedusaBuildCommand) {
+    return buildDefault;
+  }
+  throw new Error(
+    `Missing required environment variable: ${key}. Set it in Medusa Cloud → Environment Variables.`,
+  );
+}
+
+function envOptional(key: string): string | undefined {
+  const value = process.env[key];
+  return value && value.trim() !== "" ? value : undefined;
+}
+
+const redisUrl = envOptional("REDIS_URL");
+const enableExplicitRedisModules = process.env["ENABLE_EXPLICIT_REDIS_MODULES"] === "true";
+
+const databaseUrl = envOrBuildDefault(
+  "DATABASE_URL",
+  "postgres://postgres:postgres@localhost:5432/vaivae_medusa_build",
+);
+const jwtSecret = envOrBuildDefault("JWT_SECRET", "medusa-build-jwt-secret");
+const cookieSecret = envOrBuildDefault("COOKIE_SECRET", "medusa-build-cookie-secret");
+const storeCors = envOrBuildDefault("STORE_CORS", "http://localhost:3000");
+const adminCors = envOrBuildDefault("ADMIN_CORS", "http://localhost:9000");
+const authCors = envOrBuildDefault("AUTH_CORS", "http://localhost:3000");
+const medusaBackendUrl = envOrBuildDefault("MEDUSA_BACKEND_URL", "http://localhost:9000");
+const medusaStorefrontUrl = envOrBuildDefault("MEDUSA_STOREFRONT_URL", "http://localhost:3000");
+const stripeApiKey = envOrBuildDefault("STRIPE_API_KEY", "sk_test_medusa_build_placeholder");
+const stripeWebhookSecret = envOrBuildDefault(
+  "STRIPE_WEBHOOK_SECRET",
+  "whsec_medusa_build_placeholder",
+);
+const posthogApiKey = envOrBuildDefault("POSTHOG_API_KEY", "phc_medusa_build_placeholder");
+const posthogHost = process.env["POSTHOG_HOST"] ?? "https://us.i.posthog.com";
+
+const workerModeRaw = process.env["MEDUSA_WORKER_MODE"];
+const workerMode: "shared" | "worker" | "server" =
+  workerModeRaw === "worker" || workerModeRaw === "server" ? workerModeRaw : "shared";
+
+// Medusa Cloud auto-configures Caching, Event Bus, Workflow Engine, and Locking
+// modules with Redis. Only add explicit Redis modules when running outside Cloud
+// (set ENABLE_EXPLICIT_REDIS_MODULES=true). See AGENTS.md §4.5.
 const redisModules: InputConfigModules =
-  env.ENABLE_EXPLICIT_REDIS_MODULES && redisUrl
+  enableExplicitRedisModules && redisUrl
     ? [
         {
           resolve: "@medusajs/medusa/caching",
@@ -19,26 +84,18 @@ const redisModules: InputConfigModules =
               {
                 resolve: "@medusajs/medusa/caching-redis",
                 id: "redis",
-                options: {
-                  redisUrl,
-                },
+                options: { redisUrl },
               },
             ],
           },
         },
         {
           resolve: "@medusajs/medusa/event-bus-redis",
-          options: {
-            redisUrl,
-          },
+          options: { redisUrl },
         },
         {
           resolve: "@medusajs/medusa/workflow-engine-redis",
-          options: {
-            redis: {
-              redisUrl,
-            },
-          },
+          options: { redis: { redisUrl } },
         },
         {
           resolve: "@medusajs/medusa/locking",
@@ -47,9 +104,7 @@ const redisModules: InputConfigModules =
               {
                 resolve: "@medusajs/medusa/locking-redis",
                 id: "redis",
-                options: {
-                  redisUrl,
-                },
+                options: { redisUrl },
               },
             ],
           },
@@ -66,8 +121,8 @@ const modules: InputConfigModules = [
           resolve: "@medusajs/medusa/payment-stripe",
           id: "stripe",
           options: {
-            apiKey: env.STRIPE_API_KEY,
-            webhookSecret: env.STRIPE_WEBHOOK_SECRET,
+            apiKey: stripeApiKey,
+            webhookSecret: stripeWebhookSecret,
             capture: true,
           },
         },
@@ -82,8 +137,8 @@ const modules: InputConfigModules = [
           resolve: "@medusajs/analytics-posthog",
           id: "posthog",
           options: {
-            posthogEventsKey: env.POSTHOG_API_KEY,
-            posthogHost: env.POSTHOG_HOST,
+            posthogEventsKey: posthogApiKey,
+            posthogHost,
           },
         },
       ],
@@ -105,14 +160,14 @@ const modules: InputConfigModules = [
 ];
 
 const projectConfig: ProjectConfigOptions = {
-  databaseUrl: env.DATABASE_URL,
-  workerMode: env.MEDUSA_WORKER_MODE,
+  databaseUrl,
+  workerMode,
   http: {
-    storeCors: env.STORE_CORS,
-    adminCors: env.ADMIN_CORS,
-    authCors: env.AUTH_CORS,
-    jwtSecret: env.JWT_SECRET,
-    cookieSecret: env.COOKIE_SECRET,
+    storeCors,
+    adminCors,
+    authCors,
+    jwtSecret,
+    cookieSecret,
   },
 };
 
@@ -123,8 +178,8 @@ if (redisUrl) {
 module.exports = defineConfig({
   projectConfig,
   admin: {
-    backendUrl: env.MEDUSA_BACKEND_URL,
-    storefrontUrl: env.MEDUSA_STOREFRONT_URL,
+    backendUrl: medusaBackendUrl,
+    storefrontUrl: medusaStorefrontUrl,
     path: "/app",
   },
   modules,
@@ -144,4 +199,4 @@ module.exports = defineConfig({
 });
 
 // Stripe webhook auto-mounted by @medusajs/payment-stripe at /hooks/payment/stripe_stripe.
-// In production, point Stripe Dashboard -> Webhooks -> endpoint at https://api.vaivae.com/hooks/payment/stripe_stripe.
+// In production, point Stripe Dashboard → Webhooks → endpoint at https://api.vaivae.com/hooks/payment/stripe_stripe.

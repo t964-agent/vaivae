@@ -14,9 +14,9 @@ import type * as MedusaUtils from "@medusajs/framework/utils";
 // modules, subscribers, workflows, and API routes — all of which are loaded
 // AFTER the TS runtime is ready.
 //
-// We use `require()` for runtime values because the file uses CJS
-// `module.exports = defineConfig(...)` (matching Medusa's official starter).
-// Pure ESM imports + module.exports is rejected by `verbatimModuleSyntax`.
+// We use `require()` for runtime values because the file uses CJS exports
+// (matching Medusa's official starter). Pure ESM imports + module.exports is
+// rejected by `verbatimModuleSyntax`.
 
 const { defineConfig, loadEnv } = require("@medusajs/framework/utils") as typeof MedusaUtils;
 
@@ -188,7 +188,7 @@ if (redisUrl) {
   projectConfig.redisUrl = redisUrl;
 }
 
-module.exports = defineConfig({
+const __result = defineConfig({
   projectConfig,
   admin: {
     backendUrl: medusaBackendUrl,
@@ -210,6 +210,11 @@ module.exports = defineConfig({
   ],
   featureFlags: {},
 });
+
+// Medusa Cloud appends `module.exports = __result` while adapting config for
+// managed infrastructure. Defining this binding keeps both local and Cloud
+// config loading on the same path.
+module.exports = __result;
 
 // Stripe webhook auto-mounted by @medusajs/payment-stripe at /hooks/payment/stripe_stripe.
 // In production, point Stripe Dashboard → Webhooks → endpoint at https://api.vaivae.com/hooks/payment/stripe_stripe.

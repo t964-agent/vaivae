@@ -32,7 +32,7 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noUncheckedSideEffectImports": true,
     "useUnknownInCatchVariables": true,
     "noImplicitOverride": true,

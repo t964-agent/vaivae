@@ -28,7 +28,7 @@ function createDirective(name: string, sources: Array<string | null | undefined>
   return `${name} ${uniqueSources(sources).join(" ")}`;
 }
 
-function createContentSecurityPolicy(nonce: string): string {
+function createContentSecurityPolicy(nonce: string, enforce: boolean): string {
   const medusaOrigin = getOrigin(process.env["NEXT_PUBLIC_MEDUSA_BACKEND_URL"]);
   const posthogOrigin = getOrigin(process.env["NEXT_PUBLIC_POSTHOG_HOST"]);
   const sentryOrigin = getOrigin(process.env["NEXT_PUBLIC_SENTRY_DSN"]);
@@ -141,7 +141,7 @@ function createContentSecurityPolicy(nonce: string): string {
     createDirective("frame-ancestors", ["'self'"]),
     createDirective("form-action", ["'self'", "https://hooks.stripe.com"]),
     createDirective("base-uri", ["'self'"]),
-    "upgrade-insecure-requests",
+    ...(enforce ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 }
 
@@ -167,11 +167,9 @@ export function proxy(request: NextRequest) {
     response.headers.set(key, value);
   }
 
-  const cspHeader =
-    process.env["CSP_ENFORCE"] === "true"
-      ? "Content-Security-Policy"
-      : "Content-Security-Policy-Report-Only";
-  response.headers.set(cspHeader, createContentSecurityPolicy(nonce));
+  const enforceCsp = process.env["CSP_ENFORCE"] === "true";
+  const cspHeader = enforceCsp ? "Content-Security-Policy" : "Content-Security-Policy-Report-Only";
+  response.headers.set(cspHeader, createContentSecurityPolicy(nonce, enforceCsp));
 
   return response;
 }

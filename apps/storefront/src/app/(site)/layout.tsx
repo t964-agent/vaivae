@@ -40,6 +40,10 @@ type SiteLayoutProps = {
 
 let hasWarnedMissingTermlyUuid = false;
 
+function isVercelAnalyticsEnabled(): boolean {
+  return process.env["NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED"] === "true";
+}
+
 async function getInitialCart(): Promise<StoreCart | null> {
   try {
     return await getCart();
@@ -67,6 +71,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
   ]);
   const cartItemCount = getCartItemCount(cart);
   const termlyWebsiteUuid = getTermlyWebsiteUuid();
+  const vercelAnalyticsEnabled = isVercelAnalyticsEnabled();
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
 
   return (
@@ -121,7 +126,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
       <SanityLive />
       {draft.isEnabled ? <VisualEditing /> : null}
       <SpeedInsights />
-      <Analytics />
+      {vercelAnalyticsEnabled ? <Analytics /> : null}
     </div>
   );
 }

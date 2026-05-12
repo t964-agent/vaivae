@@ -1,5 +1,35 @@
 import { z } from "zod";
 
+/* eslint-disable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-namespace -- NodeJS.ProcessEnv augmentation requires this shape. */
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      MEDUSA_REVALIDATE_SECRET?: string;
+      NEXT_PUBLIC_BASE_URL?: string;
+      NEXT_PUBLIC_GTM_ID?: string;
+      NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY?: string;
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL?: string;
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY?: string;
+      NEXT_PUBLIC_MUX_ENV_KEY?: string;
+      NEXT_PUBLIC_POSTHOG_HOST?: string;
+      NEXT_PUBLIC_POSTHOG_KEY?: string;
+      NEXT_PUBLIC_SANITY_DATASET?: string;
+      NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
+      NEXT_PUBLIC_SENTRY_DSN?: string;
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?: string;
+      NEXT_PUBLIC_TERMLY_WEBSITE_UUID?: string;
+      REGION_ID?: string;
+      SANITY_API_READ_TOKEN?: string;
+      SANITY_REVALIDATE_SECRET?: string;
+      SENTRY_AUTH_TOKEN?: string;
+      SENTRY_DSN?: string;
+      SENTRY_ORG?: string;
+      SENTRY_PROJECT?: string;
+    }
+  }
+}
+/* eslint-enable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-namespace */
+
 const emptyStringToUndefined = (value: unknown): unknown => {
   if (typeof value === "string" && value.trim() === "") {
     return undefined;
@@ -63,8 +93,12 @@ function formatEnvError(error: z.ZodError): string {
     .join("; ");
 }
 
-function parseEnv<TSchema extends z.ZodType>(schema: TSchema, label: string): z.infer<TSchema> {
-  const result = schema.safeParse(process.env);
+function parseEnv<TSchema extends z.ZodType>(
+  schema: TSchema,
+  label: string,
+  input: unknown,
+): z.infer<TSchema> {
+  const result = schema.safeParse(input);
 
   if (!result.success) {
     throw new Error(
@@ -83,20 +117,63 @@ let cachedPublicEnv: PublicEnv | undefined;
 let cachedSanityPublicEnv: SanityPublicEnv | undefined;
 let cachedServerEnv: ServerEnv | undefined;
 
+function getSanityPublicEnvInput(): Record<keyof SanityPublicEnv, string | undefined> {
+  return {
+    NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+    NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  };
+}
+
+function getPublicEnvInput(): Record<keyof PublicEnv, string | undefined> {
+  return {
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
+    NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY,
+    NEXT_PUBLIC_MEDUSA_BACKEND_URL: process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL,
+    NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_MUX_ENV_KEY: process.env.NEXT_PUBLIC_MUX_ENV_KEY,
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+    NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_TERMLY_WEBSITE_UUID: process.env.NEXT_PUBLIC_TERMLY_WEBSITE_UUID,
+  };
+}
+
+function getServerEnvInput(): Record<keyof ServerEnv, string | undefined> {
+  return {
+    ...getPublicEnvInput(),
+    MEDUSA_REVALIDATE_SECRET: process.env.MEDUSA_REVALIDATE_SECRET,
+    REGION_ID: process.env.REGION_ID,
+    SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
+    SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+    SENTRY_DSN: process.env.SENTRY_DSN,
+    SENTRY_ORG: process.env.SENTRY_ORG,
+    SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+  };
+}
+
 export function getPublicEnv(): PublicEnv {
-  cachedPublicEnv ??= parseEnv(publicEnvSchema, "public");
+  cachedPublicEnv ??= parseEnv(publicEnvSchema, "public", getPublicEnvInput());
 
   return cachedPublicEnv;
 }
 
 export function getSanityPublicEnv(): SanityPublicEnv {
-  cachedSanityPublicEnv ??= parseEnv(sanityPublicEnvSchema, "Sanity public");
+  cachedSanityPublicEnv ??= parseEnv(
+    sanityPublicEnvSchema,
+    "Sanity public",
+    getSanityPublicEnvInput(),
+  );
 
   return cachedSanityPublicEnv;
 }
 
 export function getServerEnv(): ServerEnv {
-  cachedServerEnv ??= parseEnv(serverEnvSchema, "server");
+  cachedServerEnv ??= parseEnv(serverEnvSchema, "server", getServerEnvInput());
 
   return cachedServerEnv;
 }

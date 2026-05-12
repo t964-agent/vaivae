@@ -46,6 +46,7 @@ const HERO_EXIT_END = 0.075;
 const WIPE_START = 0.02;
 const WIPE_END = 0.085;
 const WIPE_RADIUS_PEAK = 82;
+const LOADER_MAX_WAIT_MS = 1800;
 
 const sectionInitialStates = {
   "clip-reveal": { opacity: 0, rotation: 0, scale: 1, x: 0, y: 50 },
@@ -202,6 +203,17 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
   const motionEnabled = !reduceMotion;
   const [loaderProgress, setLoaderProgress] = useState(motionEnabled ? 0 : 1);
   const [loaderHidden, setLoaderHidden] = useState(!motionEnabled);
+  const hasMarkedReadyRef = useRef(false);
+  const markReady = useCallback(() => {
+    if (hasMarkedReadyRef.current) {
+      return;
+    }
+
+    hasMarkedReadyRef.current = true;
+    setLoaderProgress(1);
+    setLoaderHidden(true);
+    onReady?.();
+  }, [onReady]);
   const handleCaptureProgress = useCallback((progress: number) => {
     setLoaderProgress(Math.min(1, Math.max(0, progress)));
   }, []);
@@ -214,7 +226,7 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
 
   useEffect(() => {
     if (!motionEnabled) {
-      onReady?.();
+      markReady();
       return;
     }
 
@@ -223,13 +235,21 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
     }
 
     const hideTimer = window.setTimeout(() => {
-      setLoaderProgress(1);
-      setLoaderHidden(true);
-      onReady?.();
+      markReady();
     }, 250);
 
     return () => window.clearTimeout(hideTimer);
-  }, [frameCapture.ready, motionEnabled, onReady]);
+  }, [frameCapture.ready, markReady, motionEnabled]);
+
+  useEffect(() => {
+    if (!motionEnabled || loaderHidden) {
+      return;
+    }
+
+    const fallbackTimer = window.setTimeout(markReady, LOADER_MAX_WAIT_MS);
+
+    return () => window.clearTimeout(fallbackTimer);
+  }, [loaderHidden, markReady, motionEnabled]);
 
   useEffect(() => {
     if (!motionEnabled || !frameCapture.ready) {

@@ -15,6 +15,7 @@ type FrameSample = {
 type UseFrameCaptureCanvasOptions = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   enabled: boolean;
+  maxCaptureDurationMs?: number | undefined;
   onProgress?: ((progress: number) => void) | undefined;
   targetFrames?: number | undefined;
   videoEnd?: number | undefined;
@@ -22,8 +23,10 @@ type UseFrameCaptureCanvasOptions = {
   videoStart?: number | undefined;
 };
 
-const DEFAULT_TARGET_FRAMES = 120;
-const MAX_CAPTURE_WIDTH = 1280;
+const DEFAULT_TARGET_FRAMES = 48;
+const DEFAULT_MAX_CAPTURE_DURATION_MS = 2400;
+const MAX_CAPTURE_WIDTH = 960;
+const MIN_SAMPLE_INTERVAL_SECONDS = 0.06;
 
 function clamp01(value: number): number {
   if (value < 0) {
@@ -54,6 +57,7 @@ function waitForMetadata(video: HTMLVideoElement): Promise<void> {
 export function useFrameCaptureCanvas({
   canvasRef,
   enabled,
+  maxCaptureDurationMs = DEFAULT_MAX_CAPTURE_DURATION_MS,
   onProgress,
   targetFrames = DEFAULT_TARGET_FRAMES,
   videoEnd = 0.92,
@@ -124,7 +128,7 @@ export function useFrameCaptureCanvas({
     let frameCallbackHandle = 0;
 
     const closeFrames = () => {
-      for (const frame of framesRef.current) {
+      for (const frame of new Set(framesRef.current)) {
         frame.close();
       }
 
@@ -238,7 +242,7 @@ export function useFrameCaptureCanvas({
           const time = video.currentTime;
 
           if (
-            time === lastTime ||
+            time - lastTime < MIN_SAMPLE_INTERVAL_SECONDS ||
             time <= 0 ||
             video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA
           ) {
@@ -281,7 +285,7 @@ export function useFrameCaptureCanvas({
           window.requestAnimationFrame(tick);
         }
 
-        window.setTimeout(stop, (duration + 1) * 1000);
+        window.setTimeout(stop, Math.min((duration + 1) * 1000, maxCaptureDurationMs));
       });
 
       try {
@@ -328,8 +332,12 @@ export function useFrameCaptureCanvas({
         return;
       }
 
-      for (let index = 0; index < targetFrames; index += 1) {
-        const targetTime = (index / (targetFrames - 1)) * duration;
+      const capturedDuration = resolved[resolved.length - 1]?.time ?? duration;
+      const targetFrameCount = Math.max(1, targetFrames);
+      const targetFrameDenominator = Math.max(1, targetFrameCount - 1);
+
+      for (let index = 0; index < targetFrameCount; index += 1) {
+        const targetTime = (index / targetFrameDenominator) * capturedDuration;
         let best = first;
         let bestDistance = Math.abs(best.time - targetTime);
 
@@ -349,6 +357,14 @@ export function useFrameCaptureCanvas({
         }
 
         frames[index] = best.bitmap;
+      }
+
+      const retainedFrames = new Set(frames);
+
+      for (const sample of resolved) {
+        if (!retainedFrames.has(sample.bitmap)) {
+          sample.bitmap.close();
+        }
       }
 
       framesRef.current = frames;
@@ -374,7 +390,7 @@ export function useFrameCaptureCanvas({
 
       closeFrames();
     };
-  }, [canvasRef, enabled, onProgress, targetFrames, videoRef]);
+  }, [canvasRef, enabled, maxCaptureDurationMs, onProgress, targetFrames, videoRef]);
 
   return { drawFrameForProgress, ready };
 }

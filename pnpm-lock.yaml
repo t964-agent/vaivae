@@ -31,6 +31,9 @@ catalogs:
       specifier: 6.0.3
       version: 6.0.3
 
+patchedDependencies:
+  '@medusajs/promotion@2.14.2': 8ff6c8c726d2f0d103bac2f6b536905eca996bc8ba43f07a20cdbc00f69375ba
+
 importers:
 
   .:
@@ -16478,7 +16481,7 @@ snapshots:
       '@medusajs/payment-stripe': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
       '@medusajs/pricing': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
       '@medusajs/product': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
-      '@medusajs/promotion': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
+      '@medusajs/promotion': 2.14.2(patch_hash=8ff6c8c726d2f0d103bac2f6b536905eca996bc8ba43f07a20cdbc00f69375ba)(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
       '@medusajs/rbac': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
       '@medusajs/region': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
       '@medusajs/sales-channel': 2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))
@@ -16614,7 +16617,7 @@ snapshots:
     dependencies:
       '@medusajs/framework': 2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3)
 
-  '@medusajs/promotion@2.14.2(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))':
+  '@medusajs/promotion@2.14.2(patch_hash=8ff6c8c726d2f0d103bac2f6b536905eca996bc8ba43f07a20cdbc00f69375ba)(@medusajs/framework@2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3))':
     dependencies:
       '@medusajs/framework': 2.14.2(@medusajs/cli@2.14.2(@types/node@24.12.3))(@types/node@24.12.3)(ioredis@5.10.1)(vite@7.3.3(@types/node@24.12.3)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.47.1)(tsx@4.21.0)(yaml@2.8.4))(zod@4.4.3)
 

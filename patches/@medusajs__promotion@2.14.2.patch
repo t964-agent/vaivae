@@ -1,8 +1,8 @@
 diff --git a/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js b/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
-index 4aa8f5f..5ad8a1f 100644
+index 680140cb3655ba7af39b9c5d4173f3eaa8a5a1c6..9923cfd51ea6a1cbdd093d4c768ad3891c2f73e1 100644
 --- a/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
 +++ b/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
-@@ -93,27 +93,10 @@ async function buildPromotionRuleQueryFilterFromContext(context, sharedContext =
+@@ -94,26 +94,10 @@ async function buildPromotionRuleQueryFilterFromContext(context, sharedContext)
          }
      });
      // Handle the case where context has no attributes at all, it means

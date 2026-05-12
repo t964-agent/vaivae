@@ -8,8 +8,12 @@
     "node": "24.15.0"
   },
   "scripts": {
+    "patch:medusa-promotion": "node -e \"const fs=require('node:fs'); const script=fs.existsSync('./src/scripts/patch-medusa-promotion.js') ? './src/scripts/patch-medusa-promotion.js' : './src/scripts/patch-medusa-promotion.cjs'; require(script)\"",
+    "predev": "pnpm run patch:medusa-promotion",
     "dev": "medusa develop",
+    "prebuild": "pnpm run patch:medusa-promotion",
     "build": "node -r ts-node/register -r tsconfig-paths/register -e \"process.argv.push('build'); require('./medusa-config')\" && rm -rf .medusa/server && medusa build && test -f .medusa/server/package.json && test -f .medusa/server/medusa-config.js",
+    "prestart": "pnpm run patch:medusa-promotion",
     "start": "medusa start",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",

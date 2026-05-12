@@ -25,6 +25,11 @@
     "prepare": "husky || true",
     "clean": "turbo run clean && rm -rf node_modules .turbo"
   },
+  "pnpm": {
+    "patchedDependencies": {
+      "@medusajs/promotion@2.14.2": "patches/@medusajs__promotion@2.14.2.patch"
+    }
+  },
   "devDependencies": {
     "turbo": "2.9.12",
     "typescript": "6.0.3",

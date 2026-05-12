@@ -1,0 +1,34 @@
+diff --git a/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js b/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
+index 4aa8f5f..5ad8a1f 100644
+--- a/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
++++ b/dist/utils/compute-actions/build-promotion-rule-query-filter-from-context.js
+@@ -93,27 +93,10 @@ async function buildPromotionRuleQueryFilterFromContext(context, sharedContext =
+         }
+     });
+     // Handle the case where context has no attributes at all, it means
+-    // that any promotion that have a rule cant be satisfied by the context
++    // no rule prefilter can be safely expressed. Medusa 2.14.2's raw SQL
++    // filter is mis-escaped by MikroORM on PostgreSQL in this path.
+     if (attributeValueMap.size === 0) {
+-        // If context has no attributes, exclude all promotions that have any rules (promotion rules, target rules, or buy rules)
+-        const noRulesSubquery = (alias) => `
+-      ${alias}.id NOT IN (
+-        SELECT DISTINCT ppr.promotion_id
+-        FROM promotion_promotion_rule ppr
+-        UNION
+-        SELECT DISTINCT am.promotion_id
+-        FROM promotion_application_method am
+-        JOIN application_method_target_rules amtr ON am.id = amtr.application_method_id
+-        UNION
+-        SELECT DISTINCT am2.promotion_id
+-        FROM promotion_application_method am2
+-        JOIN application_method_buy_rules ambr ON am2.id = ambr.application_method_id
+-      )
+-    `.trim();
+-        return {
+-            [(0, postgresql_1.raw)((alias) => noRulesSubquery(alias))]: true,
+-        };
++        return null;
+     }
+     const joinedConditions = sqlConditions.join(" OR ");
+     const queryEstimatedSize = joinedConditions.length;

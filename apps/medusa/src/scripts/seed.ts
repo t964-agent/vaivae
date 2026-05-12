@@ -19,6 +19,7 @@ type Workflow<TResult> = {
 };
 
 type CoreFlows = {
+  createApiKeysWorkflow(container: ExecArgs["container"]): Workflow<ApiKey[]>;
   createInventoryLevelsWorkflow(container: ExecArgs["container"]): Workflow<unknown>;
   createProductCategoriesWorkflow(container: ExecArgs["container"]): Workflow<ProductCategory[]>;
   createProductsWorkflow(container: ExecArgs["container"]): Workflow<Product[]>;
@@ -28,10 +29,12 @@ type CoreFlows = {
   createShippingProfilesWorkflow(container: ExecArgs["container"]): Workflow<ShippingProfile[]>;
   createStockLocationsWorkflow(container: ExecArgs["container"]): Workflow<StockLocation[]>;
   createTaxRegionsWorkflow(container: ExecArgs["container"]): Workflow<unknown>;
+  linkSalesChannelsToApiKeyWorkflow(container: ExecArgs["container"]): Workflow<unknown>;
   linkSalesChannelsToStockLocationWorkflow(container: ExecArgs["container"]): Workflow<unknown>;
 };
 
 const {
+  createApiKeysWorkflow,
   createInventoryLevelsWorkflow,
   createProductCategoriesWorkflow,
   createProductsWorkflow,
@@ -41,8 +44,21 @@ const {
   createShippingProfilesWorkflow,
   createStockLocationsWorkflow,
   createTaxRegionsWorkflow,
+  linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
 } = require("@medusajs/medusa/core-flows") as CoreFlows;
+
+type ApiKey = {
+  id: string;
+  redacted?: string | null;
+  title: string;
+  token?: string | null;
+  type: "publishable" | "secret";
+};
+
+type ApiKeyModuleService = {
+  listApiKeys(filters?: Record<string, unknown>, config?: { take?: number }): Promise<ApiKey[]>;
+};
 
 type Store = {
   default_location_id?: string | null;
@@ -183,6 +199,7 @@ type InventoryLevelInput = {
 };
 
 type SeedContext = {
+  apiKeyModule: ApiKeyModuleService;
   container: ExecArgs["container"];
   fulfillmentModule: FulfillmentModuleService;
   link: LinkService;
@@ -206,6 +223,7 @@ const PRODUCT_CATEGORY_NAME = "Drop 01";
 const PAYMENT_PROVIDER_ID = "pp_stripe_stripe";
 const TAX_PROVIDER_ID = "tp_system";
 const FULFILLMENT_PROVIDER_ID = "manual_manual";
+const STOREFRONT_API_KEY_TITLE = "Vercel Storefront";
 
 function first<TItem>(items: readonly TItem[], label: string): TItem {
   const item = items[0];
@@ -665,6 +683,57 @@ async function linkSalesChannelToStockLocation(
   }
 }
 
+async function ensurePublishableApiKey(
+  ctx: SeedContext,
+  salesChannel: SalesChannel,
+): Promise<void> {
+  const existing = await ctx.apiKeyModule.listApiKeys(
+    { title: STOREFRONT_API_KEY_TITLE, type: "publishable" },
+    { take: 1 },
+  );
+  let apiKey = existing[0];
+
+  if (apiKey) {
+    ctx.logger.info(`${STOREFRONT_API_KEY_TITLE} publishable key already exists.`);
+  } else {
+    const { result } = await createApiKeysWorkflow(ctx.container).run({
+      input: {
+        api_keys: [
+          {
+            created_by: "drop-01-seed",
+            title: STOREFRONT_API_KEY_TITLE,
+            type: "publishable",
+          },
+        ],
+      },
+    });
+
+    apiKey = first(result, "created storefront publishable API key");
+  }
+
+  try {
+    await linkSalesChannelsToApiKeyWorkflow(ctx.container).run({
+      input: { add: [salesChannel.id], id: apiKey.id, remove: [] },
+    });
+  } catch (error: unknown) {
+    if (isDuplicateLinkError(error)) {
+      ctx.logger.info("Storefront publishable key sales channel link already exists; skipping.");
+    } else {
+      throw error;
+    }
+  }
+
+  const token = apiKey.token?.trim();
+
+  if (token) {
+    ctx.logger.info(`Storefront publishable API key token: ${token}`);
+  } else if (apiKey.redacted) {
+    ctx.logger.warn(
+      `Storefront publishable API key exists as ${apiKey.redacted}, but Medusa did not return its full token. Copy it from Medusa Admin if needed.`,
+    );
+  }
+}
+
 function hasInventoryLevelAtLocation(item: InventoryItem, stockLocation: StockLocation): boolean {
   return (item.location_levels ?? []).some((level) => level.location_id === stockLocation.id);
 }
@@ -725,6 +794,7 @@ async function ensureInventoryLevels(
 
 async function seed({ container }: ExecArgs): Promise<void> {
   const ctx: SeedContext = {
+    apiKeyModule: container.resolve<ApiKeyModuleService>(Modules.API_KEY),
     container,
     fulfillmentModule: container.resolve<FulfillmentModuleService>(Modules.FULFILLMENT),
     link: container.resolve<LinkService>(ContainerRegistrationKeys.LINK),
@@ -762,6 +832,7 @@ async function seed({ container }: ExecArgs): Promise<void> {
   const category = await ensureProductCategory(ctx);
   await ensureProducts(ctx, salesChannel, shippingProfile, category);
   await ensureInventoryLevels(ctx, stockLocation);
+  await ensurePublishableApiKey(ctx, salesChannel);
 
   ctx.logger.info("Drop 01 seed complete.");
 }

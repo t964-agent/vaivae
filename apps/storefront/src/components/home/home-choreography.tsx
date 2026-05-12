@@ -46,6 +46,8 @@ const HERO_EXIT_END = 0.075;
 const WIPE_START = 0.02;
 const WIPE_END = 0.085;
 const WIPE_RADIUS_PEAK = 82;
+const VIDEO_START = 0.02;
+const VIDEO_END = 0.945;
 
 const sectionInitialStates = {
   "clip-reveal": { opacity: 0, rotation: 0, scale: 1, x: 0, y: 50 },
@@ -219,6 +221,8 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
     canvasRef,
     enabled: motionEnabled,
     onProgress: handleCaptureProgress,
+    videoEnd: VIDEO_END,
+    videoStart: VIDEO_START,
   });
 
   useEffect(() => {
@@ -361,27 +365,8 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
         }
       };
 
-      const hideFixedLayers = () => {
-        gsap.set(
-          [hero, videoWrap, marquee, ...Array.from(root.querySelectorAll(".home-scroll-section"))],
-          {
-            autoAlpha: 0,
-          },
-        );
-      };
-
-      const showFixedLayers = () => {
-        gsap.set(
-          [hero, videoWrap, marquee, ...Array.from(root.querySelectorAll(".home-scroll-section"))],
-          { visibility: "visible" },
-        );
-        gsap.set([videoWrap], { opacity: 1 });
-      };
-
       const trigger = ScrollTrigger.create({
         end: "bottom bottom",
-        onEnterBack: showFixedLayers,
-        onLeave: hideFixedLayers,
         onUpdate: (self) => {
           const progress = self.progress;
 

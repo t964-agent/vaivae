@@ -18,6 +18,9 @@ type UseImageSequenceCanvasOptions = {
 };
 
 const BACKGROUND_WORKERS = 4;
+const EAGER_FRAME_INTERVAL = 8;
+const EAGER_START_FRAME_COUNT = 24;
+const EAGER_WORKERS = 4;
 
 function clamp01(value: number): number {
   if (value < 0) {
@@ -39,32 +42,43 @@ function selectSequence(): HomeHeroSequence {
   return HOME_HERO_SEQUENCE.desktop;
 }
 
-function createFrameLoadOrder(frameCount: number): number[] {
-  const order: number[] = [];
+function createFrameLoadPlan(frameCount: number): { background: number[]; eager: number[] } {
+  const eager: number[] = [];
+  const background: number[] = [];
   const seen = new Set<number>();
-  const add = (index: number) => {
+  const addEager = (index: number) => {
     if (index < 0 || index >= frameCount || seen.has(index)) {
       return;
     }
 
     seen.add(index);
-    order.push(index);
+    eager.push(index);
   };
-  const eagerFrameCount = Math.min(18, frameCount);
+  const addBackground = (index: number) => {
+    if (index < 0 || index >= frameCount || seen.has(index)) {
+      return;
+    }
 
-  for (let index = 0; index < eagerFrameCount; index += 1) {
-    add(index);
+    seen.add(index);
+    background.push(index);
+  };
+  const eagerStartFrames = Math.min(EAGER_START_FRAME_COUNT, frameCount);
+
+  for (let index = 0; index < eagerStartFrames; index += 1) {
+    addEager(index);
   }
 
-  for (let index = 0; index < frameCount; index += 6) {
-    add(index);
+  addEager(frameCount - 1);
+
+  for (let index = 0; index < frameCount; index += EAGER_FRAME_INTERVAL) {
+    addEager(index);
   }
 
   for (let index = 0; index < frameCount; index += 1) {
-    add(index);
+    addBackground(index);
   }
 
-  return order;
+  return { background, eager };
 }
 
 function waitForImage(image: HTMLImageElement): Promise<void> {
@@ -123,7 +137,7 @@ export function useImageSequenceCanvas({
   canvasRef,
   enabled,
   onProgress,
-  videoEnd = 0.92,
+  videoEnd = 0.945,
   videoStart = 0.02,
 }: UseImageSequenceCanvasOptions) {
   const [ready, setReady] = useState(!enabled);
@@ -287,9 +301,37 @@ export function useImageSequenceCanvas({
       }
     };
 
+    const loadFrameQueue = async (
+      queue: number[],
+      workerCount: number,
+      onFrameLoaded?: (() => void) | undefined,
+    ) => {
+      let nextOrderIndex = 0;
+      const workers = Array.from({ length: Math.min(workerCount, queue.length) }, async () => {
+        while (!cancelled && nextOrderIndex < queue.length) {
+          const frameIndex = queue[nextOrderIndex];
+
+          nextOrderIndex += 1;
+
+          if (frameIndex === undefined || framesRef.current[frameIndex]) {
+            continue;
+          }
+
+          try {
+            await loadAndStoreFrame(frameIndex);
+            onFrameLoaded?.();
+          } catch {
+            // Missing frames degrade to the nearest loaded frame during scrub.
+          }
+        }
+      });
+
+      await Promise.all(workers);
+    };
+
     const loadSequence = async () => {
-      const order = createFrameLoadOrder(sequence.frameCount);
-      const firstFrame = order.shift();
+      const { background, eager } = createFrameLoadPlan(sequence.frameCount);
+      const firstFrame = eager.shift();
 
       if (firstFrame === undefined) {
         markReady();
@@ -311,29 +353,22 @@ export function useImageSequenceCanvas({
       }
 
       drawFrame(0);
-      markReady();
+      onProgress?.(0.16);
 
-      let nextOrderIndex = 0;
-      const workerCount = Math.min(BACKGROUND_WORKERS, order.length);
-      const workers = Array.from({ length: workerCount }, async () => {
-        while (!cancelled && nextOrderIndex < order.length) {
-          const frameIndex = order[nextOrderIndex];
+      let loadedEagerFrames = 0;
+      const totalEagerFrames = Math.max(1, eager.length);
 
-          nextOrderIndex += 1;
-
-          if (frameIndex === undefined || framesRef.current[frameIndex]) {
-            continue;
-          }
-
-          try {
-            await loadAndStoreFrame(frameIndex);
-          } catch {
-            // Missing frames degrade to the nearest loaded frame during scrub.
-          }
-        }
+      await loadFrameQueue(eager, EAGER_WORKERS, () => {
+        loadedEagerFrames += 1;
+        onProgress?.(0.16 + 0.78 * Math.min(1, loadedEagerFrames / totalEagerFrames));
       });
 
-      await Promise.all(workers);
+      if (cancelled) {
+        return;
+      }
+
+      markReady();
+      await loadFrameQueue(background, BACKGROUND_WORKERS);
     };
 
     drawFrameRef.current = drawFrame;

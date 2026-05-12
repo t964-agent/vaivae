@@ -10,14 +10,14 @@ export const HOME_HERO_SEQUENCE_MEDIA_QUERY = "(max-width: 767px), (orientation:
 
 export const HOME_HERO_SEQUENCE = {
   desktop: {
-    frameCount: 144,
-    frameHeight: 810,
+    frameCount: 193,
+    frameHeight: 1080,
     framePath: "/home/hero-sequence/desktop/frame-",
-    frameWidth: 1440,
+    frameWidth: 1920,
     poster: "/home/hero-sequence/poster-desktop.webp",
   },
   mobile: {
-    frameCount: 144,
+    frameCount: 193,
     frameHeight: 1280,
     framePath: "/home/hero-sequence/mobile/frame-",
     frameWidth: 720,

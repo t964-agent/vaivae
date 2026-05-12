@@ -23,28 +23,30 @@ rm -f "${DESKTOP_DIR}"/frame-*.webp "${MOBILE_DIR}"/frame-*.webp
 # centered portrait crop so phones do not download the desktop sequence.
 ffmpeg -hide_banner -loglevel error -y \
   -i "${SOURCE}" \
-  -vf "fps=18,scale=1440:-2:flags=lanczos" \
-  -c:v libwebp -quality 82 -compression_level 5 \
+  -vf "scale=1920:-2:flags=lanczos" \
+  -fps_mode passthrough \
+  -c:v libwebp -preset picture -quality 95 -compression_level 6 \
   "${DESKTOP_DIR}/frame-%04d.webp"
 
 ffmpeg -hide_banner -loglevel error -y \
   -i "${SOURCE}" \
-  -vf "fps=18,scale=720:1280:force_original_aspect_ratio=increase:flags=lanczos,crop=720:1280" \
-  -c:v libwebp -quality 80 -compression_level 5 \
+  -vf "scale=720:1280:force_original_aspect_ratio=increase:flags=lanczos,crop=720:1280" \
+  -fps_mode passthrough \
+  -c:v libwebp -preset picture -quality 82 -compression_level 5 \
   "${MOBILE_DIR}/frame-%04d.webp"
 
 ffmpeg -hide_banner -loglevel error -y \
   -i "${SOURCE}" \
   -frames:v 1 \
-  -vf "scale=1440:-2:flags=lanczos" \
-  -c:v libwebp -quality 84 -compression_level 5 \
+  -vf "scale=1920:-2:flags=lanczos" \
+  -c:v libwebp -preset picture -quality 95 -compression_level 6 \
   "${OUTPUT_DIR}/poster-desktop.webp"
 
 ffmpeg -hide_banner -loglevel error -y \
   -i "${SOURCE}" \
   -frames:v 1 \
   -vf "scale=720:1280:force_original_aspect_ratio=increase:flags=lanczos,crop=720:1280" \
-  -c:v libwebp -quality 82 -compression_level 5 \
+  -c:v libwebp -preset picture -quality 82 -compression_level 5 \
   "${OUTPUT_DIR}/poster-mobile.webp"
 
 desktop_frames=("${DESKTOP_DIR}"/frame-*.webp)

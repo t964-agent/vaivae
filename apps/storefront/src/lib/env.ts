@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/* eslint-disable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-namespace -- NodeJS.ProcessEnv augmentation requires this shape. */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- NodeJS.ProcessEnv augmentation requires this shape. */
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -28,7 +28,7 @@ declare global {
     }
   }
 }
-/* eslint-enable @typescript-eslint/consistent-type-definitions, @typescript-eslint/no-namespace */
+/* eslint-enable @typescript-eslint/consistent-type-definitions */
 
 const emptyStringToUndefined = (value: unknown): unknown => {
   if (typeof value === "string" && value.trim() === "") {

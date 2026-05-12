@@ -73,6 +73,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
   const termlyWebsiteUuid = getTermlyWebsiteUuid();
   const vercelAnalyticsEnabled = isVercelAnalyticsEnabled();
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
+  const isHome = requestHeaders.get("x-pathname") === "/";
 
   return (
     <div
@@ -95,7 +96,7 @@ export default async function SiteLayout({ children }: SiteLayoutProps) {
             <main className="min-h-dvh" id="main-content">
               {children}
             </main>
-            <SiteFooter />
+            {isHome ? null : <SiteFooter />}
           </NuqsAdapter>
           <CartDrawer initialCart={cart} key={cart?.id ?? "empty-cart"} />
           <Toaster

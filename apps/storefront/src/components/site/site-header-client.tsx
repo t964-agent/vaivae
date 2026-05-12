@@ -100,10 +100,9 @@ export function SiteHeaderClient({
   const openCart = useCartUiStore((store) => store.open);
   const reduceMotion = useReducedMotion() === true;
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [pastHero, setPastHero] = useState(false);
   const [visibleCartItemCount, setVisibleCartItemCount] = useState(cartItemCount);
   const isHome = pathname === "/";
-  const isSolid = !isHome || pastHero;
+  const isSolid = !isHome;
   const headerLinks = getUsableLinks(navigation?.headerLinks);
   const mobileExtras = getUsableLinks(navigation?.mobileMenuExtras);
   const primaryLinks = headerLinks.length > 0 ? headerLinks : fallbackHeaderLinks;
@@ -125,39 +124,6 @@ export function SiteHeaderClient({
       window.removeEventListener(CART_UPDATED_EVENT, handleCartUpdated);
     };
   }, []);
-
-  useEffect(() => {
-    if (!isHome) {
-      return;
-    }
-
-    let frame = 0;
-
-    const update = () => {
-      frame = 0;
-      setPastHero(window.scrollY >= window.innerHeight - 80);
-    };
-    const scheduleUpdate = () => {
-      if (frame) {
-        return;
-      }
-
-      frame = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-
-    return () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-      }
-
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-    };
-  }, [isHome]);
 
   return (
     <header

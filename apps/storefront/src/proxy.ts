@@ -156,6 +156,7 @@ export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   const nonce = createNonce();
   requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
 
   const response = NextResponse.next({
     request: {

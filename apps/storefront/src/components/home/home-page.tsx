@@ -1,8 +1,5 @@
 import type { PortableTextBlock } from "@portabletext/types";
 
-import { PageBuilder } from "@/components/page-builder/page-builder";
-import { resolvePageBuilderContext } from "@/components/page-builder/context";
-import type { PageBuilderModule } from "@/components/page-builder/types";
 import { resolveChromeLink } from "@/components/site/site-link";
 import { homePageQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
@@ -200,15 +197,7 @@ export async function HomePage() {
   const homePage = await getHomePageData();
   const modules = homePage?.pageBuilder ?? [];
   const hero = modules.find(isHeroFilmModule);
-  const tailModules = modules.filter((module) => !isHeroFilmModule(module));
-  const pageBuilderModules = tailModules as PageBuilderModule[];
-  const context = await resolvePageBuilderContext(pageBuilderModules);
   const content = normalizeHomeContent(hero);
 
-  return (
-    <>
-      <HomeChoreographyLoader content={content} />
-      <PageBuilder context={context} modules={pageBuilderModules} />
-    </>
-  );
+  return <HomeChoreographyLoader content={content} />;
 }

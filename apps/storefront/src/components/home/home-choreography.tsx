@@ -21,7 +21,7 @@ import {
   type HomeScrollAnimation,
 } from "./home-server-fallback";
 import { HomeVideoStage } from "./home-video-stage";
-import { useFrameCaptureCanvas } from "./hooks/use-frame-capture-canvas";
+import { useImageSequenceCanvas } from "./hooks/use-image-sequence-canvas";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -196,7 +196,6 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
   const heroRef = useRef<HTMLElement | null>(null);
   const videoWrapRef = useRef<HTMLDivElement | null>(null);
   const marqueeRef = useRef<HTMLDivElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const reduceMotion = useReducedMotion() === true;
   const motionEnabled = !reduceMotion;
@@ -216,12 +215,28 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
   const handleCaptureProgress = useCallback((progress: number) => {
     setLoaderProgress(Math.min(1, Math.max(0, progress)));
   }, []);
-  const frameCapture = useFrameCaptureCanvas({
+  const imageSequence = useImageSequenceCanvas({
     canvasRef,
-    enabled: motionEnabled && Boolean(content.hero.playbackId),
+    enabled: motionEnabled,
     onProgress: handleCaptureProgress,
-    videoRef,
   });
+
+  useEffect(() => {
+    if (loaderHidden) {
+      return;
+    }
+
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [loaderHidden]);
 
   useEffect(() => {
     if (!motionEnabled) {
@@ -229,7 +244,7 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
       return;
     }
 
-    if (!frameCapture.ready) {
+    if (!imageSequence.ready) {
       return;
     }
 
@@ -238,10 +253,10 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
     }, 250);
 
     return () => window.clearTimeout(hideTimer);
-  }, [frameCapture.ready, markReady, motionEnabled]);
+  }, [imageSequence.ready, markReady, motionEnabled]);
 
   useEffect(() => {
-    if (!motionEnabled || !frameCapture.ready) {
+    if (!motionEnabled || !imageSequence.ready) {
       return;
     }
 
@@ -262,11 +277,11 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
     };
-  }, [frameCapture.ready, motionEnabled]);
+  }, [imageSequence.ready, motionEnabled]);
 
   useGSAP(
     () => {
-      if (!motionEnabled || !frameCapture.ready) {
+      if (!motionEnabled || !imageSequence.ready) {
         return;
       }
 
@@ -371,7 +386,7 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
           const progress = self.progress;
 
           updateHeroAndWipe(progress);
-          frameCapture.drawFrameForProgress(progress);
+          imageSequence.drawFrameForProgress(progress);
           updateMarquee(progress);
           sectionUpdaters.forEach((update) => update(progress));
         },
@@ -394,7 +409,7 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
         window.removeEventListener("load", refreshOnLoad);
       };
     },
-    { dependencies: [frameCapture.ready, motionEnabled], scope: rootRef },
+    { dependencies: [imageSequence.ready, motionEnabled], scope: rootRef },
   );
 
   if (reduceMotion) {
@@ -412,13 +427,7 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
     >
       <HomeLoader hidden={loaderHidden} progress={loaderProgress} />
       <HomeHero content={content.hero} ref={heroRef} />
-      <HomeVideoStage
-        ref={videoWrapRef}
-        canvasRef={canvasRef}
-        playbackId={content.hero.playbackId}
-        posterUrl={content.hero.posterUrl}
-        videoRef={videoRef}
-      />
+      <HomeVideoStage ref={videoWrapRef} canvasReady={imageSequence.ready} canvasRef={canvasRef} />
       <HomeMarquee content={content.marquee} ref={marqueeRef} />
       <HomeCursorLens disabled={!motionEnabled} />
       <div ref={scrollContainerRef} className="relative z-[2] h-[900vh] w-full max-md:h-[600vh]">

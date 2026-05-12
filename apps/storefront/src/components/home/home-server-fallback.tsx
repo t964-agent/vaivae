@@ -10,8 +10,6 @@ import { renderEmphasisText } from "../page-builder/utils";
 export type HomeHeroContent = {
   eyebrow: string;
   heading: string;
-  playbackId?: string | undefined;
-  posterUrl?: string | undefined;
   scrollIndicator: boolean;
   subhead: string;
 };

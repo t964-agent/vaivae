@@ -21,6 +21,7 @@
     "sanity:dev": "sanity dev",
     "sanity:deploy": "sanity deploy",
     "sanity:seed": "tsx ./src/scripts/sanity-seed.ts",
+    "hero:sequence": "bash ./scripts/generate-home-hero-sequence.sh",
     "clean": "rm -rf .next .turbo node_modules"
   },
   "dependencies": {

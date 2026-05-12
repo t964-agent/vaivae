@@ -116,24 +116,10 @@ function cleanText(value: string | null | undefined): string | null {
   return trimmed && trimmed.length > 0 ? trimmed : null;
 }
 
-function getPlaybackId(hero: HomeHeroFilmModule | null | undefined): string | undefined {
-  if (hero?.media?.sourceType !== "mux") {
-    return undefined;
-  }
-
-  return cleanText(hero.media.muxPlaybackId) ?? undefined;
-}
-
-function getPosterUrl(hero: HomeHeroFilmModule | null | undefined): string | undefined {
-  return cleanText(hero?.media?.posterImage?.asset?.url) ?? undefined;
-}
-
 function getHeroContent(hero: HomeHeroFilmModule | null | undefined): HomeHeroContent {
   return {
     eyebrow: cleanText(hero?.eyebrow) ?? FALLBACK_HERO.eyebrow,
     heading: cleanText(hero?.heading) ?? FALLBACK_HERO.heading,
-    playbackId: getPlaybackId(hero),
-    posterUrl: getPosterUrl(hero),
     scrollIndicator: hero?.scrollIndicator ?? FALLBACK_HERO.scrollIndicator,
     subhead: cleanText(hero?.subhead) ?? FALLBACK_HERO.subhead,
   };

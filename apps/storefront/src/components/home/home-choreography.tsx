@@ -46,7 +46,6 @@ const HERO_EXIT_END = 0.075;
 const WIPE_START = 0.02;
 const WIPE_END = 0.085;
 const WIPE_RADIUS_PEAK = 82;
-const LOADER_MAX_WAIT_MS = 1800;
 
 const sectionInitialStates = {
   "clip-reveal": { opacity: 0, rotation: 0, scale: 1, x: 0, y: 50 },
@@ -242,16 +241,6 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
   }, [frameCapture.ready, markReady, motionEnabled]);
 
   useEffect(() => {
-    if (!motionEnabled || loaderHidden) {
-      return;
-    }
-
-    const fallbackTimer = window.setTimeout(markReady, LOADER_MAX_WAIT_MS);
-
-    return () => window.clearTimeout(fallbackTimer);
-  }, [loaderHidden, markReady, motionEnabled]);
-
-  useEffect(() => {
     if (!motionEnabled || !frameCapture.ready) {
       return;
     }
@@ -367,7 +356,11 @@ export function HomeChoreography({ content, onReady }: HomeChoreographyProps) {
       };
 
       const showFixedLayers = () => {
-        gsap.set([videoWrap], { autoAlpha: 1 });
+        gsap.set(
+          [hero, videoWrap, marquee, ...Array.from(root.querySelectorAll(".home-scroll-section"))],
+          { visibility: "visible" },
+        );
+        gsap.set([videoWrap], { opacity: 1 });
       };
 
       const trigger = ScrollTrigger.create({

@@ -23,10 +23,9 @@ type UseFrameCaptureCanvasOptions = {
   videoStart?: number | undefined;
 };
 
-const DEFAULT_TARGET_FRAMES = 48;
-const DEFAULT_MAX_CAPTURE_DURATION_MS = 2400;
-const MAX_CAPTURE_WIDTH = 960;
-const MIN_SAMPLE_INTERVAL_SECONDS = 0.06;
+const DEFAULT_TARGET_FRAMES = 120;
+const DEFAULT_MAX_CAPTURE_DURATION_MS = 12_000;
+const MAX_CAPTURE_WIDTH = 1280;
 
 function clamp01(value: number): number {
   if (value < 0) {
@@ -242,7 +241,7 @@ export function useFrameCaptureCanvas({
           const time = video.currentTime;
 
           if (
-            time - lastTime < MIN_SAMPLE_INTERVAL_SECONDS ||
+            time === lastTime ||
             time <= 0 ||
             video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA
           ) {
@@ -332,12 +331,11 @@ export function useFrameCaptureCanvas({
         return;
       }
 
-      const capturedDuration = resolved[resolved.length - 1]?.time ?? duration;
       const targetFrameCount = Math.max(1, targetFrames);
       const targetFrameDenominator = Math.max(1, targetFrameCount - 1);
 
       for (let index = 0; index < targetFrameCount; index += 1) {
-        const targetTime = (index / targetFrameDenominator) * capturedDuration;
+        const targetTime = (index / targetFrameDenominator) * duration;
         let best = first;
         let bestDistance = Math.abs(best.time - targetTime);
 

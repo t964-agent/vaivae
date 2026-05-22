@@ -1,5 +1,5 @@
 import { LinkIcon } from "@sanity/icons";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 const INTERNAL_LINK_TYPES = [
   { type: "siteSettings" },
@@ -8,7 +8,6 @@ const INTERNAL_LINK_TYPES = [
   { type: "page" },
   { type: "lookbook" },
   { type: "journal" },
-  { type: "capsule" },
   { type: "legal" },
 ];
 
@@ -112,6 +111,13 @@ export const link = defineType({
       name: "targetBlank",
       title: "Open in new tab",
       type: "boolean",
+    }),
+    defineField({
+      description: "Optional nested links for header dropdowns.",
+      name: "children",
+      of: [defineArrayMember({ type: "link" })],
+      title: "Sub-links",
+      type: "array",
     }),
   ],
   icon: LinkIcon,

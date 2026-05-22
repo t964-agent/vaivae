@@ -186,19 +186,6 @@ _type == "productRail" => {
     ${ctaFragment}
   }
 },
-_type == "capsuleRail" => {
-  eyebrow,
-  heading,
-  "capsules": array::compact(capsules[]->{
-    _id,
-    _type,
-    title,
-    "slug": slug.current
-  }),
-  cta{
-    ${ctaFragment}
-  }
-},
 _type == "editorialExcerpt" => {
   journalEntry->{
     _id,
@@ -430,7 +417,26 @@ export const navigationQuery = defineQuery(`*[_type == "navigation" && _id == "n
       "slug": slug.current
     },
     href,
-    targetBlank
+    targetBlank,
+    children[]{
+      _key,
+      _type,
+      type,
+      label,
+      internal{
+        _ref,
+        _type,
+        _weak
+      },
+      "internalTarget": internal->{
+        _id,
+        _type,
+        "title": coalesce(siteName, title, name),
+        "slug": slug.current
+      },
+      href,
+      targetBlank
+    }
   },
   secondaryLinks[]{
     _key,
@@ -708,16 +714,6 @@ export const lookbookByHandleQuery =
   coverVideo{
     muxAssetId
   },
-  seasonOrDrop->{
-    _id,
-    _type,
-    title,
-    "slug": slug.current,
-    eyebrow,
-    coverImage{
-      ${imageFragment}
-    }
-  },
   description[]{
     ${portableTextFragment}
   },
@@ -801,52 +797,6 @@ export const journalListQuery = defineQuery(`*[_type == "journal"] | order(publi
   tags,
   author,
   publishedAt
-}`);
-
-export const capsuleByHandleQuery =
-  defineQuery(`*[_type == "capsule" && slug.current == $handle][0]{
-  _id,
-  _type,
-  _createdAt,
-  _updatedAt,
-  _rev,
-  title,
-  "slug": slug.current,
-  eyebrow,
-  description[]{
-    ${portableTextFragment}
-  },
-  coverImage{
-    ${imageFragment}
-  },
-  coverVideo{
-    muxAssetId
-  },
-  pageBuilder[]{
-    ${pageBuilderFragment}
-  },
-  "products": array::compact(products[]->{
-    ${productReferenceFragment}
-  }),
-  seo{
-    ${seoFragment}
-  },
-  releaseDate,
-  endDate
-}`);
-
-export const capsuleListQuery =
-  defineQuery(`*[_type == "capsule"] | order(coalesce(releaseDate, _createdAt) desc){
-  _id,
-  _type,
-  title,
-  "slug": slug.current,
-  eyebrow,
-  coverImage{
-    ${imageFragment}
-  },
-  releaseDate,
-  endDate
 }`);
 
 export const legalBySlugQuery = defineQuery(`*[_type == "legal" && slug.current == $slug][0]{
@@ -1022,7 +972,26 @@ export const globalQuery = defineQuery(`{
         "slug": slug.current
       },
       href,
-      targetBlank
+      targetBlank,
+      children[]{
+        _key,
+        _type,
+        type,
+        label,
+        internal{
+          _ref,
+          _type,
+          _weak
+        },
+        "internalTarget": internal->{
+          _id,
+          _type,
+          "title": coalesce(siteName, title, name),
+          "slug": slug.current
+        },
+        href,
+        targetBlank
+      }
     },
     secondaryLinks[]{
       _key,

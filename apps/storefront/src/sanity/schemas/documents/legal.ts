@@ -18,7 +18,6 @@ const reservedLegalSlugs = new Set<string>([
   "account",
   "api",
   "accessibility",
-  "capsule",
   "cart",
   "checkout",
   "collections",

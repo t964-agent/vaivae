@@ -6,15 +6,7 @@ import { cn } from "@/lib/utils";
 
 type ChromeInternalTarget = {
   _id: string;
-  _type:
-    | "capsule"
-    | "homePage"
-    | "journal"
-    | "legal"
-    | "lookbook"
-    | "page"
-    | "product"
-    | "siteSettings";
+  _type: "homePage" | "journal" | "legal" | "lookbook" | "page" | "product" | "siteSettings";
   title: string | null;
   slug: string | null;
 };
@@ -22,12 +14,29 @@ type ChromeInternalTarget = {
 export type ChromeLink = {
   _key?: string;
   _type: "link";
+  children?: ChromeLink[] | null;
   type: "external" | "internal" | null;
   label: string | null;
   internalTarget: ChromeInternalTarget | null;
   href: string | null;
   targetBlank: boolean | null;
 };
+
+const sameSiteHosts = new Set(["vaivae.com", "www.vaivae.com", "vaivae.vercel.app"]);
+
+function normalizeSameSiteHref(href: string): string {
+  try {
+    const url = new URL(href);
+
+    if (sameSiteHosts.has(url.hostname)) {
+      return `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    return href;
+  }
+
+  return href;
+}
 
 type ResolvedChromeLink = {
   href: string;
@@ -53,8 +62,6 @@ function routeFromTarget(target: ChromeInternalTarget | null): string | null {
   }
 
   switch (target._type) {
-    case "capsule":
-      return `/capsule/${target.slug}`;
     case "journal":
       return `/journal/${target.slug}`;
     case "legal":
@@ -70,9 +77,13 @@ function routeFromTarget(target: ChromeInternalTarget | null): string | null {
 }
 
 export function resolveChromeLink(link: ChromeLink): ResolvedChromeLink | null {
-  const href = link.href?.trim() ?? "";
+  const href = normalizeSameSiteHref(link.href?.trim() ?? "");
 
   if (link.type === "external" && href) {
+    if (href.startsWith("/") || href.startsWith("#")) {
+      return { href, isExternal: false, targetBlank: false };
+    }
+
     return {
       href,
       isExternal: true,

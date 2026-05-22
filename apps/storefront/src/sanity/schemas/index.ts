@@ -1,4 +1,3 @@
-import { capsule } from "./documents/capsule";
 import { colorSwatch } from "./documents/color-swatch";
 import { journal } from "./documents/journal";
 import { legal } from "./documents/legal";
@@ -14,7 +13,6 @@ import { link } from "./objects/link";
 import { seo } from "./objects/seo";
 import { socialLink } from "./objects/social-link";
 import { brandPromise } from "./pageBuilder/modules/brand-promise";
-import { capsuleRail } from "./pageBuilder/modules/capsule-rail";
 import { ctaSection } from "./pageBuilder/modules/cta-section";
 import { editorialExcerpt } from "./pageBuilder/modules/editorial-excerpt";
 import { heroFilm } from "./pageBuilder/modules/hero-film";
@@ -43,7 +41,6 @@ export const schemaTypes = [
   heroFilm,
   brandPromise,
   productRail,
-  capsuleRail,
   editorialExcerpt,
   lookbookGrid,
   journalRail,
@@ -54,7 +51,6 @@ export const schemaTypes = [
   page,
   lookbook,
   journal,
-  capsule,
   legal,
   product,
   material,

@@ -29,13 +29,24 @@ type SiteHeaderClientProps = {
   navigation: GlobalQueryResult["navigation"];
 };
 
+const COLLECTION_HREF = "/collections/summer-fall-26";
+
 const fallbackHeaderLinks = [
   {
-    _key: "fallback-lookbook",
+    _key: "fallback-ready-to-wear",
     _type: "link",
-    href: "#",
+    href: "/products",
     internalTarget: null,
-    label: "Lookbook",
+    label: "READY-TO-WEAR",
+    targetBlank: false,
+    type: "internal",
+  },
+  {
+    _key: "fallback-collections",
+    _type: "link",
+    href: COLLECTION_HREF,
+    internalTarget: null,
+    label: "COLLECTIONS",
     targetBlank: false,
     type: "internal",
   },
@@ -60,30 +71,99 @@ const fallbackHeaderLinks = [
 ] satisfies ChromeLink[];
 
 function getUsableLinks(links: ChromeLink[] | null | undefined): ChromeLink[] {
-  return links?.filter((link) => Boolean(link.label?.trim() && resolveChromeLink(link))) ?? [];
+  return (
+    links?.filter((link) => {
+      if (!link.label?.trim()) {
+        return false;
+      }
+
+      return Boolean(resolveChromeLink(link) ?? getUsableLinks(link.children).length > 0);
+    }) ?? []
+  );
+}
+
+function normalizeHeaderLabel(label: string | null): string {
+  return label?.trim().replaceAll(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+/**
+ * Normalize legacy CMS labels and force the COLLECTIONS link to point at the
+ * current single collection page. Sub-links are intentionally stripped so the
+ * header renders as a flat, direct link until there are multiple collections.
+ */
+function getPrimaryLinks(links: ChromeLink[]): ChromeLink[] {
+  return links.map((link) => {
+    const label = normalizeHeaderLabel(link.label);
+
+    if (label === "drop 1" || label === "drop 01") {
+      return { ...link, label: "READY-TO-WEAR" };
+    }
+
+    if (label === "lookbook" || label === "collections" || label === "summer fall 26") {
+      return {
+        ...link,
+        children: [],
+        href: COLLECTION_HREF,
+        internalTarget: null,
+        label: "COLLECTIONS",
+        targetBlank: false,
+        type: "internal",
+      };
+    }
+
+    return link;
+  });
 }
 
 function HeaderNavLink({
   className,
   link,
   onClick,
+  variant = "desktop",
 }: {
   className?: string;
   link: ChromeLink;
   onClick?: () => void;
+  variant?: "desktop" | "mobile";
 }) {
   const interactionProps = onClick ? { onClick } : {};
-
-  return (
-    <SiteChromeLink
-      className={cn(
-        "font-body text-xs font-medium tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold",
-        className,
-      )}
-      link={link}
-      {...interactionProps}
-    />
+  const subLinks = getUsableLinks(link.children);
+  const linkClassName = cn(
+    "font-body text-xs font-medium tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold",
+    className,
   );
+
+  if (subLinks.length > 0) {
+    return (
+      <details className={cn("group", variant === "desktop" && "relative")}>
+        <summary className={cn(linkClassName, "flex cursor-pointer list-none items-center gap-2")}>
+          {link.label}
+        </summary>
+        <div
+          className={cn(
+            "grid gap-3",
+            variant === "desktop"
+              ? "absolute top-full left-1/2 z-50 mt-4 min-w-48 -translate-x-1/2 border border-on-light/10 bg-cream p-4 shadow-fine"
+              : "mt-3 border-l border-on-light/10 pl-4",
+          )}
+        >
+          {subLinks.map((subLink) => (
+            <SiteChromeLink
+              className={cn(
+                "font-body text-xs font-medium tracking-[0.16em] text-on-light/65 uppercase underline-offset-4 transition-colors hover:text-on-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold",
+                variant === "mobile" && "text-sm",
+              )}
+              key={subLink._key ?? `${subLink.label}-${subLink.href}`}
+              link={subLink}
+              {...interactionProps}
+            />
+          ))}
+        </div>
+      </details>
+    );
+  }
+
+  return <SiteChromeLink className={linkClassName} link={link} {...interactionProps} />;
 }
 
 function formatCartCount(count: number): string {
@@ -105,7 +185,7 @@ export function SiteHeaderClient({
   const isSolid = !isHome;
   const headerLinks = getUsableLinks(navigation?.headerLinks);
   const mobileExtras = getUsableLinks(navigation?.mobileMenuExtras);
-  const primaryLinks = headerLinks.length > 0 ? headerLinks : fallbackHeaderLinks;
+  const primaryLinks = getPrimaryLinks(headerLinks.length > 0 ? headerLinks : fallbackHeaderLinks);
   const promoEnabled =
     navigation?.promoBannerEnabled === true && Boolean(navigation.promoBannerText?.trim());
 
@@ -207,6 +287,7 @@ export function SiteHeaderClient({
                       key={link._key ?? `${link.label}-${link.href}-mobile`}
                       link={link}
                       onClick={() => setMobileOpen(false)}
+                      variant="mobile"
                     />
                   ))}
                   {mobileExtras.length > 0 ? (

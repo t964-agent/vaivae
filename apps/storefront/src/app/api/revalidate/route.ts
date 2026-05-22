@@ -57,8 +57,6 @@ function getRevalidationTags(document: RevalidationDocument): readonly string[] 
       return withSlugTag("lookbook", document.slug);
     case "journal":
       return withSlugTag("journal", document.slug);
-    case "capsule":
-      return withSlugTag("capsule", document.slug);
     case "legal":
       return withSlugTag("legal", document.slug);
     case "material":

@@ -40,7 +40,7 @@ async function getJournalEntries(): Promise<JournalListQueryResult> {
 export async function generateMetadata({ searchParams }: JournalPageProps): Promise<Metadata> {
   const page = getPageNumber(await searchParams);
   const description =
-    "Field notes from vaïvae: essays, capsule studies, and quiet records from the studio.";
+    "Field notes from vaïvae: essays, collection studies, and quiet records from the studio.";
 
   return {
     alternates: {
@@ -84,7 +84,7 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
               Editorial Journal
             </SectionHeading>
             <SectionBody>
-              Essays, studio notes, and capsule records. Written with the same restraint as the
+              Essays, studio notes, and collection records. Written with the same restraint as the
               garments themselves.
             </SectionBody>
           </Stack>

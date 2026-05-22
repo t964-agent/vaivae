@@ -188,27 +188,6 @@ const previewModules = [
     ],
   },
   {
-    _key: "capsule-rail",
-    _type: "capsuleRail",
-    capsules: [
-      {
-        _id: "capsule.preview-01",
-        _type: "capsule",
-        slug: "preview-capsule",
-        title: "Preview Capsule",
-      },
-      {
-        _id: "capsule.preview-02",
-        _type: "capsule",
-        slug: "preview-study",
-        title: "Preview Study",
-      },
-    ],
-    cta: mockCta("View capsules"),
-    eyebrow: "Capsules",
-    heading: "Capsule rail",
-  },
-  {
     _key: "editorial-excerpt",
     _type: "editorialExcerpt",
     cta: mockCta("Read journal"),

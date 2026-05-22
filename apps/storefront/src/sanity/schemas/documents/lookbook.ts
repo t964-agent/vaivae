@@ -41,15 +41,6 @@ export const lookbook = defineType({
       title: "Cover video",
       type: "object",
     }),
-    defineField({
-      description: "Optional capsule or drop this lookbook belongs to.",
-      name: "seasonOrDrop",
-      options: { disableNew: true },
-      title: "Season or drop",
-      to: [{ type: "capsule" }],
-      type: "reference",
-      weak: true,
-    }),
     defineEditorialBodyField({
       description: "Short visual story or context for the lookbook.",
       name: "description",

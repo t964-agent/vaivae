@@ -1,5 +1,4 @@
 import { BrandPromise } from "./modules/brand-promise";
-import { CapsuleRail } from "./modules/capsule-rail";
 import { CtaSection } from "./modules/cta-section";
 import { EditorialExcerpt } from "./modules/editorial-excerpt";
 import { HeroFilm } from "./modules/hero-film";
@@ -29,8 +28,6 @@ function ModuleRenderer({ builderModule, context }: ModuleRendererProps) {
       return <BrandPromise data={builderModule} />;
     case "productRail":
       return <ProductRail data={builderModule} medusaProducts={context?.medusaProducts} />;
-    case "capsuleRail":
-      return <CapsuleRail data={builderModule} />;
     case "editorialExcerpt":
       return <EditorialExcerpt data={builderModule} />;
     case "lookbookGrid":

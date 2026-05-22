@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 
 import type { StoreProduct } from "@/medusa/types";
 import {
-  capsuleListQuery,
   journalListQuery,
   legalListQuery,
   lookbookListQuery,
@@ -172,7 +171,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       baseUrl,
       changeFrequency: "weekly",
       lastModified: now,
-      path: "/capsule",
+      path: "/collections/summer-fall-26",
       priority: 0.8,
     }),
   ];
@@ -204,10 +203,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Keep the sitemap available even when Medusa is temporarily unreachable.
   }
 
-  const [lookbooks, journals, capsules, legalPages, pages] = await Promise.all([
+  const [lookbooks, journals, legalPages, pages] = await Promise.all([
     getSanityRoutes(lookbookListQuery, "lookbook").catch(() => []),
     getSanityRoutes(journalListQuery, "journal").catch(() => []),
-    getSanityRoutes(capsuleListQuery, "capsule").catch(() => []),
     getSanityRoutes(legalListQuery, "legal").catch(() => []),
     getSanityRoutes(pageListQuery, "page").catch(() => []),
   ]);
@@ -239,21 +237,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               lastModified: getSanityRouteDate(journal, now),
               path: `/journal/${slug}`,
               priority: 0.7,
-            }),
-          ]
-        : [];
-    }),
-    ...capsules.flatMap((capsule) => {
-      const slug = normalizeSlug(capsule.slug);
-
-      return slug
-        ? [
-            routeEntry({
-              baseUrl,
-              changeFrequency: "weekly",
-              lastModified: getSanityRouteDate(capsule, now),
-              path: `/capsule/${slug}`,
-              priority: 0.8,
             }),
           ]
         : [];

@@ -4,7 +4,6 @@ export const pageBuilderTypes = [
   "heroFilm",
   "brandPromise",
   "productRail",
-  "capsuleRail",
   "editorialExcerpt",
   "lookbookGrid",
   "journalRail",
@@ -16,7 +15,6 @@ export const pageBuilderTypes = [
 
 export const homePageBuilderTypes = [
   "heroFilm",
-  "capsuleRail",
   "editorialExcerpt",
   "brandPromise",
   "productRail",
@@ -25,25 +23,11 @@ export const homePageBuilderTypes = [
   "imagePair",
 ] as const;
 
-export const capsulePageBuilderTypes = [
-  "heroFilm",
-  "productRail",
-  "imagePair",
-  "lookbookGrid",
-  "quote",
-  "editorialExcerpt",
-  "ctaSection",
-] as const;
-
 export const productStorytellingTypes = ["imagePair", "videoChapter", "quote"] as const;
 
 export const pageBuilderArray = pageBuilderTypes.map((type) => defineArrayMember({ type }));
 
 export const homePageBuilderArray = homePageBuilderTypes.map((type) => defineArrayMember({ type }));
-
-export const capsulePageBuilderArray = capsulePageBuilderTypes.map((type) =>
-  defineArrayMember({ type }),
-);
 
 export const productStorytellingArray = productStorytellingTypes.map((type) =>
   defineArrayMember({ type }),
@@ -61,7 +45,7 @@ export const pageBuilderOptions = {
       },
       {
         name: "commerce",
-        of: ["productRail", "capsuleRail", "lookbookGrid", "journalRail", "ctaSection"],
+        of: ["productRail", "lookbookGrid", "journalRail", "ctaSection"],
         title: "Commerce and navigation",
       },
     ],
@@ -76,25 +60,6 @@ export const productStorytellingOptions = {
   insertMenu: {
     filter: "auto" as const,
     groups: [{ name: "editorial", of: ["imagePair", "videoChapter", "quote"], title: "Editorial" }],
-    showIcons: true,
-    views: [{ name: "list" as const }],
-  },
-  layout: "list" as const,
-  sortable: true,
-};
-
-export const capsulePageBuilderOptions = {
-  insertMenu: {
-    filter: "auto" as const,
-    groups: [
-      { name: "hero", of: ["heroFilm"], title: "Hero" },
-      { name: "editorial", of: ["imagePair", "quote", "editorialExcerpt"], title: "Editorial" },
-      {
-        name: "commerce",
-        of: ["productRail", "lookbookGrid", "ctaSection"],
-        title: "Commerce and navigation",
-      },
-    ],
     showIcons: true,
     views: [{ name: "list" as const }],
   },

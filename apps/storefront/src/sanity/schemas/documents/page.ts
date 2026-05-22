@@ -7,7 +7,6 @@ const reservedPageSlugs = new Set([
   "account",
   "api",
   "accessibility",
-  "capsule",
   "cart",
   "checkout",
   "collections",

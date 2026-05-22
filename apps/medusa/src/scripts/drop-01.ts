@@ -72,7 +72,6 @@ type Drop01Product = {
 };
 
 const DROP_01_RELEASE = {
-  capsuleId: "capsule-drop-01-may-2026",
   date: "2026-05-12T14:00:00.000Z",
   eyebrow: "Drop 01 - May 2026",
   title: "Drop 01 - The Living Runway",

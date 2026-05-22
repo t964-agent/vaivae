@@ -62,7 +62,6 @@ type Drop01Module = {
   DROP_01_MATERIALS: readonly Drop01Material[];
   DROP_01_PRODUCTS: readonly Drop01Product[];
   DROP_01_RELEASE: {
-    capsuleId: string;
     date: string;
     eyebrow: string;
     title: string;
@@ -123,7 +122,7 @@ const {
 } = nodeRequire("../../../medusa/src/scripts/drop-01") as Drop01Module;
 
 const SANITY_API_VERSION = "2026-03-01";
-const BASE_URL = "https://vaivae.com";
+const BASE_URL = "https://vaivae.vercel.app";
 const PLACEHOLDER_FILENAME = "vaivae-drop-01-placeholder.png";
 const PLACEHOLDER_MUX_PLAYBACK_ID = "uNbxnGLKJ00yfbijDO8COxTOyVKT01xpxW";
 const PLACEHOLDER_IMAGE_BASE64 =
@@ -325,8 +324,8 @@ function navigationDocument(): SeedDocument {
     _id: "navigation",
     _type: "navigation",
     headerLinks: [
-      externalLink("nav-drop-01", "Drop 01", "/products"),
-      externalLink("nav-lookbook", "Lookbook", "/lookbook"),
+      externalLink("nav-drop-01", "READY-TO-WEAR", "/products"),
+      externalLink("nav-collections", "COLLECTIONS", "/collections/summer-fall-26"),
       externalLink("nav-journal", "Journal", "/journal"),
       externalLink("nav-atelier", "Atelier", "/atelier"),
     ],
@@ -348,8 +347,8 @@ function footerDocument(): SeedDocument {
         _key: "footer-shop",
         _type: "footerColumn",
         links: [
-          externalLink("footer-products", "Drop 01", "/products"),
-          externalLink("footer-lookbook", "Lookbook", "/lookbook"),
+          externalLink("footer-products", "READY-TO-WEAR", "/products"),
+          externalLink("footer-collections", "COLLECTIONS", "/collections/summer-fall-26"),
           externalLink("footer-journal", "Journal", "/journal"),
         ],
         title: "Shop",
@@ -483,59 +482,6 @@ function productDocuments(assetId: string): SeedDocument[] {
   }));
 }
 
-function capsuleDocument(assetId: string): SeedDocument {
-  return {
-    _id: DROP_01_RELEASE.capsuleId,
-    _type: "capsule",
-    coverImage: image(
-      assetId,
-      "Drop 01 campaign placeholder",
-      "Replace with final campaign cover.",
-    ),
-    coverVideo: { muxAssetId: PLACEHOLDER_MUX_PLAYBACK_ID },
-    description: ptBlocks("capsule-drop-01", [
-      "An AI muse emerges from the brand world itself: fabric, light, and color resolving into a season.",
-      "Drop 01 gathers the launch lounge collection into a restrained first edit of knit, open mesh, linen, and Écru Argenté light.",
-    ]),
-    eyebrow: DROP_01_RELEASE.eyebrow,
-    pageBuilder: [
-      {
-        _key: "capsule-product-rail",
-        _type: "productRail",
-        cta: cta("Shop Drop 01", "/products", "underline"),
-        density: "spacious",
-        eyebrow: "The edit",
-        heading: "Six launch silhouettes",
-        intro: "A small, considered catalog for the first living runway.",
-        layout: "grid",
-        products: DROP_01_PRODUCTS.map((product) =>
-          weakRef(product.medusaProductId, `capsule-product-${product.handle}`),
-        ),
-      },
-      {
-        _key: "capsule-quote",
-        _type: "quote",
-        attribution: "vaïvae editorial",
-        quote: "No model placed on top of the brand. The muse emerges from inside the world.",
-        source: "Drop 01 prototype",
-        style: "pull",
-      },
-    ],
-    products: DROP_01_PRODUCTS.map((product) =>
-      weakRef(product.medusaProductId, `capsule-product-ref-${product.handle}`),
-    ),
-    releaseDate: DROP_01_RELEASE.date,
-    seo: {
-      _type: "seo",
-      description: "Drop 01 introduces The Living Runway, vaïvae's launch lounge collection.",
-      noindex: false,
-      title: "Drop 01 - The Living Runway",
-    },
-    slug: slug("drop-01-may-2026"),
-    title: DROP_01_RELEASE.title,
-  };
-}
-
 function lookbookDocuments(assetId: string): SeedDocument[] {
   return [
     {
@@ -555,7 +501,6 @@ function lookbookDocuments(assetId: string): SeedDocument[] {
         products: [weakRef(product.medusaProductId, `look-product-${product.handle}`)],
       })),
       publishedAt: DROP_01_RELEASE.date,
-      seasonOrDrop: weakRef(DROP_01_RELEASE.capsuleId),
       seo: {
         _type: "seo",
         description: "The Drop 01 lookbook: Terracotta, Glacial, Coral, and Linen in motion.",
@@ -581,7 +526,6 @@ function lookbookDocuments(assetId: string): SeedDocument[] {
         products: [weakRef(product.medusaProductId, `look-product-${product.handle}`)],
       })),
       publishedAt: "2026-05-13T14:00:00.000Z",
-      seasonOrDrop: weakRef(DROP_01_RELEASE.capsuleId),
       seo: {
         _type: "seo",
         description: "A closer look at the three-piece lounge story inside vaïvae Drop 01.",
@@ -820,14 +764,6 @@ function homePageDocument(assetId: string): SeedDocument {
         ),
       },
       {
-        _key: "home-capsule-rail",
-        _type: "capsuleRail",
-        capsules: [weakRef(DROP_01_RELEASE.capsuleId, "home-capsule-drop-01")],
-        cta: cta("Enter the capsule", "/capsule/drop-01-may-2026", "underline"),
-        eyebrow: "Capsule",
-        heading: DROP_01_RELEASE.title,
-      },
-      {
         _key: "home-editorial-excerpt",
         _type: "editorialExcerpt",
         cta: cta("Read the launch note", "/journal/the-living-runway", "underline"),
@@ -897,7 +833,6 @@ async function seed(): Promise<void> {
     ...colorSwatchDocuments(),
     ...sizeGuideDocuments(),
     ...productDocuments(placeholderAssetId),
-    capsuleDocument(placeholderAssetId),
     ...lookbookDocuments(placeholderAssetId),
     ...journalDocuments(placeholderAssetId),
     ...legalDocuments(),

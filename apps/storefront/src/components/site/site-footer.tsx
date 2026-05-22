@@ -33,6 +33,43 @@ function getUsableLinks(links: ChromeLink[] | null | undefined): ChromeLink[] {
   return links?.filter((link) => Boolean(link.label?.trim())) ?? [];
 }
 
+function normalizeLabel(label: string | null): string {
+  return label?.trim().replaceAll(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+function getDisplayLabel(label: string | null): string | null {
+  const normalized = normalizeLabel(label);
+
+  if (normalized === "drop 1" || normalized === "drop 01") {
+    return "READY-TO-WEAR";
+  }
+
+  if (normalized === "lookbook" || normalized === "summer fall 26") {
+    return "COLLECTIONS";
+  }
+
+  return label;
+}
+
+function getDisplayLink(link: ChromeLink): ChromeLink {
+  const normalized = normalizeLabel(link.label);
+
+  if (
+    normalized === "lookbook" ||
+    normalized === "collections" ||
+    normalized === "summer fall 26"
+  ) {
+    return {
+      ...link,
+      href: "/collections/summer-fall-26",
+      targetBlank: false,
+      type: "internal",
+    };
+  }
+
+  return link;
+}
+
 function formatPaymentMethod(method: PaymentMethod): string {
   switch (method) {
     case "amex":
@@ -71,14 +108,20 @@ function FooterColumns({ footer }: { footer: Footer }) {
             </h2>
             {links.length > 0 ? (
               <ul className="grid gap-3">
-                {links.map((link) => (
-                  <li key={link._key ?? `${link.label}-${link.href}`}>
-                    <SiteChromeLink
-                      className="font-body text-sm leading-5 text-on-dark/72 underline-offset-4 transition-colors hover:text-on-dark hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
-                      link={link}
-                    />
-                  </li>
-                ))}
+                {links.map((link) => {
+                  const displayLink = getDisplayLink(link);
+
+                  return (
+                    <li key={link._key ?? `${link.label}-${link.href}`}>
+                      <SiteChromeLink
+                        className="font-body text-sm leading-5 text-on-dark/72 underline-offset-4 transition-colors hover:text-on-dark hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
+                        link={displayLink}
+                      >
+                        {getDisplayLabel(link.label)}
+                      </SiteChromeLink>
+                    </li>
+                  );
+                })}
               </ul>
             ) : null}
           </div>
@@ -131,14 +174,20 @@ function FooterBottom({ footer, siteSettings }: { footer: Footer; siteSettings: 
           {copyright}
         </p>
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
-          {resolvedLegalLinks.map((link) => (
-            <li key={link._key ?? `${link.label}-${link.href}`}>
-              <SiteChromeLink
-                className="font-body text-xs tracking-[0.14em] text-on-dark/58 uppercase underline-offset-4 hover:text-on-dark hover:underline"
-                link={link}
-              />
-            </li>
-          ))}
+          {resolvedLegalLinks.map((link) => {
+            const displayLink = getDisplayLink(link);
+
+            return (
+              <li key={link._key ?? `${link.label}-${link.href}`}>
+                <SiteChromeLink
+                  className="font-body text-xs tracking-[0.14em] text-on-dark/58 uppercase underline-offset-4 hover:text-on-dark hover:underline"
+                  link={displayLink}
+                >
+                  {getDisplayLabel(link.label)}
+                </SiteChromeLink>
+              </li>
+            );
+          })}
         </ul>
         {socialLinks.length > 0 ? (
           <ul className="flex flex-wrap gap-x-5 gap-y-2">

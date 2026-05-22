@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import type { Route } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { MuxVideo } from "@/components/atoms/mux-video";
@@ -11,7 +9,7 @@ import { ProductCard, productCardMedusaFromStoreProduct } from "@/components/car
 import { resolvePageBuilderContext } from "@/components/page-builder/context";
 import { ProductRail } from "@/components/page-builder/modules/product-rail";
 import { asPortableText } from "@/components/page-builder/utils";
-import { Button, Container, Stack } from "@/components/ui";
+import { Container, Stack } from "@/components/ui";
 import {
   cleanText,
   createProductRailModule,
@@ -177,13 +175,6 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
             <SectionHeading as="h1" className="text-[clamp(4rem,12vw,13rem)] text-on-dark">
               <em>{title}</em>
             </SectionHeading>
-            {lookbook.seasonOrDrop?.slug ? (
-              <Button asChild tone="on-dark" variant="underline">
-                <Link href={`/capsule/${lookbook.seasonOrDrop.slug}` as Route}>
-                  {lookbook.seasonOrDrop.title ?? "View capsule"}
-                </Link>
-              </Button>
-            ) : null}
           </Stack>
         </Container>
       </section>

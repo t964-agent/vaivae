@@ -552,7 +552,7 @@ async function ensureProductCategory(ctx: SeedContext): Promise<ProductCategory>
     input: {
       product_categories: [
         {
-          description: "The launch capsule for vaïvae Drop 01 - The Living Runway.",
+          description: "The launch edit for vaïvae Drop 01 - The Living Runway.",
           handle: PRODUCT_CATEGORY_HANDLE,
           is_active: true,
           is_internal: false,

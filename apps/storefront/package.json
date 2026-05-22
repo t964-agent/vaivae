@@ -20,7 +20,7 @@
     "sanity:typegen": "sanity schema extract --path=src/sanity/schema.json && sanity typegen generate",
     "sanity:dev": "sanity dev",
     "sanity:deploy": "sanity deploy",
-    "sanity:seed": "tsx ./src/scripts/sanity-seed.ts",
+    "sanity:seed": "tsx --env-file-if-exists=.env.local ./src/scripts/sanity-seed.ts",
     "hero:sequence": "bash ./scripts/generate-home-hero-sequence.sh",
     "clean": "rm -rf .next .turbo node_modules"
   },

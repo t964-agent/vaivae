@@ -326,9 +326,66 @@ If something in **this AGENTS.md is wrong**, edit it. This file is the rulebook 
 | Add design tokens          | `apps/storefront/src/styles/globals.css` (`@theme`)          |
 | Update architecture        | `docs/architecture.md` (and write an ADR if it's a decision) |
 
+## 13. Local secrets and the Sanity write token
+
+Some scripts need credentials that **do not** belong in Vercel (because the
+runtime storefront only reads from Sanity). The canonical location for these
+is `apps/storefront/.env.local` (gitignored, `0600` perms).
+
+The two most common cases:
+
+1. **`pnpm sanity:seed`** — needs `SANITY_WRITE_TOKEN`. The script is wired
+   to auto-load `.env.local` via `tsx --env-file-if-exists=.env.local`, so
+   you do not need to `export` anything. Just put the value in the file.
+2. **Local dev against the Cloud Medusa backend** — pull the public env from
+   Vercel once and merge into `.env.local`:
+   ```bash
+   pnpm vercel env pull --environment=development apps/storefront/.env.local
+   ```
+   Then add `SANITY_WRITE_TOKEN` separately (Vercel does not store it).
+
+### Creating a write token (correct way, with required project membership)
+
+A common failure mode: a token is created at the organisation level but the
+owning user has no role on the project, producing a `projectUserNotFoundError`
+(HTTP 401) at the first mutation. To avoid that:
+
+1. Go to `https://www.sanity.io/manage/project/<project-id>/api` →
+   **Add API token**.
+2. Name it `vaivae-seed` (or similar).
+3. **Permissions: Editor** (Developer is fine too if schema migrations are
+   in scope). Viewer is not enough.
+4. Copy the `sk...` value into `apps/storefront/.env.local` as
+   `SANITY_WRITE_TOKEN=<value>`. Never commit it. Rotate at the same URL
+   if it ever leaks.
+
+The project id and dataset for vaïvae production are:
+`NEXT_PUBLIC_SANITY_PROJECT_ID=cwzckel4` and
+`NEXT_PUBLIC_SANITY_DATASET=production`. Both can also be pulled with the
+`vercel env pull` command above.
+
+### Verifying a token before running destructive operations
+
+```bash
+node --env-file=apps/storefront/.env.local --input-type=module -e '
+import { createClient } from "@sanity/client";
+const c = createClient({
+  apiVersion: "2026-03-01",
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  token: process.env.SANITY_WRITE_TOKEN,
+  useCdn: false,
+});
+console.log(await c.fetch("*[_id == \"siteSettings\"][0]._id"));
+'
+```
+
+A successful run prints `siteSettings`. A `projectUserNotFoundError` means
+the token's owner needs to be added to the project (see above).
+
 ---
 
-## 13. Final reminders
+## 14. Final reminders
 
 - Be **decisive**. The architecture is detailed enough that you should rarely need to ask "what stack?" questions. If you do need to ask, point at the section of the doc that is unclear so the human can fix it.
 - Be **concise** in PR descriptions and chat replies. Reference file paths with line numbers (e.g. `apps/storefront/src/lib/medusa.ts:42`).

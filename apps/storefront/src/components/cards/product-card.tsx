@@ -134,8 +134,8 @@ export function ProductCard({
     return <ProductCardSkeleton layout={layout} />;
   }
 
-  const handle = sanity?.handle?.trim() || medusa?.handle?.trim() || null;
-  const title = sanity?.title?.trim() || medusa?.title?.trim() || "Untitled product";
+  const handle = medusa?.handle?.trim() || sanity?.handle?.trim() || null;
+  const title = medusa?.title?.trim() || sanity?.title?.trim() || "Untitled product";
   const hook = sanity?.oneLineHook?.trim();
   const price = formatPrice(medusa?.price ?? null);
   const isUnavailable = medusa?.available === false;

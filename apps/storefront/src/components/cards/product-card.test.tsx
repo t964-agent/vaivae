@@ -15,20 +15,20 @@ import {
 } from "./product-card";
 
 describe("ProductCard", () => {
-  it("renders editorial and commerce data as a product link", () => {
+  it("prefers Medusa title and handle while preserving Sanity editorial data", () => {
     // Arrange
     const medusa = {
       available: true,
       handle: "terracotta-slip",
       id: "prod_terracotta",
       price: { amount: 118000, currency_code: "usd" },
-      title: "Fallback title",
+      title: "Terracotta slip",
     } satisfies ProductCardMedusa;
     const sanity = {
       _id: "prod_terracotta",
-      handle: "terracotta-slip",
+      handle: "stale-terracotta-slip",
       oneLineHook: "Cut on the bias, made for late light.",
-      title: "Terracotta slip",
+      title: "Stale Sanity title",
     } satisfies ProductCardSanity;
 
     // Act

@@ -21,11 +21,11 @@ function getHotspots(
   return (data.productHotspots ?? []).map((hotspot) => {
     const sanityProduct = hotspot.product;
     const medusaProduct = sanityProduct?.handle ? medusaProducts?.get(sanityProduct.handle) : null;
-    const handle = sanityProduct?.handle ?? medusaProduct?.handle ?? null;
+    const handle = medusaProduct?.handle ?? sanityProduct?.handle ?? null;
     const label =
       hotspot.label?.trim() ||
-      sanityProduct?.title?.trim() ||
       medusaProduct?.title?.trim() ||
+      sanityProduct?.title?.trim() ||
       "Shop the look";
 
     return {

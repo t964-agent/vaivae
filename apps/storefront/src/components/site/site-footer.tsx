@@ -37,6 +37,8 @@ function normalizeLabel(label: string | null): string {
   return label?.trim().replaceAll(/\s+/g, " ").toLowerCase() ?? "";
 }
 
+const collectionLabels = new Set(["collection", "collections", "lookbook", "pre fall 26", "summer fall 26"]);
+
 function getDisplayLabel(label: string | null): string | null {
   const normalized = normalizeLabel(label);
 
@@ -44,30 +46,11 @@ function getDisplayLabel(label: string | null): string | null {
     return "READY-TO-WEAR";
   }
 
-  if (normalized === "lookbook" || normalized === "summer fall 26") {
+  if (collectionLabels.has(normalized)) {
     return "COLLECTIONS";
   }
 
   return label;
-}
-
-function getDisplayLink(link: ChromeLink): ChromeLink {
-  const normalized = normalizeLabel(link.label);
-
-  if (
-    normalized === "lookbook" ||
-    normalized === "collections" ||
-    normalized === "summer fall 26"
-  ) {
-    return {
-      ...link,
-      href: "/collections/summer-fall-26",
-      targetBlank: false,
-      type: "internal",
-    };
-  }
-
-  return link;
 }
 
 function formatPaymentMethod(method: PaymentMethod): string {
@@ -109,13 +92,11 @@ function FooterColumns({ footer }: { footer: Footer }) {
             {links.length > 0 ? (
               <ul className="grid gap-3">
                 {links.map((link) => {
-                  const displayLink = getDisplayLink(link);
-
                   return (
                     <li key={link._key ?? `${link.label}-${link.href}`}>
                       <SiteChromeLink
                         className="font-body text-sm leading-5 text-on-dark/72 underline-offset-4 transition-colors hover:text-on-dark hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-accent-gold"
-                        link={displayLink}
+                        link={link}
                       >
                         {getDisplayLabel(link.label)}
                       </SiteChromeLink>
@@ -175,13 +156,11 @@ function FooterBottom({ footer, siteSettings }: { footer: Footer; siteSettings: 
         </p>
         <ul className="flex flex-wrap gap-x-5 gap-y-2">
           {resolvedLegalLinks.map((link) => {
-            const displayLink = getDisplayLink(link);
-
             return (
               <li key={link._key ?? `${link.label}-${link.href}`}>
                 <SiteChromeLink
                   className="font-body text-xs tracking-[0.14em] text-on-dark/58 uppercase underline-offset-4 hover:text-on-dark hover:underline"
-                  link={displayLink}
+                  link={link}
                 >
                   {getDisplayLabel(link.label)}
                 </SiteChromeLink>

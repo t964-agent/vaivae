@@ -112,6 +112,8 @@ type UploadedAsset = {
   _id: string;
 };
 
+type CollectionFrameAspectRatio = "16/10" | "4/5" | "3/4" | "1/1";
+
 const nodeRequire = createRequire(import.meta.url);
 const {
   DROP_01_COLOR_SWATCHES,
@@ -127,6 +129,72 @@ const PLACEHOLDER_FILENAME = "vaivae-drop-01-placeholder.png";
 const PLACEHOLDER_MUX_PLAYBACK_ID = "uNbxnGLKJ00yfbijDO8COxTOyVKT01xpxW";
 const PLACEHOLDER_IMAGE_BASE64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
+const SUMMER_FALL_26_COLLECTION_ID = "collection-summer-fall-26";
+const SUMMER_FALL_26_META_DESCRIPTION =
+  "The Summer Sets — the opening note of vaïvae. Soft-touch viscose, featherweight knit, raw-cut cotton. Logos absent, hardware absent. Composed, covered, never concealed.";
+const SUMMER_FALL_26_STATEMENT_PARAGRAPHS = [
+  "The Summer Sets collection is both an introduction and a quiet declaration: the opening note of the House, marked by what is kept in and what is left out.",
+  "Materials are tactile and intentional: soft-touch viscose, featherweight knit, raw-cut cotton, jersey that falls like water, raw materials rested rather than pressed. Their ease contrasts with their precision — a dichotomy that is quintessentially vaïvae.",
+  "Logos are absent. Hardware is absent. There is no distraction. The focus is on the woman inside the cloth, one cloth that moves with her and never against her. Silhouettes shift with fabrics that breathe.",
+  "Pieces arrive in pairs and travel apart. Wear them pool to table, hotel room to evening, suitcase to skin, always uncrushed.",
+  "The collection lives in the spaces between cities and time, a wear between St Tropez and Dubai, between a beach day, a coffee run afternoon and an easy elegant night.",
+] as const;
+const SUMMER_FALL_26_RUNWAY_FRAMES: ReadonlyArray<{
+  alt: string;
+  aspectRatio: CollectionFrameAspectRatio;
+  caption: string;
+}> = [
+  {
+    alt: "Summer Sets — Frame 01 — Opening look in soft-touch viscose.",
+    aspectRatio: "16/10",
+    caption: "Opening",
+  },
+  {
+    alt: "Summer Sets — Frame 02 — Featherweight knit, raw-cut details.",
+    aspectRatio: "4/5",
+    caption: "Featherweight knit",
+  },
+  {
+    alt: "Summer Sets — Frame 03 — Jersey that falls like water.",
+    aspectRatio: "4/5",
+    caption: "Jersey, like water",
+  },
+  {
+    alt: "Summer Sets — Frame 04 — Raw-cut cotton at rest.",
+    aspectRatio: "3/4",
+    caption: "At rest",
+  },
+  {
+    alt: "Summer Sets — Frame 05 — A composed silhouette in motion.",
+    aspectRatio: "4/5",
+    caption: "Composed",
+  },
+  {
+    alt: "Summer Sets — Frame 06 — Covered, never concealed.",
+    aspectRatio: "4/5",
+    caption: "Covered",
+  },
+  {
+    alt: "Summer Sets — Frame 07 — Pieces that travel apart.",
+    aspectRatio: "16/10",
+    caption: "Between cities",
+  },
+  {
+    alt: "Summer Sets — Frame 08 — Pool to table.",
+    aspectRatio: "3/4",
+    caption: "Pool to table",
+  },
+  {
+    alt: "Summer Sets — Frame 09 — Hotel room to evening.",
+    aspectRatio: "3/4",
+    caption: "Room to evening",
+  },
+  {
+    alt: "Summer Sets — Frame 10 — Closing look. Quiet against attention.",
+    aspectRatio: "3/4",
+    caption: "Closing",
+  },
+];
 
 function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -325,7 +393,7 @@ function navigationDocument(): SeedDocument {
     _type: "navigation",
     headerLinks: [
       externalLink("nav-drop-01", "READY-TO-WEAR", "/products"),
-      externalLink("nav-collections", "COLLECTIONS", "/collections/summer-fall-26"),
+      internalLink("nav-collections", "COLLECTIONS", SUMMER_FALL_26_COLLECTION_ID),
       externalLink("nav-journal", "Journal", "/journal"),
       externalLink("nav-atelier", "Atelier", "/atelier"),
     ],
@@ -348,7 +416,7 @@ function footerDocument(): SeedDocument {
         _type: "footerColumn",
         links: [
           externalLink("footer-products", "READY-TO-WEAR", "/products"),
-          externalLink("footer-collections", "COLLECTIONS", "/collections/summer-fall-26"),
+          internalLink("footer-collections", "COLLECTIONS", SUMMER_FALL_26_COLLECTION_ID),
           externalLink("footer-journal", "Journal", "/journal"),
         ],
         title: "Shop",
@@ -534,6 +602,42 @@ function lookbookDocuments(assetId: string): SeedDocument[] {
       },
       slug: slug("premiere-lounge-collection"),
       title: "Première - Lounge Collection",
+    },
+  ];
+}
+
+function collectionDocuments(assetId: string): SeedDocument[] {
+  return [
+    {
+      _id: SUMMER_FALL_26_COLLECTION_ID,
+      _type: "collection",
+      credits: "IHAB — runway frames for vaïvae",
+      hero: {
+        eyebrow: "Collection",
+        headline: "Summer Fall 26",
+        subtitle: "The Summer Sets",
+      },
+      publishedAt: "2026-05-23T00:00:00.000Z",
+      runwayFrames: SUMMER_FALL_26_RUNWAY_FRAMES.map((frame, index) => ({
+        _key: `summer-fall-26-frame-${String(index + 1).padStart(2, "0")}`,
+        _type: "runwayFrame",
+        aspectRatio: frame.aspectRatio,
+        caption: frame.caption,
+        image: image(assetId, frame.alt),
+      })),
+      seo: {
+        _type: "seo",
+        description: SUMMER_FALL_26_META_DESCRIPTION,
+        noindex: false,
+        title: "Summer Fall 26",
+      },
+      slug: slug("summer-fall-26"),
+      statement: {
+        closingLine: "Modest held against the heat, quiet held against attention.",
+        closingQuote: "Composed. Covered. Never concealed.",
+        paragraphs: SUMMER_FALL_26_STATEMENT_PARAGRAPHS,
+      },
+      title: "Summer Fall 26",
     },
   ];
 }
@@ -834,6 +938,7 @@ async function seed(): Promise<void> {
     ...sizeGuideDocuments(),
     ...productDocuments(placeholderAssetId),
     ...lookbookDocuments(placeholderAssetId),
+    ...collectionDocuments(placeholderAssetId),
     ...journalDocuments(placeholderAssetId),
     ...legalDocuments(),
     homePageDocument(placeholderAssetId),

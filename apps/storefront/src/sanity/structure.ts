@@ -18,7 +18,7 @@ import type { StructureResolver } from "sanity/structure";
 export const singletonTypes = ["siteSettings", "navigation", "footer", "homePage"] as const;
 export const createHiddenTypes = [...singletonTypes, "product"] as const;
 
-const editorialTypes = ["lookbook", "journal", "legal"] as const;
+const editorialTypes = ["collection", "lookbook", "journal", "legal"] as const;
 const catalogTypes = ["product", "material", "colorSwatch", "sizeGuide"] as const;
 const explicitlyStructuredTypes = new Set<string>([
   ...createHiddenTypes,
@@ -80,6 +80,7 @@ export const structure: StructureResolver = (S) =>
             .id("editorialList")
             .title("Editorial")
             .items([
+              S.documentTypeListItem("collection").icon(ImagesIcon).title("Collections"),
               S.documentTypeListItem("lookbook").icon(ImagesIcon).title("Lookbooks"),
               S.documentTypeListItem("journal").icon(BookIcon).title("Journal"),
               S.divider(),

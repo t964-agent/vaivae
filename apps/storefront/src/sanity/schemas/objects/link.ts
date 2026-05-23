@@ -5,6 +5,7 @@ const INTERNAL_LINK_TYPES = [
   { type: "siteSettings" },
   { type: "homePage" },
   { type: "product" },
+  { type: "collection" },
   { type: "page" },
   { type: "lookbook" },
   { type: "journal" },

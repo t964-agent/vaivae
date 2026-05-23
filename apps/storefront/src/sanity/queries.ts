@@ -746,6 +746,50 @@ export const lookbookListQuery = defineQuery(`*[_type == "lookbook"] | order(pub
   publishedAt
 }`);
 
+export const collectionByHandleQuery =
+  defineQuery(`*[_type == "collection" && slug.current == $handle][0]{
+  _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
+  title,
+  "slug": slug.current,
+  hero{
+    eyebrow,
+    headline,
+    subtitle
+  },
+  statement{
+    paragraphs,
+    closingQuote,
+    closingLine
+  },
+  runwayFrames[]{
+    _key,
+    _type,
+    image{
+      ${imageFragment}
+    },
+    caption,
+    aspectRatio
+  },
+  credits,
+  seo{
+    ${seoFragment}
+  },
+  publishedAt
+}`);
+
+export const collectionListQuery = defineQuery(`*[_type == "collection"] | order(publishedAt desc){
+  _id,
+  _type,
+  _updatedAt,
+  title,
+  "slug": slug.current,
+  publishedAt
+}`);
+
 export const journalEntryQuery = defineQuery(`*[_type == "journal" && slug.current == $slug][0]{
   _id,
   _type,

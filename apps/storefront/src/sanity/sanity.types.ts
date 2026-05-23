@@ -357,6 +357,13 @@ export type HomePageReference = {
   [internalGroqTypeReferenceTo]?: "homePage";
 };
 
+export type CollectionReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "collection";
+};
+
 export type PageReference = {
   _ref: string;
   _type: "reference";
@@ -379,6 +386,7 @@ export type Link = {
     | SiteSettingsReference
     | HomePageReference
     | ProductReference
+    | CollectionReference
     | PageReference
     | LookbookReference
     | JournalReference
@@ -573,6 +581,36 @@ export type Page = {
         _key: string;
       } & CtaSection)
   >;
+};
+
+export type Collection = {
+  _id: string;
+  _type: "collection";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  hero?: {
+    eyebrow?: string;
+    headline?: string;
+    subtitle?: string;
+  };
+  statement?: {
+    paragraphs?: Array<string>;
+    closingQuote?: string;
+    closingLine?: string;
+  };
+  runwayFrames?: Array<{
+    image?: VaivaeImage;
+    caption?: string;
+    aspectRatio?: "16/10" | "4/5" | "3/4" | "1/1";
+    _type: "runwayFrame";
+    _key: string;
+  }>;
+  credits?: string;
+  seo?: Seo;
+  publishedAt?: string;
 };
 
 export type MaterialReference = {
@@ -1004,6 +1042,7 @@ export type AllSanitySchemaTypes =
   | Navigation
   | SiteSettingsReference
   | HomePageReference
+  | CollectionReference
   | PageReference
   | LegalReference
   | Link
@@ -1016,6 +1055,7 @@ export type AllSanitySchemaTypes =
   | Seo
   | Journal
   | Page
+  | Collection
   | MaterialReference
   | ColorSwatchReference
   | SizeGuideReference
@@ -1168,6 +1208,12 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
+          _type: "collection";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
           _type: "homePage";
           title: string | null;
           slug: null;
@@ -1222,6 +1268,12 @@ export type NavigationQueryResult = {
         _weak: boolean | null;
       } | null;
       internalTarget:
+        | {
+            _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
         | {
             _id: string;
             _type: "homePage";
@@ -1282,6 +1334,12 @@ export type NavigationQueryResult = {
     internalTarget:
       | {
           _id: string;
+          _type: "collection";
+          title: string | null;
+          slug: string | null;
+        }
+      | {
+          _id: string;
           _type: "homePage";
           title: string | null;
           slug: null;
@@ -1337,6 +1395,12 @@ export type NavigationQueryResult = {
       _weak: boolean | null;
     } | null;
     internalTarget:
+      | {
+          _id: string;
+          _type: "collection";
+          title: string | null;
+          slug: string | null;
+        }
       | {
           _id: string;
           _type: "homePage";
@@ -1395,6 +1459,12 @@ export type NavigationQueryResult = {
       _weak: boolean | null;
     } | null;
     internalTarget:
+      | {
+          _id: string;
+          _type: "collection";
+          title: string | null;
+          slug: string | null;
+        }
       | {
           _id: string;
           _type: "homePage";
@@ -1469,6 +1539,12 @@ export type FooterQueryResult = {
       internalTarget:
         | {
             _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
             _type: "homePage";
             title: string | null;
             slug: null;
@@ -1529,6 +1605,12 @@ export type FooterQueryResult = {
       _weak: boolean | null;
     } | null;
     internalTarget:
+      | {
+          _id: string;
+          _type: "collection";
+          title: string | null;
+          slug: string | null;
+        }
       | {
           _id: string;
           _type: "homePage";
@@ -1660,6 +1742,12 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -1728,6 +1816,12 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -1787,6 +1881,12 @@ export type HomePageQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -1895,6 +1995,12 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -1986,6 +2092,12 @@ export type HomePageQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -2107,6 +2219,12 @@ export type HomePageQueryResult = {
               internalTarget:
                 | {
                     _id: string;
+                    _type: "collection";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
                     _type: "homePage";
                     title: string | null;
                     slug: null;
@@ -2166,6 +2284,12 @@ export type HomePageQueryResult = {
                 _weak: boolean | null;
               } | null;
               internalTarget:
+                | {
+                    _id: string;
+                    _type: "collection";
+                    title: string | null;
+                    slug: string | null;
+                  }
                 | {
                     _id: string;
                     _type: "homePage";
@@ -2280,6 +2404,12 @@ export type HomePageQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -2353,6 +2483,12 @@ export type HomePageQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -2453,6 +2589,12 @@ export type HomePageQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -2585,6 +2727,12 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -2653,6 +2801,12 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -2712,6 +2866,12 @@ export type PageBySlugQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -2820,6 +2980,12 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -2911,6 +3077,12 @@ export type PageBySlugQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -3032,6 +3204,12 @@ export type PageBySlugQueryResult = {
               internalTarget:
                 | {
                     _id: string;
+                    _type: "collection";
+                    title: string | null;
+                    slug: string | null;
+                  }
+                | {
+                    _id: string;
                     _type: "homePage";
                     title: string | null;
                     slug: null;
@@ -3091,6 +3269,12 @@ export type PageBySlugQueryResult = {
                 _weak: boolean | null;
               } | null;
               internalTarget:
+                | {
+                    _id: string;
+                    _type: "collection";
+                    title: string | null;
+                    slug: string | null;
+                  }
                 | {
                     _id: string;
                     _type: "homePage";
@@ -3205,6 +3389,12 @@ export type PageBySlugQueryResult = {
             internalTarget:
               | {
                   _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
+              | {
+                  _id: string;
                   _type: "homePage";
                   title: string | null;
                   slug: null;
@@ -3278,6 +3468,12 @@ export type PageBySlugQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -3373,6 +3569,12 @@ export type PageBySlugQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -3473,6 +3675,12 @@ export type PageBySlugQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -3721,6 +3929,12 @@ export type ProductByHandleQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -4192,6 +4406,12 @@ export type ProductByMedusaIdQueryResult = {
               _weak: boolean | null;
             } | null;
             internalTarget:
+              | {
+                  _id: string;
+                  _type: "collection";
+                  title: string | null;
+                  slug: string | null;
+                }
               | {
                   _id: string;
                   _type: "homePage";
@@ -4798,6 +5018,96 @@ export type LookbookListQueryResult = Array<{
     alt: string | null;
     caption: string | null;
   } | null;
+  publishedAt: string | null;
+}>;
+
+// Source: src/sanity/queries.ts
+// Variable: collectionByHandleQuery
+// Query: *[_type == "collection" && slug.current == $handle][0]{  _id,  _type,  _createdAt,  _updatedAt,  _rev,  title,  "slug": slug.current,  hero{    eyebrow,    headline,    subtitle  },  statement{    paragraphs,    closingQuote,    closingLine  },  runwayFrames[]{    _key,    _type,    image{      _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption    },    caption,    aspectRatio  },  credits,  seo{    _type,title,description,noindex,ogImage{  _type,asset->{  _id,  _type,  url,  metadata{    lqip,    dimensions{      width,      height,      aspectRatio    }  }},hotspot,crop,alt,caption},keywords  },  publishedAt}
+export type CollectionByHandleQueryResult = {
+  _id: string;
+  _type: "collection";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  slug: string | null;
+  hero: {
+    eyebrow: string | null;
+    headline: string | null;
+    subtitle: string | null;
+  } | null;
+  statement: {
+    paragraphs: Array<string> | null;
+    closingQuote: string | null;
+    closingLine: string | null;
+  } | null;
+  runwayFrames: Array<{
+    _key: string;
+    _type: "runwayFrame";
+    image: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    caption: string | null;
+    aspectRatio: "1/1" | "16/10" | "3/4" | "4/5" | null;
+  }> | null;
+  credits: string | null;
+  seo: {
+    _type: "seo";
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    ogImage: {
+      _type: "vaivaeImage";
+      asset: {
+        _id: string;
+        _type: "sanity.imageAsset";
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number | null;
+            height: number | null;
+            aspectRatio: number | null;
+          } | null;
+        } | null;
+      } | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+      alt: string | null;
+      caption: string | null;
+    } | null;
+    keywords: Array<string> | null;
+  } | null;
+  publishedAt: string | null;
+} | null;
+
+// Source: src/sanity/queries.ts
+// Variable: collectionListQuery
+// Query: *[_type == "collection"] | order(publishedAt desc){  _id,  _type,  _updatedAt,  title,  "slug": slug.current,  publishedAt}
+export type CollectionListQueryResult = Array<{
+  _id: string;
+  _type: "collection";
+  _updatedAt: string;
+  title: string | null;
+  slug: string | null;
   publishedAt: string | null;
 }>;
 
@@ -5424,6 +5734,12 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
             _type: "homePage";
             title: string | null;
             slug: null;
@@ -5478,6 +5794,12 @@ export type GlobalQueryResult = {
           _weak: boolean | null;
         } | null;
         internalTarget:
+          | {
+              _id: string;
+              _type: "collection";
+              title: string | null;
+              slug: string | null;
+            }
           | {
               _id: string;
               _type: "homePage";
@@ -5538,6 +5860,12 @@ export type GlobalQueryResult = {
       internalTarget:
         | {
             _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
+        | {
+            _id: string;
             _type: "homePage";
             title: string | null;
             slug: null;
@@ -5593,6 +5921,12 @@ export type GlobalQueryResult = {
         _weak: boolean | null;
       } | null;
       internalTarget:
+        | {
+            _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
         | {
             _id: string;
             _type: "homePage";
@@ -5651,6 +5985,12 @@ export type GlobalQueryResult = {
         _weak: boolean | null;
       } | null;
       internalTarget:
+        | {
+            _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
         | {
             _id: string;
             _type: "homePage";
@@ -5721,6 +6061,12 @@ export type GlobalQueryResult = {
         internalTarget:
           | {
               _id: string;
+              _type: "collection";
+              title: string | null;
+              slug: string | null;
+            }
+          | {
+              _id: string;
               _type: "homePage";
               title: string | null;
               slug: null;
@@ -5781,6 +6127,12 @@ export type GlobalQueryResult = {
         _weak: boolean | null;
       } | null;
       internalTarget:
+        | {
+            _id: string;
+            _type: "collection";
+            title: string | null;
+            slug: string | null;
+          }
         | {
             _id: string;
             _type: "homePage";
@@ -5850,6 +6202,8 @@ declare module "@sanity/client" {
     '*[\n  _type == "product" &&\n  editorialReady == true &&\n  medusaProductId in $medusaProductIds\n] | order(title asc){\n  _id,\n  _type,\n  medusaProductId,\n  title,\n  "handle": handle.current,\n  editorialReady,\n  heroImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  oneLineHook\n}': ProductsByMedusaIdsQueryResult;
     '*[_type == "lookbook" && slug.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  coverVideo{\n    muxAssetId\n  },\n  description[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  looks[]{\n    _key,\n    _type,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    caption,\n    "products": array::compact(products[]->{\n      _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n    })\n  },\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': LookbookByHandleQueryResult;
     '*[_type == "lookbook"] | order(publishedAt desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  publishedAt\n}': LookbookListQueryResult;
+    '*[_type == "collection" && slug.current == $handle][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  hero{\n    eyebrow,\n    headline,\n    subtitle\n  },\n  statement{\n    paragraphs,\n    closingQuote,\n    closingLine\n  },\n  runwayFrames[]{\n    _key,\n    _type,\n    image{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    },\n    caption,\n    aspectRatio\n  },\n  credits,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': CollectionByHandleQueryResult;
+    '*[_type == "collection"] | order(publishedAt desc){\n  _id,\n  _type,\n  _updatedAt,\n  title,\n  "slug": slug.current,\n  publishedAt\n}': CollectionListQueryResult;
     '*[_type == "journal" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  subtitle,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  excerpt,\n  body[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  tags,\n  "relatedProducts": array::compact(relatedProducts[]->{\n    _id,\n_type,\n"medusaProductId": medusaProductId,\ntitle,\n"handle": handle.current,\neditorialReady,\noneLineHook,\nheroImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  }),\n  "relatedLookbooks": array::compact(relatedLookbooks[]->{\n    _id,\n    _type,\n    title,\n    "slug": slug.current,\n    coverImage{\n      _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n    }\n  }),\n  author,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  },\n  publishedAt\n}': JournalEntryQueryResult;
     '*[_type == "journal"] | order(publishedAt desc){\n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  subtitle,\n  eyebrow,\n  coverImage{\n    _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n  },\n  excerpt,\n  tags,\n  author,\n  publishedAt\n}': JournalListQueryResult;
     '*[_type == "legal" && slug.current == $slug][0]{\n  _id,\n  _type,\n  _createdAt,\n  _updatedAt,\n  _rev,\n  title,\n  "slug": slug.current,\n  kind,\n  body[]{\n    ...,\n_type == "vaivaeImage" => {\n  _key,\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n}\n  },\n  lastUpdated,\n  seo{\n    _type,\ntitle,\ndescription,\nnoindex,\nogImage{\n  _type,\nasset->{\n  _id,\n  _type,\n  url,\n  metadata{\n    lqip,\n    dimensions{\n      width,\n      height,\n      aspectRatio\n    }\n  }\n},\nhotspot,\ncrop,\nalt,\ncaption\n},\nkeywords\n  }\n}': LegalBySlugQueryResult;

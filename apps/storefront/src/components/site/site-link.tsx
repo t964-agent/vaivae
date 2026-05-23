@@ -6,7 +6,15 @@ import { cn } from "@/lib/utils";
 
 type ChromeInternalTarget = {
   _id: string;
-  _type: "homePage" | "journal" | "legal" | "lookbook" | "page" | "product" | "siteSettings";
+  _type:
+    | "collection"
+    | "homePage"
+    | "journal"
+    | "legal"
+    | "lookbook"
+    | "page"
+    | "product"
+    | "siteSettings";
   title: string | null;
   slug: string | null;
 };
@@ -62,6 +70,8 @@ function routeFromTarget(target: ChromeInternalTarget | null): string | null {
   }
 
   switch (target._type) {
+    case "collection":
+      return `/collections/${target.slug}`;
     case "journal":
       return `/journal/${target.slug}`;
     case "legal":

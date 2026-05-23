@@ -30,6 +30,7 @@ type SiteHeaderClientProps = {
 };
 
 const COLLECTION_HREF = "/collections/summer-fall-26";
+const collectionLabels = new Set(["collection", "collections", "lookbook", "pre fall 26", "summer fall 26"]);
 
 const fallbackHeaderLinks = [
   {
@@ -87,9 +88,9 @@ function normalizeHeaderLabel(label: string | null): string {
 }
 
 /**
- * Normalize legacy CMS labels and force the COLLECTIONS link to point at the
- * current single collection page. Sub-links are intentionally stripped so the
- * header renders as a flat, direct link until there are multiple collections.
+ * Normalize legacy CMS labels while preserving Sanity's internal target. Sub-links
+ * are stripped so the header renders as a flat collection link until there are
+ * multiple collection navigation entries.
  */
 function getPrimaryLinks(links: ChromeLink[]): ChromeLink[] {
   return links.map((link) => {
@@ -99,15 +100,11 @@ function getPrimaryLinks(links: ChromeLink[]): ChromeLink[] {
       return { ...link, label: "READY-TO-WEAR" };
     }
 
-    if (label === "lookbook" || label === "collections" || label === "summer fall 26") {
+    if (collectionLabels.has(label)) {
       return {
         ...link,
         children: [],
-        href: COLLECTION_HREF,
-        internalTarget: null,
         label: "COLLECTIONS",
-        targetBlank: false,
-        type: "internal",
       };
     }
 

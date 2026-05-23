@@ -1,4 +1,5 @@
 import { colorSwatch } from "./documents/color-swatch";
+import { collection } from "./documents/collection";
 import { journal } from "./documents/journal";
 import { legal } from "./documents/legal";
 import { lookbook } from "./documents/lookbook";
@@ -49,6 +50,7 @@ export const schemaTypes = [
   quote,
   ctaSection,
   page,
+  collection,
   lookbook,
   journal,
   legal,

@@ -29,15 +29,6 @@ type SiteHeaderClientProps = {
   navigation: GlobalQueryResult["navigation"];
 };
 
-const COLLECTION_HREF = "/collections/summer-fall-26";
-const collectionLabels = new Set([
-  "collection",
-  "collections",
-  "lookbook",
-  "pre fall 26",
-  "summer fall 26",
-]);
-
 const fallbackHeaderLinks = [
   {
     _key: "fallback-ready-to-wear",
@@ -45,15 +36,6 @@ const fallbackHeaderLinks = [
     href: "/products",
     internalTarget: null,
     label: "READY-TO-WEAR",
-    targetBlank: false,
-    type: "internal",
-  },
-  {
-    _key: "fallback-collections",
-    _type: "link",
-    href: COLLECTION_HREF,
-    internalTarget: null,
-    label: "COLLECTIONS",
     targetBlank: false,
     type: "internal",
   },
@@ -93,25 +75,12 @@ function normalizeHeaderLabel(label: string | null): string {
   return label?.trim().replaceAll(/\s+/g, " ").toLowerCase() ?? "";
 }
 
-/**
- * Normalize legacy CMS labels while preserving Sanity's internal target. Sub-links
- * are stripped so the header renders as a flat collection link until there are
- * multiple collection navigation entries.
- */
 function getPrimaryLinks(links: ChromeLink[]): ChromeLink[] {
   return links.map((link) => {
     const label = normalizeHeaderLabel(link.label);
 
     if (label === "drop 1" || label === "drop 01") {
       return { ...link, label: "READY-TO-WEAR" };
-    }
-
-    if (collectionLabels.has(label)) {
-      return {
-        ...link,
-        children: [],
-        label: "COLLECTIONS",
-      };
     }
 
     return link;

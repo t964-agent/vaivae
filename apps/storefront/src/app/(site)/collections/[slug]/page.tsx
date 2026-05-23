@@ -7,15 +7,15 @@ import { Container, Stack } from "@/components/ui";
 import { cleanText, getSanityImageUrl, truncateText } from "@/lib/editorial";
 import { breadcrumbJsonLd, collectionPageJsonLd, jsonLdScriptProps } from "@/lib/seo/jsonld";
 import { cn } from "@/lib/utils";
-import { collectionByHandleQuery, collectionListQuery } from "@/sanity/queries";
+import { collectionBySlugQuery, collectionListQuery } from "@/sanity/queries";
 import { sanityFetch } from "@/sanity/live";
-import type { CollectionByHandleQueryResult } from "@/sanity/types";
+import type { CollectionBySlugQueryResult } from "@/sanity/types";
 
 type CollectionPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-type Collection = NonNullable<CollectionByHandleQueryResult>;
+type Collection = NonNullable<CollectionBySlugQueryResult>;
 type RunwayFrame = NonNullable<Collection["runwayFrames"]>[number];
 type RunwayGroupKind = "banner" | "pair" | "solo" | "trio";
 type RunwayGroup = {
@@ -26,10 +26,10 @@ type RunwayGroup = {
 const FALLBACK_DESCRIPTION =
   "A vaïvae collection study told through restrained copy, runway frames, and cinematic editorial cadence.";
 
-async function getCollection(slug: string, stega = true): Promise<CollectionByHandleQueryResult> {
+async function getCollection(slug: string, stega = true): Promise<CollectionBySlugQueryResult> {
   const { data } = await sanityFetch({
-    params: { handle: slug },
-    query: collectionByHandleQuery,
+    params: { slug },
+    query: collectionBySlugQuery,
     ...(stega ? {} : { stega: false }),
     tags: ["collection", `collection:${slug}`],
   });

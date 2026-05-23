@@ -746,8 +746,8 @@ export const lookbookListQuery = defineQuery(`*[_type == "lookbook"] | order(pub
   publishedAt
 }`);
 
-export const collectionByHandleQuery =
-  defineQuery(`*[_type == "collection" && slug.current == $handle][0]{
+export const collectionBySlugQuery =
+  defineQuery(`*[_type == "collection" && slug.current == $slug][0]{
   _id,
   _type,
   _createdAt,

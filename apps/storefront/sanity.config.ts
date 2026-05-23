@@ -67,9 +67,9 @@ function createLocation(
 
 const presentationResolve = {
   locations: {
-    capsule: defineLocations({
+    collection: defineLocations({
       resolve: (value: LocationValue | null) =>
-        createLocation(value, { fallbackTitle: "Capsule", prefix: "/capsule" }),
+        createLocation(value, { fallbackTitle: "Untitled collection", prefix: "/collections" }),
       select: { slug: "slug.current", title: "title" },
     }),
     homePage: defineLocations({
@@ -128,9 +128,9 @@ const presentationResolve = {
       route: "/journal/:slug",
     },
     {
-      filter: `_type == "capsule" && slug.current == $slug`,
+      filter: `_type == "collection" && slug.current == $slug`,
       params: ({ params }) => getRouteParam(params, "slug"),
-      route: "/capsule/:slug",
+      route: "/collections/:slug",
     },
     {
       filter: `_type == "product" && handle.current == $handle`,

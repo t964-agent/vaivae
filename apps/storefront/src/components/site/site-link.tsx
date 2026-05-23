@@ -46,6 +46,18 @@ function normalizeSameSiteHref(href: string): string {
   return href;
 }
 
+function normalizeRetiredRouteHref(href: string): string | null {
+  if (href === "/capsule") {
+    return null;
+  }
+
+  if (href.startsWith("/capsule/")) {
+    return `/collections/${href.slice("/capsule/".length)}`;
+  }
+
+  return href;
+}
+
 type ResolvedChromeLink = {
   href: string;
   isExternal: boolean;
@@ -87,7 +99,7 @@ function routeFromTarget(target: ChromeInternalTarget | null): string | null {
 }
 
 export function resolveChromeLink(link: ChromeLink): ResolvedChromeLink | null {
-  const href = normalizeSameSiteHref(link.href?.trim() ?? "");
+  const href = normalizeRetiredRouteHref(normalizeSameSiteHref(link.href?.trim() ?? ""));
 
   if (link.type === "external" && href) {
     if (href.startsWith("/") || href.startsWith("#")) {
@@ -107,7 +119,7 @@ export function resolveChromeLink(link: ChromeLink): ResolvedChromeLink | null {
     return { href: internalHref, isExternal: false, targetBlank: false };
   }
 
-  if (href.startsWith("/") || href.startsWith("#")) {
+  if (href && (href.startsWith("/") || href.startsWith("#"))) {
     return { href, isExternal: false, targetBlank: false };
   }
 

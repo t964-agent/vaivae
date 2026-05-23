@@ -14,6 +14,7 @@ import { structureTool } from "sanity/structure";
 
 import { apiVersion, dataset, projectId, studioUrl } from "./src/sanity/api";
 import { schemaTypes } from "./src/sanity/schemas";
+import { OpenInMedusaAdminAction } from "./src/sanity/actions/open-in-medusa-admin";
 import { createHiddenTypes, singletonTypes, structure } from "./src/sanity/structure";
 
 const singletonTypeSet = new Set<string>(singletonTypes);
@@ -145,11 +146,13 @@ export default defineConfig({
   document: {
     actions: (previousActions, context) => {
       if (syncedDocumentTypeSet.has(context.schemaType)) {
-        return previousActions.filter((action) => {
+        const syncedDocumentActions = previousActions.filter((action) => {
           const actionName = action.action;
 
           return actionName ? !blockedSyncedDocumentActions.has(actionName) : true;
         });
+
+        return [...syncedDocumentActions, OpenInMedusaAdminAction];
       }
 
       if (!singletonTypeSet.has(context.schemaType)) {

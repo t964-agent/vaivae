@@ -1,9 +1,9 @@
 import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import SanitySyncModule = require("../../../../../modules/sanity-sync");
-import SyncOneProduct = require("../../../../../workflows/sanity/steps/sync-one-product");
+import SanityProductSync = require("../../../../../workflows/sanity/sync-product");
 
 const { SANITY_SYNC_MODULE } = SanitySyncModule;
-const { extractMaterials, retrieveProductForSanitySync } = SyncOneProduct;
+const { extractMaterials, retrieveProductForSanitySync } = SanityProductSync;
 
 type SanityProductMirror = {
   _id: string;

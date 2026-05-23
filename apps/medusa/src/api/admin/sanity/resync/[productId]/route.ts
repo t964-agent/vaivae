@@ -1,7 +1,7 @@
 import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http";
-import SyncOneProduct = require("../../../../../workflows/sanity/steps/sync-one-product");
+import SanityProductSync = require("../../../../../workflows/sanity/sync-product");
 
-const { syncProductById } = SyncOneProduct;
+const { syncProductById } = SanityProductSync;
 
 function getProductId(req: AuthenticatedMedusaRequest): string | null {
   const productId = req.params.productId;

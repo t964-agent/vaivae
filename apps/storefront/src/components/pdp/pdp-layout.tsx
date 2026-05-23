@@ -135,9 +135,7 @@ async function Recommendations({ products }: { products: StoreProduct[] }) {
   }
 
   const editorialByMedusaId = await listEditorialProducts(products.map((product) => product.id));
-  const medusaProducts = new Map(
-    products.flatMap((product) => (product.handle ? [[product.handle, product] as const] : [])),
-  );
+  const medusaProducts = new Map(products.map((product) => [product.id, product] as const));
   const productRail = {
     _key: "pdp-recommendations",
     _type: "productRail",

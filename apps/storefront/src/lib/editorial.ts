@@ -82,7 +82,7 @@ export function uniqueProductReferences(products: ProductRailProduct[]): Product
   const unique: ProductRailProduct[] = [];
 
   for (const product of products) {
-    const key = cleanText(product.handle) ?? product._id;
+    const key = cleanText(product.medusaProductId) ?? product._id;
 
     if (seen.has(key)) {
       continue;

@@ -12,7 +12,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@/medusa": path.resolve(appRoot, "./src/lib/medusa"),
       "@": path.resolve(appRoot, "./src"),
+      "server-only": path.resolve(appRoot, "./vitest.server-only.ts"),
     },
   },
   test: {

@@ -1,10 +1,7 @@
 import type * as MedusaUtils from "@medusajs/framework/utils";
-import type * as WorkflowSdk from "@medusajs/framework/workflows-sdk";
-import SanitySyncModule = require("../../../modules/sanity-sync");
+import SanitySyncModule = require("../../modules/sanity-sync");
 
 const { Modules } = require("@medusajs/framework/utils") as typeof MedusaUtils;
-const { createStep, StepResponse } =
-  require("@medusajs/framework/workflows-sdk") as typeof WorkflowSdk;
 const { SANITY_SYNC_MODULE } = SanitySyncModule;
 
 type ResolutionContainer = {
@@ -44,10 +41,6 @@ type SyncedProductMirrorPayload = {
   handle: string;
   mirrorMaterials: string[];
   title: string;
-};
-
-type SyncOneProductStepInput = {
-  productId: string;
 };
 
 function extractMaterials(product: ProductForSanitySync): string[] {
@@ -114,21 +107,11 @@ async function deleteProductMirrorById(
   await syncService.deleteProduct(productId);
 }
 
-const syncOneSanityProductStep = createStep(
-  "sync-one-sanity-product",
-  async (input: SyncOneProductStepInput, { container }) => {
-    const payload = await syncProductById(container as ResolutionContainer, input.productId);
-
-    return new StepResponse(payload);
-  },
-);
-
 const exported = {
   deleteProductMirrorById,
   extractMaterials,
   resolveSanitySyncService,
   retrieveProductForSanitySync,
-  syncOneSanityProductStep,
   syncProductById,
 };
 

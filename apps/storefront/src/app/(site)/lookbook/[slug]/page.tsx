@@ -231,8 +231,9 @@ export default async function LookbookDetailPage({ params }: LookbookPageProps) 
                         {lookProducts.length > 0 ? (
                           <div className="grid gap-4 sm:grid-cols-2">
                             {lookProducts.map((product) => {
-                              const medusa = product.handle
-                                ? context.medusaProducts?.get(product.handle)
+                              const productId = product.medusaProductId?.trim();
+                              const medusa = productId
+                                ? context.medusaProducts?.get(productId)
                                 : null;
 
                               return (

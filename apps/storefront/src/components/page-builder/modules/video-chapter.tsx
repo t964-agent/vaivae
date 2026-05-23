@@ -20,7 +20,8 @@ function getHotspots(
 ): VideoChapterHotspot[] {
   return (data.productHotspots ?? []).map((hotspot) => {
     const sanityProduct = hotspot.product;
-    const medusaProduct = sanityProduct?.handle ? medusaProducts?.get(sanityProduct.handle) : null;
+    const productId = sanityProduct?.medusaProductId?.trim();
+    const medusaProduct = productId ? medusaProducts?.get(productId) : null;
     const handle = medusaProduct?.handle ?? sanityProduct?.handle ?? null;
     const label =
       hotspot.label?.trim() ||

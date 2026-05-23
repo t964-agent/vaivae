@@ -33,7 +33,8 @@ export function ProductRail({ data, medusaProducts }: ProductRailProps) {
 
   const layout = data.density === "compact" ? "compact" : "editorial";
   const cards = products.map((product) => {
-    const medusa = product.handle ? medusaProducts?.get(product.handle) : null;
+    const productId = product.medusaProductId?.trim();
+    const medusa = productId ? medusaProducts?.get(productId) : null;
 
     return (
       <ProductCard

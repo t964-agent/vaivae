@@ -6,32 +6,32 @@ import type { StoreProduct } from "@/medusa/types";
 
 import type { PageBuilderContext, PageBuilderModule } from "./types";
 
-function addHandle(handles: Set<string>, handle: string | null | undefined): void {
-  const normalized = handle?.trim();
+function addProductId(productIds: Set<string>, medusaProductId: string | null | undefined): void {
+  const normalized = medusaProductId?.trim();
 
   if (normalized) {
-    handles.add(normalized);
+    productIds.add(normalized);
   }
 }
 
-function collectProductHandles(modules: PageBuilderModule[] | null | undefined): string[] {
-  const handles = new Set<string>();
+function collectProductIds(modules: PageBuilderModule[] | null | undefined): string[] {
+  const productIds = new Set<string>();
 
   for (const builderModule of modules ?? []) {
     if (builderModule._type === "productRail") {
       for (const product of builderModule.products ?? []) {
-        addHandle(handles, product.handle);
+        addProductId(productIds, product.medusaProductId);
       }
     }
 
     if (builderModule._type === "videoChapter") {
       for (const hotspot of builderModule.productHotspots ?? []) {
-        addHandle(handles, hotspot.product?.handle);
+        addProductId(productIds, hotspot.product?.medusaProductId);
       }
     }
   }
 
-  return [...handles];
+  return [...productIds];
 }
 
 /**
@@ -41,10 +41,10 @@ function collectProductHandles(modules: PageBuilderModule[] | null | undefined):
 export async function resolvePageBuilderContext(
   modules: PageBuilderModule[] | null | undefined,
 ): Promise<PageBuilderContext> {
-  const handles = collectProductHandles(modules);
+  const productIds = collectProductIds(modules);
   const medusaProducts = new Map<string, StoreProduct>();
 
-  if (handles.length === 0) {
+  if (productIds.length === 0) {
     return { medusaProducts };
   }
 
@@ -53,15 +53,13 @@ export async function resolvePageBuilderContext(
     const { products } = await getMedusaClient().store.product.list({
       fields:
         "id,title,handle,thumbnail,status,*variants,+variants.inventory_quantity,*variants.calculated_price",
-      handle: handles,
-      limit: handles.length,
+      id: productIds,
+      limit: productIds.length,
       region_id: region.id,
     });
 
     for (const product of products) {
-      if (product.handle) {
-        medusaProducts.set(product.handle, product);
-      }
+      medusaProducts.set(product.id, product);
     }
   } catch {
     // Static builds must still render Sanity-only cards when Medusa is unavailable.

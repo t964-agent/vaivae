@@ -1,13 +1,13 @@
 import type * as MedusaUtils from "@medusajs/framework/utils";
 import type * as WorkflowSdk from "@medusajs/framework/workflows-sdk";
-import SyncOneProduct = require("./steps/sync-one-product");
+import SanityProductSync = require("./sync-product");
 
 const { ContainerRegistrationKeys, Modules } =
   require("@medusajs/framework/utils") as typeof MedusaUtils;
 const { createStep, createWorkflow, StepResponse, WorkflowResponse } =
   require("@medusajs/framework/workflows-sdk") as typeof WorkflowSdk;
 
-const { syncProductById } = SyncOneProduct;
+const { syncProductById } = SanityProductSync;
 const BATCH_SIZE = 50;
 const SYNC_ALL_SANITY_PRODUCTS_WORKFLOW_ID = "sync-all-sanity-products";
 
@@ -136,7 +136,10 @@ const syncAllSanityProductsWorkflow = createWorkflow(
     store: true,
   },
   function () {
-    const result = syncAllSanityProductsStep();
+    const result = syncAllSanityProductsStep().config({
+      async: true,
+      backgroundExecution: true,
+    });
 
     return new WorkflowResponse(result);
   },

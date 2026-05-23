@@ -1,6 +1,6 @@
 import type * as MedusaUtils from "@medusajs/framework/utils";
 import type { Logger } from "pino";
-import SyncOneProduct = require("../workflows/sanity/steps/sync-one-product");
+import SanityProductSync = require("../workflows/sanity/sync-product");
 
 const { defineFileConfig } = require("@medusajs/framework/utils") as typeof MedusaUtils;
 const {
@@ -9,7 +9,7 @@ const {
   resolveSanitySyncService,
   retrieveProductForSanitySync,
   syncProductById,
-} = SyncOneProduct;
+} = SanityProductSync;
 
 type LoggerModule = {
   child(scope: string): Logger;

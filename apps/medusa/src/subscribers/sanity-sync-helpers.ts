@@ -1,45 +1,18 @@
-import type { SubscriberArgs } from "@medusajs/framework";
 import type * as MedusaUtils from "@medusajs/framework/utils";
 import type { Logger } from "pino";
-import SanitySyncModule = require("../modules/sanity-sync");
+import SyncOneProduct = require("../workflows/sanity/steps/sync-one-product");
 
-const { defineFileConfig, Modules } = require("@medusajs/framework/utils") as typeof MedusaUtils;
-const { SANITY_SYNC_MODULE } = SanitySyncModule;
-
-type ProductEventPayload = {
-  id: string;
-};
-
-type SubscriberContainer = SubscriberArgs<ProductEventPayload>["container"];
+const { defineFileConfig } = require("@medusajs/framework/utils") as typeof MedusaUtils;
+const {
+  deleteProductMirrorById,
+  extractMaterials,
+  resolveSanitySyncService,
+  retrieveProductForSanitySync,
+  syncProductById,
+} = SyncOneProduct;
 
 type LoggerModule = {
   child(scope: string): Logger;
-};
-
-type ProductMetadata = Record<string, unknown> | null;
-
-type ProductForSanitySync = {
-  id: string;
-  title: string;
-  handle: string;
-  metadata?: ProductMetadata;
-};
-
-type ProductModuleService = {
-  retrieveProduct(
-    productId: string,
-    config: { select: Array<"id" | "title" | "handle" | "metadata"> },
-  ): Promise<ProductForSanitySync>;
-};
-
-type SanitySyncService = {
-  syncProduct(product: {
-    id: string;
-    title: string;
-    handle: string;
-    materials?: string[] | null;
-  }): Promise<void>;
-  deleteProduct(productId: string): Promise<void>;
 };
 
 type SyncOperation = "create" | "delete" | "update";
@@ -137,34 +110,6 @@ function toErrorLogDetails(error: unknown): SyncErrorLogDetails {
   return details;
 }
 
-function extractMaterials(product: ProductForSanitySync): string[] {
-  const materials = product.metadata?.["mirror_materials"];
-
-  if (!Array.isArray(materials)) {
-    return [];
-  }
-
-  return materials
-    .filter((material): material is string => typeof material === "string")
-    .map((material) => material.trim())
-    .filter((material) => material.length > 0);
-}
-
-async function retrieveProductForSanitySync(
-  container: SubscriberContainer,
-  productId: string,
-): Promise<ProductForSanitySync> {
-  const productService = container.resolve<ProductModuleService>(Modules.PRODUCT);
-
-  return productService.retrieveProduct(productId, {
-    select: ["id", "title", "handle", "metadata"],
-  });
-}
-
-function resolveSanitySyncService(container: SubscriberContainer): SanitySyncService {
-  return container.resolve<SanitySyncService>(SANITY_SYNC_MODULE);
-}
-
 async function runSanitySyncSubscriber(input: {
   operation: SyncOperation;
   productId: string;
@@ -192,10 +137,12 @@ async function runSanitySyncSubscriber(input: {
 }
 
 const exportedHelpers = {
+  deleteProductMirrorById,
   extractMaterials,
   resolveSanitySyncService,
   retrieveProductForSanitySync,
   runSanitySyncSubscriber,
+  syncProductById,
 };
 
 export = exportedHelpers;

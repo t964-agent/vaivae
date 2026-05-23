@@ -25,6 +25,22 @@ type SanityProductMirrorDocument = {
   title: string;
 };
 
+type SanityProductMirrorReadDocument = {
+  _id?: unknown;
+  handle?: unknown;
+  medusaProductId?: unknown;
+  mirrorMaterials?: unknown;
+  title?: unknown;
+};
+
+type SanityProductMirror = {
+  _id: string;
+  handle: string | null;
+  medusaProductId: string | null;
+  mirrorMaterials: string[];
+  title: string | null;
+};
+
 type SanitySyncProductInput = {
   id: string;
   title: string;
@@ -54,6 +70,16 @@ function normalizeMaterials(materials: string[] | null | undefined): string[] {
   return (materials ?? [])
     .map((material) => material.trim())
     .filter((material) => material.length > 0);
+}
+
+function readString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function readStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
 }
 
 function toSanityProductMirrorDocument(
@@ -114,6 +140,32 @@ class SanitySyncService {
 
     await this.client.delete(sanityId);
     logger.info({ productId: sanityId }, "deleted product from Sanity");
+  }
+
+  async getProductMirror(productId: string): Promise<SanityProductMirror | null> {
+    const sanityId = requireTrimmed(productId, "product.id");
+    const mirror = await this.client.fetch<SanityProductMirrorReadDocument | null>(
+      `*[_id == $productId && _type == "product"][0]{
+        _id,
+        "handle": handle.current,
+        medusaProductId,
+        mirrorMaterials,
+        title
+      }`,
+      { productId: sanityId },
+    );
+
+    if (!mirror) {
+      return null;
+    }
+
+    return {
+      _id: readString(mirror._id) ?? sanityId,
+      handle: readString(mirror.handle),
+      medusaProductId: readString(mirror.medusaProductId),
+      mirrorMaterials: readStringArray(mirror.mirrorMaterials),
+      title: readString(mirror.title),
+    };
   }
 }
 

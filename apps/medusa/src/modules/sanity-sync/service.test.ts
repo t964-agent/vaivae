@@ -7,6 +7,14 @@ type SanitySyncProductInput = {
   title: string;
 };
 
+type SanityProductMirror = {
+  _id: string;
+  handle: string | null;
+  medusaProductId: string | null;
+  mirrorMaterials: string[];
+  title: string | null;
+};
+
 type PatchBuilder = {
   commit: (options: { autoGenerateArrayKeys: boolean }) => Promise<void>;
   set: (value: Record<string, unknown>) => PatchBuilder;
@@ -15,6 +23,7 @@ type PatchBuilder = {
 
 type SanitySyncServiceShape = {
   deleteProduct: (productId: string) => Promise<void>;
+  getProductMirror: (productId: string) => Promise<SanityProductMirror | null>;
   syncProduct: (product: SanitySyncProductInput) => Promise<void>;
 };
 
@@ -42,11 +51,13 @@ async function loadService() {
   const createIfNotExists = vi.fn(async () => undefined);
   const deleteDocument = vi.fn(async () => undefined);
   const patch = vi.fn(() => patchBuilder);
+  const fetch = vi.fn(async (): Promise<unknown> => null);
   const info = vi.fn();
   const child = vi.fn(() => ({ info }));
   const createSanityClient = vi.fn(() => ({
     createIfNotExists,
     delete: deleteDocument,
+    fetch,
     patch,
   }));
   const moduleLoader = require("node:module") as ModuleWithLoader;
@@ -83,6 +94,7 @@ async function loadService() {
     createIfNotExists,
     createSanityClient,
     deleteDocument,
+    fetch,
     info,
     patch,
     service: new Service(),
@@ -152,6 +164,44 @@ describe("SanitySyncService", () => {
       { productId: "prod_terracotta" },
       "deleted product from Sanity",
     );
+  });
+
+  it("reads the current Sanity mirror document by trimmed Medusa id", async () => {
+    // Arrange
+    const mocks = await loadService();
+
+    mocks.fetch.mockResolvedValueOnce({
+      _id: "prod_terracotta",
+      handle: "terracotta-slip",
+      medusaProductId: "prod_terracotta",
+      mirrorMaterials: ["silk", "linen"],
+      title: "Terracotta Slip",
+    });
+
+    // Act
+    const mirror = await mocks.service.getProductMirror(" prod_terracotta ");
+
+    // Assert
+    expect(mocks.fetch).toHaveBeenCalledWith(expect.stringContaining("_id == $productId"), {
+      productId: "prod_terracotta",
+    });
+    expect(mirror).toEqual({
+      _id: "prod_terracotta",
+      handle: "terracotta-slip",
+      medusaProductId: "prod_terracotta",
+      mirrorMaterials: ["silk", "linen"],
+      title: "Terracotta Slip",
+    });
+  });
+
+  it("returns null when the Sanity mirror document does not exist", async () => {
+    // Arrange
+    const mocks = await loadService();
+
+    mocks.fetch.mockResolvedValueOnce(null);
+
+    // Act / Assert
+    await expect(mocks.service.getProductMirror("prod_missing")).resolves.toBeNull();
   });
 
   it("rejects products without required mirror fields", async () => {

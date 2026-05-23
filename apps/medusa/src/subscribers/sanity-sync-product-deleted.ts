@@ -1,7 +1,7 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework";
 import SanitySyncHelpers = require("./sanity-sync-helpers");
 
-const { resolveSanitySyncService, runSanitySyncSubscriber } = SanitySyncHelpers;
+const { deleteProductMirrorById, runSanitySyncSubscriber } = SanitySyncHelpers;
 
 type ProductEventPayload = {
   id: string;
@@ -17,9 +17,7 @@ async function sanitySyncProductDeleted({
     operation: "delete",
     productId,
     run: async () => {
-      const syncService = resolveSanitySyncService(container);
-
-      await syncService.deleteProduct(productId);
+      await deleteProductMirrorById(container, productId);
     },
   });
 }

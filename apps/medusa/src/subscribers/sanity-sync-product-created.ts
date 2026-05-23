@@ -1,12 +1,7 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework";
 import SanitySyncHelpers = require("./sanity-sync-helpers");
 
-const {
-  extractMaterials,
-  resolveSanitySyncService,
-  retrieveProductForSanitySync,
-  runSanitySyncSubscriber,
-} = SanitySyncHelpers;
+const { runSanitySyncSubscriber, syncProductById } = SanitySyncHelpers;
 
 type ProductEventPayload = {
   id: string;
@@ -22,15 +17,7 @@ async function sanitySyncProductCreated({
     operation: "create",
     productId,
     run: async () => {
-      const product = await retrieveProductForSanitySync(container, productId);
-      const syncService = resolveSanitySyncService(container);
-
-      await syncService.syncProduct({
-        handle: product.handle,
-        id: product.id,
-        materials: extractMaterials(product),
-        title: product.title,
-      });
+      await syncProductById(container, productId);
     },
   });
 }

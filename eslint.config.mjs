@@ -91,6 +91,16 @@ export const baseConfig = [
       "@typescript-eslint/consistent-type-definitions": "off",
     },
   },
+  {
+    files: ["apps/medusa/src/admin/**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        project: ["./apps/medusa/tsconfig.admin.json"],
+        projectService: false,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
 ];
 
 const config = [...baseConfig, eslintConfigPrettier];

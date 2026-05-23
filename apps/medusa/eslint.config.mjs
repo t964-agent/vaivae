@@ -8,7 +8,8 @@ const config = [
     files: ["**/*.{ts,tsx,mts,cts}"],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: ["./tsconfig.json", "./tsconfig.admin.json"],
+        projectService: false,
         tsconfigRootDir: import.meta.dirname,
       },
     },

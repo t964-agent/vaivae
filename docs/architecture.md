@@ -583,7 +583,7 @@ A separate **staging** environment is deferred until business operations require
 
 ##### Medusa Core
 
-> **Pin every `@medusajs/*` package to `2.14.2`** in lockstep. Mismatched versions produce silent runtime errors.
+> **Pin every Medusa core/Admin package to `2.14.2`** in lockstep. Mismatched versions produce silent runtime errors. Design-system packages such as `@medusajs/ui` follow the version pinned by `@medusajs/dashboard`.
 
 | Package                       | Version  | Type | Notes                                                                                                                                                                                           |
 | ----------------------------- | -------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -596,6 +596,9 @@ A separate **staging** environment is deferred until business operations require
 | `@medusajs/admin-shared`      | `2.14.2` | dev  | For custom admin extensions.                                                                                                                                                                    |
 | `@medusajs/admin-sdk`         | `2.14.2` | dev  |                                                                                                                                                                                                 |
 | `@medusajs/dashboard`         | `2.14.2` | dev  | Direct pin required by the Admin Vite bundle under pnpm's strict module resolution.                                                                                                             |
+| `@medusajs/js-sdk`            | `2.14.2` | dep  | Direct pin required for custom Admin widgets to make authenticated Admin API calls under pnpm's strict module resolution.                                                                       |
+| `@medusajs/ui`                | `4.1.9`  | dep  | Direct pin matching `@medusajs/dashboard@2.14.2` for custom Admin widgets under pnpm's strict module resolution.                                                                                |
+| `@tanstack/react-query`       | `5.64.2` | dep  | Direct pin matching `@medusajs/dashboard@2.14.2` for custom Admin widget queries and mutations under pnpm's strict module resolution.                                                           |
 | `@medusajs/draft-order`       | `2.14.2` | dev  | Default Admin plugin import; direct pin required by the Admin Vite bundle under pnpm's strict module resolution.                                                                                |
 | `@medusajs/payment-stripe`    | `2.14.2` | dep  | Bundled in `@medusajs/medusa`; pinning explicitly is a safety net.                                                                                                                              |
 | `@medusajs/analytics-posthog` | `2.14.2` | dep  | Server-side PostHog event capture (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)).                                                                                   |

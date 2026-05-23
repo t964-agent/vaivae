@@ -72,6 +72,7 @@ const adminCors = envOrBuildDefault("ADMIN_CORS", "http://localhost:9000");
 const authCors = envOrBuildDefault("AUTH_CORS", "http://localhost:3000");
 const medusaBackendUrl = envOrBuildDefault("MEDUSA_BACKEND_URL", "http://localhost:9000");
 const medusaStorefrontUrl = envOrBuildDefault("MEDUSA_STOREFRONT_URL", "http://localhost:3000");
+const sanityStudioUrl = envOptional("SANITY_STUDIO_URL");
 const stripeApiKey = envOrBuildDefault("STRIPE_API_KEY", "sk_test_medusa_build_placeholder");
 const stripeWebhookSecret = envOrBuildDefault(
   "STRIPE_WEBHOOK_SECRET",
@@ -194,6 +195,13 @@ const __result = defineConfig({
     backendUrl: medusaBackendUrl,
     storefrontUrl: medusaStorefrontUrl,
     path: "/app",
+    vite: (config) => ({
+      ...config,
+      define: {
+        ...config.define,
+        "import.meta.env.VITE_SANITY_STUDIO_URL": JSON.stringify(sanityStudioUrl ?? ""),
+      },
+    }),
   },
   modules,
   plugins: [

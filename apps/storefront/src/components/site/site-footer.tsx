@@ -37,7 +37,13 @@ function normalizeLabel(label: string | null): string {
   return label?.trim().replaceAll(/\s+/g, " ").toLowerCase() ?? "";
 }
 
-const collectionLabels = new Set(["collection", "collections", "lookbook", "pre fall 26", "summer fall 26"]);
+const collectionLabels = new Set([
+  "collection",
+  "collections",
+  "lookbook",
+  "pre fall 26",
+  "summer fall 26",
+]);
 
 function getDisplayLabel(label: string | null): string | null {
   const normalized = normalizeLabel(label);

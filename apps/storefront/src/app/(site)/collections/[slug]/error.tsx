@@ -7,7 +7,10 @@ type CollectionDetailErrorProps = {
   reset: () => void;
 };
 
-export default function CollectionDetailError({ error: _error, reset }: CollectionDetailErrorProps) {
+export default function CollectionDetailError({
+  error: _error,
+  reset,
+}: CollectionDetailErrorProps) {
   return (
     <EditorialRouteError
       body="Refresh the page to reload the runway frames."

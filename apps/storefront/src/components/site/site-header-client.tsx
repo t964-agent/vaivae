@@ -30,7 +30,13 @@ type SiteHeaderClientProps = {
 };
 
 const COLLECTION_HREF = "/collections/summer-fall-26";
-const collectionLabels = new Set(["collection", "collections", "lookbook", "pre fall 26", "summer fall 26"]);
+const collectionLabels = new Set([
+  "collection",
+  "collections",
+  "lookbook",
+  "pre fall 26",
+  "summer fall 26",
+]);
 
 const fallbackHeaderLinks = [
   {

@@ -441,7 +441,11 @@ export default async function CollectionDetailPage({ params }: CollectionPagePro
             </Stack>
 
             {runwayGroups.map((group, index) => (
-              <RunwayFrameGroup group={group} key={`${group.kind}-${index}`} total={runwayFrameCount} />
+              <RunwayFrameGroup
+                group={group}
+                key={`${group.kind}-${index}`}
+                total={runwayFrameCount}
+              />
             ))}
           </Stack>
         </Container>

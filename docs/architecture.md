@@ -2,7 +2,7 @@
 
 > Status: **Draft — sections 1-22 populated; pinned dependency manifest in §3.5; awaiting launch-blocker decisions in §19**
 > Owner: Engineering
-> Last updated: 2026-05-10
+> Last updated: 2026-05-23
 
 This document is the single source of truth for the technical architecture of vaïvae.com. It captures decisions, rationale, and concrete patterns that any contributor — human or AI agent — should follow when building, extending, or operating the platform.
 
@@ -339,7 +339,7 @@ sequenceDiagram
   E->>SS: Edit + Publish
   SS->>CL: Save document
   CL-)V: Webhook /api/revalidate
-  V-->>V: revalidateTag(["sanity:home", ...])
+  V-->>V: revalidateTag(["home-page", ...])
   Note over V: Next request rebuilds<br/>affected ISR pages
 ```
 
@@ -360,7 +360,7 @@ sequenceDiagram
 
   Admin->>M: Create/update product
   M->>M: Subscriber on product.created / product.updated
-  M->>CL: Upsert Sanity product doc<br/>(medusaProductId, slug skeleton)
+  M->>CL: Upsert Sanity product doc<br/>(medusaProductId, title, handle, mirrorMaterials)
   Note over CL: Editor adds story,<br/>gallery, fit/care, SEO
   CL-)V: Webhook on publish
   V-->>V: revalidateTag("product:{id}")
@@ -369,7 +369,7 @@ sequenceDiagram
 Rules:
 
 - Medusa creates a **skeleton** Sanity document on product create. Editors enrich it.
-- Sync **never** overwrites editor-owned fields. Only `medusaProductId`, structural references, and seed metadata are managed by Medusa.
+- Sync **never** overwrites editor-owned fields. Only `medusaProductId`, `title`, `handle`, and `mirrorMaterials` are managed by Medusa.
 - Editors **cannot** create canonical products in Sanity. Product creation is always in Medusa.
 
 ### 3.4 Deployment Topology
@@ -779,30 +779,30 @@ The platform operates on a strict principle: **every piece of data has exactly o
 
 ### 4.1 Source-of-Truth Map
 
-| Data                                                     | Source of Truth                                                 | Mirrored Where                                 | Notes                                                              |
-| -------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
-| Product ID, variant ID, SKU                              | **Medusa**                                                      | Sanity (`medusaProductId` reference only)      | Immutable identifiers                                              |
-| Product handle (URL slug)                                | **Medusa**                                                      | —                                              | Storefront routes use Medusa's `handle`                            |
-| Short factual description                                | **Medusa**                                                      | —                                              | Used by Admin search, exports, Google Merchant feed                |
-| Long story-led copy & gallery                            | **Sanity**                                                      | —                                              | Editorial content, Portable Text, custom modules                   |
-| Material composition                                     | **Medusa** for filterable values; **Sanity** for narrative copy | —                                              | Filters and compliance rely on Medusa                              |
-| Fit & care                                               | **Sanity**                                                      | —                                              | Reusable references via `sizeGuide` document                       |
-| Model specs (height, wearing size)                       | **Sanity**                                                      | —                                              | PDP-only editorial detail                                          |
-| Packshot / variant images                                | **Medusa**                                                      | —                                              | Used by cart, admin, exports                                       |
-| Lifestyle / lookbook imagery                             | **Sanity**                                                      | —                                              | CMS-managed assets                                                 |
-| Variant labels (e.g. `Charcoal`)                         | **Medusa** (`ProductOptionValue`)                               | Sanity (optional swatch metadata by reference) | Medusa is source for filterable values                             |
-| Price, sale price, price rules                           | **Medusa** (Pricing module)                                     | —                                              | **Never** copy to Sanity                                           |
-| Inventory, availability, backorder                       | **Medusa** (Inventory module)                                   | —                                              | Resolved per `SalesChannel` / `StockLocation`                      |
-| Promotions, gift cards, tax, shipping                    | **Medusa**                                                      | —                                              | Operational commerce                                               |
-| Customer (email, addresses)                              | **Medusa**                                                      | —                                              |                                                                    |
-| Customer wishlist                                        | **Medusa** (custom module)                                      | localStorage for guests, merged on login       | See [§4.2.3](#423-customer-side-data)                              |
-| Marketing opt-in & consent                               | **Medusa** (custom module on customer)                          | Klaviyo when added (one-way push from Medusa)  | Medusa is durable record of consent                                |
-| GDPR consent log                                         | **Medusa** (custom module)                                      | —                                              | Versioned consent records with timestamp + source                  |
-| Cart, order, line items, returns, refunds                | **Medusa**                                                      | —                                              |                                                                    |
-| Editorial pages (lookbook, journal, capsule, home, etc.) | **Sanity**                                                      | —                                              | Defined in [§4.2.2](#422-content-entities-sanity)                  |
-| Legal & policy pages                                     | **Sanity**                                                      | —                                              | Operational logic (e.g. return eligibility window) lives in Medusa |
-| Navigation, footer, brand settings                       | **Sanity** (singleton)                                          | —                                              |                                                                    |
-| SEO metadata per page                                    | **Sanity** (with Medusa fallback for product data)              | —                                              |                                                                    |
+| Data                                                        | Source of Truth                                                 | Mirrored Where                                 | Notes                                                              |
+| ----------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------ |
+| Product ID, variant ID, SKU                                 | **Medusa**                                                      | Sanity (`medusaProductId` reference only)      | Immutable identifiers                                              |
+| Product handle (URL slug)                                   | **Medusa**                                                      | —                                              | Storefront routes use Medusa's `handle`                            |
+| Short factual description                                   | **Medusa**                                                      | —                                              | Used by Admin search, exports, Google Merchant feed                |
+| Long story-led copy & gallery                               | **Sanity**                                                      | —                                              | Editorial content, Portable Text, custom modules                   |
+| Material composition                                        | **Medusa** for filterable values; **Sanity** for narrative copy | —                                              | Filters and compliance rely on Medusa                              |
+| Fit & care                                                  | **Sanity**                                                      | —                                              | Reusable references via `sizeGuide` document                       |
+| Model specs (height, wearing size)                          | **Sanity**                                                      | —                                              | PDP-only editorial detail                                          |
+| Packshot / variant images                                   | **Medusa**                                                      | —                                              | Used by cart, admin, exports                                       |
+| Lifestyle / lookbook imagery                                | **Sanity**                                                      | —                                              | CMS-managed assets                                                 |
+| Variant labels (e.g. `Charcoal`)                            | **Medusa** (`ProductOptionValue`)                               | Sanity (optional swatch metadata by reference) | Medusa is source for filterable values                             |
+| Price, sale price, price rules                              | **Medusa** (Pricing module)                                     | —                                              | **Never** copy to Sanity                                           |
+| Inventory, availability, backorder                          | **Medusa** (Inventory module)                                   | —                                              | Resolved per `SalesChannel` / `StockLocation`                      |
+| Promotions, gift cards, tax, shipping                       | **Medusa**                                                      | —                                              | Operational commerce                                               |
+| Customer (email, addresses)                                 | **Medusa**                                                      | —                                              |                                                                    |
+| Customer wishlist                                           | **Medusa** (custom module)                                      | localStorage for guests, merged on login       | See [§4.2.3](#423-customer-side-data)                              |
+| Marketing opt-in & consent                                  | **Medusa** (custom module on customer)                          | Klaviyo when added (one-way push from Medusa)  | Medusa is durable record of consent                                |
+| GDPR consent log                                            | **Medusa** (custom module)                                      | —                                              | Versioned consent records with timestamp + source                  |
+| Cart, order, line items, returns, refunds                   | **Medusa**                                                      | —                                              |                                                                    |
+| Editorial pages (lookbook, journal, collection, home, etc.) | **Sanity**                                                      | —                                              | Defined in [§4.2.2](#422-content-entities-sanity)                  |
+| Legal & policy pages                                        | **Sanity**                                                      | —                                              | Operational logic (e.g. return eligibility window) lives in Medusa |
+| Navigation, footer, brand settings                          | **Sanity** (singleton)                                          | —                                              |                                                                    |
+| SEO metadata per page                                       | **Sanity** (with Medusa fallback for product data)              | —                                              |                                                                    |
 
 **Hard rules:**
 
@@ -817,23 +817,23 @@ The platform operates on a strict principle: **every piece of data has exactly o
 
 vaïvae uses Medusa v2's standard modules. We do not fork core entities; extensions go through the patterns described in [§6.1](#61-modules-used) and [§6.2](#62-customizations--plugins).
 
-| Entity                                                               | Purpose                                  | Key Fields                                                                                                        | Notes for vaïvae                                                              |
-| -------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `Product`                                                            | Master product record                    | `id`, `handle`, `title`, `subtitle`, `description`, `status`, `material`, `origin_country`, `hs_code`, `metadata` | `handle` drives PDP route. `description` = short factual summary.             |
-| `ProductVariant`                                                     | One purchasable SKU (size + color combo) | `id`, `sku`, `title`, `manage_inventory`, `allow_backorder`, dimensions, `metadata`                               | One variant per size×color. Inventory always managed.                         |
-| `ProductOption` / `ProductOptionValue`                               | Defines variant axes (Size, Color)       | `value`, `metadata`                                                                                               | We use exactly two options at launch: Size, Color.                            |
-| `ProductCategory`                                                    | Hierarchical category tree               | `name`, `handle`, `mpath`                                                                                         | Used for filtering and sales-channel scoping.                                 |
-| `ProductCollection`                                                  | Commerce grouping                        | `title`, `handle`                                                                                                 | Distinct from Sanity `capsulePage`. Use sparingly to avoid confusion.         |
-| `Customer`                                                           | Shopper account                          | `email`, `has_account`, addresses, `metadata`                                                                     | Guest checkouts create customers with `has_account = false`.                  |
-| `Cart`                                                               | In-progress order                        | `currency_code`, `region_id`, `sales_channel_id`, line items                                                      | Always carries region + sales channel context.                                |
-| `Order`                                                              | Completed cart                           | `display_id`, `status`, transactions, line items, returns                                                         | Source of truth for order state.                                              |
-| `Region`                                                             | Market / currency / tax context          | `currency_code`, `automatic_taxes`, countries                                                                     | At launch: one region (`USD`, US).                                            |
-| `SalesChannel`                                                       | Availability + inventory scoping         | `name`, linked stock locations                                                                                    | At launch: one storefront sales channel.                                      |
-| `StockLocation`                                                      | Physical inventory location              | address, linked sales channels                                                                                    | At launch: one location (3PL or HQ).                                          |
-| `Inventory` (`InventoryItem` + `InventoryLevel` + `ReservationItem`) | Stock per variant per location           | `stocked_quantity`, `reserved_quantity`, `available_quantity`                                                     | Reservations protect cart inventory.                                          |
-| `ShippingProfile` / `ShippingOption`                                 | Shipping rules and rates                 | service zone, provider, rules                                                                                     | See [§8.4](#84-medusa--shipping).                                             |
-| `Promotion`                                                          | Discount codes & automatic promotions    | `code`, `type`, rules, application method                                                                         | Used for capsule launches, friends-and-family, post-purchase incentives.      |
-| `Return` / `Refund`                                                  | Reverse logistics                        | reason, items, status, amount                                                                                     | Customer-initiated returns flow described in [§16](#16-operational-runbooks). |
+| Entity                                                               | Purpose                                  | Key Fields                                                                                                        | Notes for vaïvae                                                               |
+| -------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `Product`                                                            | Master product record                    | `id`, `handle`, `title`, `subtitle`, `description`, `status`, `material`, `origin_country`, `hs_code`, `metadata` | `handle` drives PDP route. `description` = short factual summary.              |
+| `ProductVariant`                                                     | One purchasable SKU (size + color combo) | `id`, `sku`, `title`, `manage_inventory`, `allow_backorder`, dimensions, `metadata`                               | One variant per size×color. Inventory always managed.                          |
+| `ProductOption` / `ProductOptionValue`                               | Defines variant axes (Size, Color)       | `value`, `metadata`                                                                                               | We use exactly two options at launch: Size, Color.                             |
+| `ProductCategory`                                                    | Hierarchical category tree               | `name`, `handle`, `mpath`                                                                                         | Used for filtering and sales-channel scoping.                                  |
+| `ProductCollection`                                                  | Commerce grouping                        | `title`, `handle`                                                                                                 | Distinct from Sanity `collection` documents. Use sparingly to avoid confusion. |
+| `Customer`                                                           | Shopper account                          | `email`, `has_account`, addresses, `metadata`                                                                     | Guest checkouts create customers with `has_account = false`.                   |
+| `Cart`                                                               | In-progress order                        | `currency_code`, `region_id`, `sales_channel_id`, line items                                                      | Always carries region + sales channel context.                                 |
+| `Order`                                                              | Completed cart                           | `display_id`, `status`, transactions, line items, returns                                                         | Source of truth for order state.                                               |
+| `Region`                                                             | Market / currency / tax context          | `currency_code`, `automatic_taxes`, countries                                                                     | At launch: one region (`USD`, US).                                             |
+| `SalesChannel`                                                       | Availability + inventory scoping         | `name`, linked stock locations                                                                                    | At launch: one storefront sales channel.                                       |
+| `StockLocation`                                                      | Physical inventory location              | address, linked sales channels                                                                                    | At launch: one location (3PL or HQ).                                           |
+| `Inventory` (`InventoryItem` + `InventoryLevel` + `ReservationItem`) | Stock per variant per location           | `stocked_quantity`, `reserved_quantity`, `available_quantity`                                                     | Reservations protect cart inventory.                                           |
+| `ShippingProfile` / `ShippingOption`                                 | Shipping rules and rates                 | service zone, provider, rules                                                                                     | See [§8.4](#84-medusa--shipping).                                              |
+| `Promotion`                                                          | Discount codes & automatic promotions    | `code`, `type`, rules, application method                                                                         | Used for capsule launches, friends-and-family, post-purchase incentives.       |
+| `Return` / `Refund`                                                  | Reverse logistics                        | reason, items, status, amount                                                                                     | Customer-initiated returns flow described in [§16](#16-operational-runbooks).  |
 
 #### 4.2.2 Content Entities (Sanity)
 
@@ -842,8 +842,8 @@ Document types planned for Phase 1. Each schema is fully defined in code in `app
 | Schema                | Type      | Purpose                                                                                                                                                                                                                                            |
 | --------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `product`             | document  | Editorial enrichment of one Medusa product. Sanity `_id === medusaProductId`; mirror fields (`medusaProductId`, `title`, `handle`, `mirrorMaterials`) are read-only, while gallery, story copy, fit & care, model specs, and SEO are Sanity-owned. |
-| `homePage`            | singleton | Composable homepage with modular sections (hero, capsule rail, editorial excerpt, brand promise, CTA).                                                                                                                                             |
-| `capsulePage`         | document  | Seasonal capsule / collection landing page with hero, story, product rail.                                                                                                                                                                         |
+| `homePage`            | singleton | Composable homepage with modular sections (hero, collection rail, editorial excerpt, brand promise, CTA).                                                                                                                                          |
+| `collection`          | document  | Seasonal collection landing page served at `/collections/[slug]` with hero copy, editorial statement, runway frames, and SEO.                                                                                                                      |
 | `lookbook`            | document  | Visual-first editorial story with galleries, hotspots, product references, season metadata.                                                                                                                                                        |
 | `journalArticle`      | document  | Long-form essays / brand notes / behind-the-scenes; Portable Text body, author, publish date, tags, product embeds.                                                                                                                                |
 | `landingPage`         | document  | Flexible campaign / SEO landing page with modular blocks.                                                                                                                                                                                          |
@@ -912,7 +912,7 @@ Implementation note: `marketing-consent` stores `ConsentRecord` rows as an appen
 - All sync subscribers are **idempotent**. They re-fetch authoritative state from Medusa inside the handler rather than trusting event payloads.
 - Sanity product sync is idempotent through deterministic `_id`, `createIfNotExists`, and `patch().set()` of mirror fields only.
 - Failed transient sync jobs are retried by Medusa Cloud's event infrastructure with backoff; permanent data errors are logged and skipped.
-- A future **manual resync job** (admin-only Medusa workflow) can repair drift in bulk.
+- Implemented admin resync routes repair drift: `POST /admin/sanity/resync/:productId` for one product and `POST /admin/sanity/resync-all` for bulk replay. `GET /admin/sanity/status/:productId` computes live drift without new persistence.
 
 #### 4.3.4 Agent 21 `sanity-sync` Module
 
@@ -930,7 +930,7 @@ Implementation note: `marketing-consent` stores `ConsentRecord` rows as an appen
 | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Editing commerce fields in Sanity                               | Mirrored fields are read-only in the Studio UI                           |
 | Using Sanity for price/inventory                                | Always fetched from Medusa at render or checkout                         |
-| Treating Medusa `ProductCollection` as editorial campaign pages | Keep commerce collections and Sanity capsule pages separate              |
+| Treating Medusa `ProductCollection` as editorial campaign pages | Keep commerce collections and Sanity `collection` documents separate     |
 | Wishlist in customer `metadata`                                 | Use a dedicated module (lists are not metadata)                          |
 | Sync race conditions                                            | Deterministic IDs + idempotent patches + re-fetch on event               |
 | Reverse-sync loops                                              | Sanity webhooks revalidate storefront caches only; Medusa is not mutated |
@@ -965,9 +965,8 @@ app/
 │   ├── lookbook/
 │   │   ├── page.tsx                 /lookbook
 │   │   └── [slug]/page.tsx          /lookbook/[slug]
-│   ├── capsules/
-│   │   ├── page.tsx                 /capsules
-│   │   └── [slug]/page.tsx          /capsules/[slug]
+│   ├── collections/
+│   │   └── [slug]/page.tsx          /collections/[slug]
 │   ├── about/page.tsx               /about
 │   ├── press/page.tsx               /press
 │   ├── wholesale/page.tsx           /wholesale
@@ -1004,7 +1003,7 @@ app/
 Notes:
 
 - `/products/[handle]` uses Medusa's product `handle` (per [§4.3.2](#432-id-conventions)).
-- Capsules and collections are intentionally separate: `capsules/[slug]` is **Sanity-driven** editorial; `shop/[collection]` is **Medusa-driven** commerce.
+- Editorial collection pages are **Sanity-driven** at `/collections/[slug]`; `/shop/[collection]` remains **Medusa-driven** commerce.
 - Checkout has its own layout group with no marketing scripts, no third-party widgets, and no animations that hurt INP.
 - The Sanity Studio mounts at `/studio` via `next-sanity` and is excluded from i18n/middleware paths.
 - Implementation note: the embedded Studio uses `app/(studio)/studio/[[...tool]]/page.tsx` with a separate `(studio)` layout. Public storefront live/visual plumbing, toasts, analytics, and brand chrome live in the `(site)` layout so `/studio` never inherits `<SanityLive />` or Visual Editing components.
@@ -1021,23 +1020,23 @@ The cart is **not** an intercepting route by default — keeping it as a client-
 
 #### 5.1.3 Rendering Strategy Per Page
 
-| Page                                    | Source                                 | Strategy                                    | Cache Tag                                   |
-| --------------------------------------- | -------------------------------------- | ------------------------------------------- | ------------------------------------------- |
-| `/` (home)                              | Sanity + featured Medusa products      | `force-cache` + tag revalidation            | `sanity:home`, `product:*` (where featured) |
-| `/shop`                                 | Medusa collections + products          | ISR, tag revalidation                       | `collection:*`, `product:*`                 |
-| `/shop/[collection]`                    | Medusa                                 | ISR per collection                          | `collection:[slug]`                         |
-| `/products/[handle]`                    | Medusa (price, stock) + Sanity (story) | Static shell + dynamic price/stock segment  | `product:[handle]`, `sanity:product:[id]`   |
-| `/journal`, `/journal/[slug]`           | Sanity                                 | ISR                                         | `sanity:journal:*`                          |
-| `/lookbook`, `/lookbook/[slug]`         | Sanity + Mux                           | ISR                                         | `sanity:lookbook:*`                         |
-| `/capsules`, `/capsules/[slug]`         | Sanity (+ Medusa product refs)         | ISR                                         | `sanity:capsule:*`                          |
-| `/about`, `/press`, `/wholesale`, legal | Sanity                                 | Static / ISR                                | `sanity:page:[slug]`                        |
-| `/search`                               | Search service / Medusa                | Dynamic                                     | —                                           |
-| `/cart`                                 | Medusa cart                            | `no-store`, dynamic                         | —                                           |
-| `/checkout`                             | Medusa + Stripe                        | `no-store`, dynamic, isolated layout        | —                                           |
-| `/account/*`                            | Medusa customer                        | `no-store`, dynamic, server-side auth check | —                                           |
-| `/account/wishlist`                     | Medusa wishlist (auth)                 | `no-store`, dynamic, server-side auth check | —                                           |
-| `/thank-you/[orderId]`                  | Medusa order                           | Dynamic, server-validated by token          | —                                           |
-| `/studio`                               | Sanity Studio (client)                 | Static shell, client-rendered               | —                                           |
+| Page                                    | Source                                 | Strategy                                    | Cache Tag                                 |
+| --------------------------------------- | -------------------------------------- | ------------------------------------------- | ----------------------------------------- |
+| `/` (home)                              | Sanity + featured Medusa products      | `force-cache` + tag revalidation            | `home-page`, `product:*` (where featured) |
+| `/shop`                                 | Medusa collections + products          | ISR, tag revalidation                       | `product-collections`, `products`         |
+| `/shop/[collection]`                    | Medusa                                 | ISR per collection                          | `product-collections`, `products`         |
+| `/products/[handle]`                    | Medusa (price, stock) + Sanity (story) | Static shell + dynamic price/stock segment  | `product:[id-or-handle]`, `products`      |
+| `/journal`, `/journal/[slug]`           | Sanity                                 | ISR                                         | `journal:*`                               |
+| `/lookbook`, `/lookbook/[slug]`         | Sanity + Mux                           | ISR                                         | `lookbook:*`                              |
+| `/collections/[slug]`                   | Sanity (`collection`)                  | ISR                                         | `collection`, `collection:[slug]`         |
+| `/about`, `/press`, `/wholesale`, legal | Sanity                                 | Static / ISR                                | `page:[slug]`, `legal:[slug]`             |
+| `/search`                               | Search service / Medusa                | Dynamic                                     | —                                         |
+| `/cart`                                 | Medusa cart                            | `no-store`, dynamic                         | —                                         |
+| `/checkout`                             | Medusa + Stripe                        | `no-store`, dynamic, isolated layout        | —                                         |
+| `/account/*`                            | Medusa customer                        | `no-store`, dynamic, server-side auth check | —                                         |
+| `/account/wishlist`                     | Medusa wishlist (auth)                 | `no-store`, dynamic, server-side auth check | —                                         |
+| `/thank-you/[orderId]`                  | Medusa order                           | Dynamic, server-validated by token          | —                                         |
+| `/studio`                               | Sanity Studio (client)                 | Static shell, client-rendered               | —                                         |
 
 Rules:
 
@@ -1045,7 +1044,7 @@ Rules:
 - Cart, account, and checkout routes never touch the global static cache.
 - `/account/layout.tsx` is the authoritative account guard. It awaits the Medusa customer session server-side and redirects unauthenticated users to `/login?next=/account`; all `/account/*` sub-routes inherit that guard.
 - The LCP element is **always in the static shell**. We do not stream the hero image or the H1.
-- `generateStaticParams` is used for top products, collections, capsules, and journal articles. The long tail is rendered on demand.
+- `generateStaticParams` is used for top products, shop collections, editorial collections, and journal articles. The long tail is rendered on demand.
 
 #### 5.1.4 Server vs Client Components
 
@@ -1240,8 +1239,7 @@ Rules:
 | `/journal/[slug]`                                     | Sanity (`journalArticle`)                | ISR                                | —                | Long-form Portable Text                         |
 | `/lookbook`                                           | Sanity (`lookbook` list)                 | ISR                                | —                | Visual-first                                    |
 | `/lookbook/[slug]`                                    | Sanity + Mux                             | ISR                                | —                | Heavy media lazy below fold                     |
-| `/capsules`                                           | Sanity (`capsulePage` list)              | ISR                                | —                |                                                 |
-| `/capsules/[slug]`                                    | Sanity + Medusa product refs             | ISR                                | —                |                                                 |
+| `/collections/[slug]`                                 | Sanity (`collection`)                    | ISR                                | —                | Operator-managed editorial collection pages     |
 | `/about`                                              | Sanity (`aboutPage`)                     | Static                             | —                |                                                 |
 | `/press`                                              | Sanity (`pressPage`)                     | ISR                                | —                | Downloadable assets                             |
 | `/wholesale`                                          | Sanity (`wholesalePage`) + form          | Static + Server Action             | —                | Inquiry form                                    |
@@ -1472,9 +1470,9 @@ All subscribers are **idempotent**: they re-fetch authoritative state from Medus
 
 Located at `apps/medusa/src/workflows/`.
 
-| Workflow               | Purpose                                                | Trigger                                                                                             |
-| ---------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `sanity-sync-products` | Bulk resync products to Sanity (recovery / migrations) | Admin route `POST /admin/sanity/resync` (single product) or `POST /admin/sanity/resync-all` (batch) |
+| Workflow               | Purpose                                                | Trigger                                                                        |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| `sanity-sync-products` | Bulk resync products to Sanity (recovery / migrations) | Admin route `POST /admin/sanity/resync-all` starts the workflow asynchronously |
 
 > The `merge-wishlist` workflow is **not** custom-built — `@alphabite/medusa-wishlist` provides this functionality per [ADR-013](#adr-013-adopt-community-wishlist-plugin).
 
@@ -1486,14 +1484,15 @@ Standard workflows we use **as-shipped**:
 
 #### 6.3.3 Custom API Routes
 
-| Route                                        | File                                                    | Purpose                                                                            |
-| -------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `GET /store/customers/me/marketing-consent`  | `src/api/store/customers/me/marketing-consent/route.ts` | Return latest authenticated customer consent state                                 |
-| `POST /store/customers/me/marketing-consent` | `src/api/store/customers/me/marketing-consent/route.ts` | Append consent record; emit `marketing-consent.updated` for Klaviyo sync           |
-| `POST /store/newsletter`                     | `src/api/store/newsletter/route.ts`                     | Public newsletter signup; records consent, emits sync event, subscribes in Klaviyo |
-| `POST /store/hooks/klaviyo`                  | `src/api/store/hooks/klaviyo/route.ts`                  | Klaviyo suppression/unsubscribe webhook; HMAC verified with raw-body middleware    |
-| `POST /admin/sanity/resync`                  | `src/api/admin/sanity/resync/route.ts`                  | Trigger single-product resync workflow                                             |
-| `POST /admin/sanity/resync-all`              | `src/api/admin/sanity/resync-all/route.ts`              | Trigger batch resync workflow                                                      |
+| Route                                        | File                                                    | Purpose                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `GET /store/customers/me/marketing-consent`  | `src/api/store/customers/me/marketing-consent/route.ts` | Return latest authenticated customer consent state                                       |
+| `POST /store/customers/me/marketing-consent` | `src/api/store/customers/me/marketing-consent/route.ts` | Append consent record; emit `marketing-consent.updated` for Klaviyo sync                 |
+| `POST /store/newsletter`                     | `src/api/store/newsletter/route.ts`                     | Public newsletter signup; records consent, emits sync event, subscribes in Klaviyo       |
+| `POST /store/hooks/klaviyo`                  | `src/api/store/hooks/klaviyo/route.ts`                  | Klaviyo suppression/unsubscribe webhook; HMAC verified with raw-body middleware          |
+| `GET /admin/sanity/status/:productId`        | `src/api/admin/sanity/status/[productId]/route.ts`      | Compute live Medusa/Sanity drift for the Admin widget                                    |
+| `POST /admin/sanity/resync/:productId`       | `src/api/admin/sanity/resync/[productId]/route.ts`      | Resync one product by calling the sync helper directly                                   |
+| `POST /admin/sanity/resync-all`              | `src/api/admin/sanity/resync-all/route.ts`              | Start non-blocking bulk `sanity-sync-products` workflow; returns `202` + `transactionId` |
 
 > Storefront note: `/account/marketing-preferences` calls the authenticated custom Store API route and must include the customer bearer token plus publishable API key. Durable consent is stored only in Medusa.
 
@@ -1503,12 +1502,11 @@ Standard workflows we use **as-shipped**:
 
 We extend Medusa Admin minimally. The principle: **let Medusa Admin be Medusa Admin.** Editorial workflows happen in Sanity Studio.
 
-| Extension                                   | Path                                                                                                                     | Purpose                                                                            |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Sanity widget on Product detail             | `apps/medusa/src/admin/widgets/product-sanity.tsx`                                                                       | Shows sync status + last synced; "Open in Sanity Studio" link; "Resync now" action |
-| Wishlist widget on Customer detail          | _Provided by `@alphabite/medusa-wishlist` if available_; otherwise `apps/medusa/src/admin/widgets/customer-wishlist.tsx` | Read-only list of wishlisted variants (for CS / concierge)                         |
-| Marketing consent widget on Customer detail | `apps/medusa/src/admin/widgets/customer-consent.tsx`                                                                     | Read-only current consent state + last event; opt-out action                       |
-| Sanity settings route                       | `apps/medusa/src/admin/routes/sanity/page.tsx`                                                                           | Trigger batch resync; show recent sync log                                         |
+| Extension                                   | Path                                                                                                                     | Purpose                                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Sanity sync widget on Product detail        | `apps/medusa/src/admin/widgets/product-sanity.tsx`                                                                       | Implemented; shows live drift status, "Open in Sanity Studio" deep link, and "Resync now" action |
+| Wishlist widget on Customer detail          | _Provided by `@alphabite/medusa-wishlist` if available_; otherwise `apps/medusa/src/admin/widgets/customer-wishlist.tsx` | Read-only list of wishlisted variants (for CS / concierge)                                       |
+| Marketing consent widget on Customer detail | `apps/medusa/src/admin/widgets/customer-consent.tsx`                                                                     | Read-only current consent state + last event; opt-out action                                     |
 
 Explicitly **out of scope** at launch: custom dashboards, branding/theme changes, replacing core admin screens, custom order screens.
 
@@ -1588,7 +1586,7 @@ sanity/
 │   ├── live.ts                 defineLive for Live Content API
 │   └── queries.ts              defineQuery exports for TypeGen
 ├── schemas/
-│   ├── documents/              product, capsulePage, lookbook,
+│   ├── documents/              product, collection, lookbook,
 │   │                            journalArticle, landingPage,
 │   │                            campaignLandingPage, legalPage,
 │   │                            sizeGuide
@@ -1599,7 +1597,7 @@ sanity/
 │   │   │                        imageWithHotspot, measurementTable,
 │   │   │                        productReference (medusaProductId)
 │   │   └── sections/           heroFilm, brandPromise, productRail,
-│   │                            capsuleRail, editorialExcerpt,
+│   │                            editorialExcerpt,
 │   │                            lookbookGrid, journalRail, imagePair,
 │   │                            videoChapter, quote, cta-section
 │   └── index.ts                exports all
@@ -1622,7 +1620,7 @@ sanity/
 | Type                                      | Key Fields                                                                                                                                                                                                                                                                                        |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `product`                                 | `medusaProductId` (immutable, required, unique), read-only mirror fields (`title`, `handle`, `mirrorMaterials`), `editorialReady`, `heroImage`, `gallery`, `narrative`, `pdpStorytelling`, `modelSpecs`, `materials`, `colorSwatches`, `sizeGuide`, `careNotes`, sustainability fields, and `seo` |
-| `capsulePage`                             | `title`, `slug`, `season`, `launchDate`, `hero` (`heroFilm` or `imagePair`), `story` (Portable Text), `productRail`, optional `sections`, `seo`                                                                                                                                                   |
+| `collection`                              | `title`, `slug`, `hero`, `statement`, `runwayFrames`, `credits`, `publishedAt`, `seo`                                                                                                                                                                                                             |
 | `lookbook`                                | `title`, `slug`, `campaign`, `season`, `coverMedia`, `blocks` (visual blocks: `imagePair`, `videoChapter`, `editorialSpread`, `productHotspot`), `credits`, `seo`                                                                                                                                 |
 | `journalArticle`                          | `title`, `slug`, `author`, `tags`, `publishedAt`, `heroMedia`, `body` (Portable Text with custom marks for product embeds), `relatedArticles`, `relatedProducts`, `seo`                                                                                                                           |
 | `landingPage`                             | `title`, `slug`, `sections` (broad set), `seo`                                                                                                                                                                                                                                                    |
@@ -1668,33 +1666,32 @@ We ship a **constrained, brand-safe palette** of 10-12 modules. Editors compose 
 
 #### 7.2.1 Module Inventory
 
-| Module             | Purpose                                                                    | Allowed In                            |
-| ------------------ | -------------------------------------------------------------------------- | ------------------------------------- |
-| `heroFilm`         | Full-bleed hero with image or Mux video, headline, subhead, CTA            | Home, capsule, landing, campaign      |
-| `brandPromise`     | Editorial statement block — large type, optional subcopy                   | Home, about, capsule                  |
-| `productRail`      | Curated product list (carousel or grid); references via `productReference` | Home, capsule, journal, landing       |
-| `capsuleRail`      | Curated list of capsule pages                                              | Home, journal                         |
-| `editorialExcerpt` | Pull-quote from a journal article + link                                   | Home, capsule                         |
-| `lookbookGrid`     | Visual grid referencing a lookbook                                         | Home, capsule, lookbook               |
-| `journalRail`      | Recent journal articles                                                    | Home, about                           |
-| `imagePair`        | Two side-by-side editorial images with optional captions                   | Home, capsule, lookbook, journal, PDP |
-| `videoChapter`     | Single Mux video chapter with optional caption + product hotspots          | Lookbook, journal, capsule            |
-| `quote`            | Editorial pull quote, attribution                                          | Journal, about, capsule               |
-| `cta-section`      | Standalone CTA band with link                                              | Home, landing, campaign, wholesale    |
-| `pdpStorytelling`  | PDP-specific section subset (story, fit, materials)                        | `product` only                        |
+| Module             | Purpose                                                                    | Allowed In                               |
+| ------------------ | -------------------------------------------------------------------------- | ---------------------------------------- |
+| `heroFilm`         | Full-bleed hero with image or Mux video, headline, subhead, CTA            | Home, collection, landing, campaign      |
+| `brandPromise`     | Editorial statement block — large type, optional subcopy                   | Home, about, collection                  |
+| `productRail`      | Curated product list (carousel or grid); references via `productReference` | Home, collection, journal, landing       |
+| `editorialExcerpt` | Pull-quote from a journal article + link                                   | Home, collection                         |
+| `lookbookGrid`     | Visual grid referencing a lookbook                                         | Home, collection, lookbook               |
+| `journalRail`      | Recent journal articles                                                    | Home, about                              |
+| `imagePair`        | Two side-by-side editorial images with optional captions                   | Home, collection, lookbook, journal, PDP |
+| `videoChapter`     | Single Mux video chapter with optional caption + product hotspots          | Lookbook, journal, collection            |
+| `quote`            | Editorial pull quote, attribution                                          | Journal, about, collection               |
+| `cta-section`      | Standalone CTA band with link                                              | Home, landing, campaign, wholesale       |
+| `pdpStorytelling`  | PDP-specific section subset (story, fit, materials)                        | `product` only                           |
 
 #### 7.2.2 Per-Page Module Sets
 
 Each document type allows **only** the modules listed above. We do **not** use a universal `pageBuilder` array.
 
-| Page Type                            | Allowed Modules                                                                                                         |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| `homePage`                           | `heroFilm`, `capsuleRail`, `editorialExcerpt`, `brandPromise`, `productRail`, `journalRail`, `cta-section`, `imagePair` |
-| `capsulePage`                        | `heroFilm`, `productRail`, `imagePair`, `lookbookGrid`, `quote`, `editorialExcerpt`, `cta-section`                      |
-| `lookbook`                           | `videoChapter`, `imagePair`, `editorialSpread`, `productHotspot`                                                        |
-| `journalArticle`                     | Portable Text body + minimal embed modules (no full page-builder freedom)                                               |
-| `landingPage`, `campaignLandingPage` | Broader subset for marketing flexibility                                                                                |
-| `product`                            | `pdpStorytelling`, `imagePair`, `quote`, `videoChapter`                                                                 |
+| Page Type                            | Allowed Modules                                                                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `homePage`                           | `heroFilm`, `editorialExcerpt`, `brandPromise`, `productRail`, `journalRail`, `cta-section`, `imagePair` |
+| `collection`                         | Runway frame sequence, editorial statement, credits, SEO (no generic page-builder modules)               |
+| `lookbook`                           | `videoChapter`, `imagePair`, `editorialSpread`, `productHotspot`                                         |
+| `journalArticle`                     | Portable Text body + minimal embed modules (no full page-builder freedom)                                |
+| `landingPage`, `campaignLandingPage` | Broader subset for marketing flexibility                                                                 |
+| `product`                            | `pdpStorytelling`, `imagePair`, `quote`, `videoChapter`                                                  |
 
 #### 7.2.3 Module Naming & Validation
 
@@ -1718,7 +1715,7 @@ Each document type allows **only** the modules listed above. We do **not** use a
 
 #### 7.3.2 Scheduled Drops & Releases
 
-- **Sanity Content Releases** (API v `2025-02-19`+) are used for capsule launches that touch multiple documents (capsule page, homepage hero, journal article, announcement bar) coordinated to the same instant.
+- **Sanity Content Releases** (API v `2025-02-19`+) are used for collection launches that touch multiple documents (collection page, homepage hero, journal article, announcement bar) coordinated to the same instant.
 - Schemas are designed with releases in mind — no hidden assumptions that there is exactly one published version of any given document.
 - For single-document scheduling (e.g. one journal article going live at noon), **Scheduled Drafts** are used.
 - Legacy "Scheduled Publishing" plugin is **not** used.
@@ -1731,7 +1728,7 @@ Configured via Sanity **Presentation Tool** + `next-sanity` `defineLive` + Draft
 | ----------------------------------------------------- | ----------------- |
 | `/`                                                   | ✓                 |
 | `/products/[handle]`                                  | ✓                 |
-| `/capsules/[slug]`                                    | ✓                 |
+| `/collections/[slug]`                                 | ✓                 |
 | `/lookbook/[slug]`                                    | ✓                 |
 | `/journal/[slug]`                                     | ✓                 |
 | `/about`, `/press`, `/wholesale`                      | ✓                 |
@@ -1747,7 +1744,7 @@ Stega encoding rules:
 
 - **Phase 1: English-only.** No localization plugins installed. Schemas use neutral field names (`title`, never `titleEn`).
 - **Future:** When a second language is introduced:
-  - Document-level localization for `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `product` (where storytelling differs by market).
+  - Document-level localization for `collection`, `lookbook`, `journalArticle`, `legalPage`, `product` (where storytelling differs by market).
   - Field-level localization via `sanity-plugin-internationalized-array` for `globalSettings`, nav labels, announcement bar copy, and product microcopy.
   - Sanity's `@sanity/document-internationalization` for top-level locale fanout.
 - Schema fields are **already namable for localization**; no rewrite required.
@@ -1828,7 +1825,7 @@ Optional editorial overrides per reference:
 - **Trigger:** Medusa subscriber on `product.created`, `product.updated`, `product.deleted`.
 - **Idempotency:** deterministic `_id === medusaProductId`, `createIfNotExists`, and `patch().set()` of mirror fields only.
 - **Delete behavior:** Sanity `product` doc is deleted by deterministic `_id` when Medusa emits `product.deleted`.
-- **Recovery:** a future admin-only resync workflow may replay Medusa products into Sanity if drift is detected.
+- **Recovery:** `POST /admin/sanity/resync/:productId` replays one Medusa product, and `POST /admin/sanity/resync-all` starts the bulk `sanity-sync-products` workflow asynchronously. `GET /admin/sanity/status/:productId` computes live drift for the Admin widget.
 
 #### 7.4.5 Pitfalls Explicitly Avoided
 
@@ -1836,7 +1833,7 @@ Optional editorial overrides per reference:
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | Editor edits Medusa mirror fields          | `readOnly: true` + grouped under `Mirror`                                                                   |
 | Sanity used to render live price/inventory | Storefront always fetches Medusa at request time                                                            |
-| Stale mirror fields mislead editor         | Product events re-patch deterministic Sanity docs; manual smoke/resync can repair drift                     |
+| Stale mirror fields mislead editor         | Product events re-patch deterministic Sanity docs; Admin widget drift status + resync routes repair misses  |
 | Broken product references in editorial     | `medusaProductId` is a string, not a Sanity ref; storefront degrades gracefully if product no longer exists |
 | Sync loops                                 | Sanity webhooks revalidate Next.js caches only; they never mutate Medusa                                    |
 | Stega leaking into SEO/JSON-LD             | `stegaClean()` applied to all metadata payloads                                                             |
@@ -1851,7 +1848,7 @@ Optional editorial overrides per reference:
 | `productCard` block | Stores `medusaProductId` + optional editorial overrides (`displayTitle`, `eyebrow`, `imageOverride`, `merchCopy`)      |
 | `productRail` block | Stores ordered array of `medusaProductId` + display options (layout, max items)                                        |
 | Live data           | Storefront fetches price, stock, availability, calculated price from Medusa **at request time** — never from Sanity    |
-| Stale mirror repair | A future admin-only replay can call the same Sanity sync service for all Medusa products                               |
+| Stale mirror repair | Admin routes can replay one product or start the bulk `sanity-sync-products` workflow without new persistence          |
 
 #### 7.4.2 Custom Inputs
 
@@ -1868,22 +1865,22 @@ Optional editorial overrides per reference:
 
 #### 7.4.4 Webhooks & Revalidation
 
-- Sanity webhook → Next.js `/api/revalidate` → tag-based revalidation (`sanity:product:{id}`, `sanity:home`, `sanity:journal:{slug}`, etc.).
+- Sanity webhook → Next.js `/api/revalidate` → tag-based revalidation (`product:{handle}`, `home-page`, `collection:{slug}`, `journal:{slug}`, etc.).
 - Webhook endpoint validates Sanity signature; secret stored as Vercel environment variable.
-- Tags are scoped narrowly — never revalidate `sanity:*` for a single edit.
+- Tags are scoped narrowly — never revalidate broad wildcard groups for a single edit.
 
 #### 7.4.5 Pitfalls Avoided
 
-| Pitfall                                 | Mitigation                                                                                       |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Sanity becomes commerce source of truth | Mirror fields are read-only; storefront always fetches commerce data from Medusa at request time |
-| Stale mirror fields                     | Deterministic ids allow safe replay through the Medusa `sanity-sync` service                     |
-| Page-builder bloat                      | Capped module palette, validation rules, deprecation policy                                      |
-| Singleton duplicates                    | Deterministic ids + Structure Tool + action filtering + duplicate-audit script                   |
-| Public dataset exposure                 | Embargoed content only on private `production` dataset                                           |
-| Stega leaking into metadata             | `stega: false` per query; `stegaClean()` on derived strings                                      |
-| Webhook spoofing                        | Signature validation + shared secret + raw body                                                  |
-| TypeGen drift                           | TypeGen runs in CI; missing/changed types fail the build                                         |
+| Pitfall                                 | Mitigation                                                                                           |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Sanity becomes commerce source of truth | Mirror fields are read-only; storefront always fetches commerce data from Medusa at request time     |
+| Stale mirror fields                     | Deterministic ids allow safe replay through the Medusa `sanity-sync` service and Admin resync routes |
+| Page-builder bloat                      | Capped module palette, validation rules, deprecation policy                                          |
+| Singleton duplicates                    | Deterministic ids + Structure Tool + action filtering + duplicate-audit script                       |
+| Public dataset exposure                 | Embargoed content only on private `production` dataset                                               |
+| Stega leaking into metadata             | `stega: false` per query; `stegaClean()` on derived strings                                          |
+| Webhook spoofing                        | Signature validation + shared secret + raw body                                                      |
+| TypeGen drift                           | TypeGen runs in CI; missing/changed types fail the build                                             |
 
 #### 7.4.6 Agent 8 Schema Alignment
 
@@ -1982,10 +1979,10 @@ This is enforced by the Medusa helpers — calls without region context fail lou
 - Endpoint: `POST /api/revalidate` in storefront.
 - Validates Sanity webhook signature (shared secret, signature header).
 - Body indicates document type + ID; route maps to revalidation tags:
-  - `product` → `revalidateTag("product:{medusaProductId}")`
-  - `homePage` → `revalidateTag("sanity:home")`
-  - `capsulePage` → `revalidateTag("sanity:capsule:{slug}")`
-  - `journalArticle` → `revalidateTag("sanity:journal:{slug}")`
+  - `product` → `revalidateTag("product")`, `revalidateTag("products")`, and scoped `product:{id-or-handle}` where present
+  - `homePage` → `revalidateTag("home-page")`
+  - `collection` → `revalidateTag("collection:{slug}")`
+  - `journal` → `revalidateTag("journal:{slug}")`
   - etc.
 - Returns 200 quickly; revalidation runs asynchronously.
 
@@ -2697,7 +2694,7 @@ Measured at p75 across mobile + desktop; tracked via Vercel Speed Insights and `
 | Best Practices | 95+     | 95+    |
 | SEO            | 95+     | 95+    |
 
-Lighthouse runs in CI via `lighthouse-ci` on representative routes (home, PDP, capsule, journal, checkout). Regressions fail the build.
+Lighthouse runs in CI via `lighthouse-ci` on representative routes (home, PDP, collection, journal, checkout). Regressions fail the build.
 
 #### 11.1.3 Asset Budgets
 
@@ -2729,16 +2726,16 @@ Cross-references [§3.3](#33-data-flow), [§5.1.3](#513-rendering-strategy-per-p
 
 #### 11.2.2 Tag Convention
 
-| Tag                         | Trigger                                     |
-| --------------------------- | ------------------------------------------- |
-| `sanity:home`               | Sanity webhook on `homePage` publish        |
-| `sanity:capsule:{slug}`     | Sanity webhook on `capsulePage` publish     |
-| `sanity:journal:{slug}`     | Sanity webhook on `journalArticle` publish  |
-| `sanity:lookbook:{slug}`    | Sanity webhook on `lookbook` publish        |
-| `sanity:page:{slug}`        | Sanity webhook on `legalPage`/`landingPage` |
-| `sanity:settings`           | Sanity webhook on `globalSettings`          |
-| `product:{medusaProductId}` | Medusa subscriber on product update         |
-| `collection:{handle}`       | Medusa subscriber on collection update      |
+| Tag                                     | Trigger                                        |
+| --------------------------------------- | ---------------------------------------------- |
+| `home-page`                             | Sanity webhook on `homePage` publish           |
+| `collection:{slug}`                     | Sanity webhook on `collection` publish         |
+| `journal:{slug}`                        | Sanity webhook on `journal` publish            |
+| `lookbook:{slug}`                       | Sanity webhook on `lookbook` publish           |
+| `page:{slug}`                           | Sanity webhook on `legal`/`page` publish       |
+| `navigation`, `footer`, `site-settings` | Sanity webhook on chrome/settings singletons   |
+| `product:{medusaProductId}`             | Medusa subscriber on product update            |
+| `product-collections`                   | Medusa subscriber on product collection update |
 
 #### 11.2.3 Never-Cached Routes
 
@@ -2773,9 +2770,9 @@ Cross-references [§3.3](#33-data-flow), [§5.1.3](#513-rendering-strategy-per-p
 | ------------------------- | ----------------------------------------------------- |
 | Home                      | `/`                                                   |
 | Shop list                 | `/shop`                                               |
-| Collection                | `/shop/[collection-handle]`                           |
+| Shop collection           | `/shop/[collection-handle]`                           |
 | Product                   | `/products/[product-handle]`                          |
-| Capsule                   | `/capsules/[capsule-slug]`                            |
+| Editorial collection      | `/collections/[collection-slug]`                      |
 | Lookbook                  | `/lookbook/[lookbook-slug]`                           |
 | Journal                   | `/journal/[article-slug]`                             |
 | Legal                     | `/privacy`, `/terms`, `/returns`, `/shipping`, `/faq` |
@@ -2813,7 +2810,7 @@ JSON-LD generated server-side, with stega stripped. Validated via Schema.org / G
 - Sitemap at `/sitemap.xml` generated by Next.js, including:
   - Static routes (home, about, press, wholesale, legal)
   - All published products from Medusa
-  - All published Sanity documents (capsules, lookbooks, journal articles)
+  - All published Sanity documents (collections, lookbooks, journal articles)
   - Excludes account, checkout, cart, search, /studio
 - `robots.txt`:
   - Allows everything by default
@@ -2823,10 +2820,10 @@ JSON-LD generated server-side, with stega stripped. Validated via Schema.org / G
 
 Agent 27 launch implementation notes:
 
-- `/sitemap.xml` is generated by `apps/storefront/src/app/sitemap.ts`; it includes home, `/products`, `/lookbook`, `/journal`, `/capsule`, Medusa product handles, Sanity lookbook/journal/capsule documents, legal pages, and generic public page slugs. If a dynamic source is temporarily unreachable, the route returns static routes plus any successful dynamic sources rather than 500ing.
+- `/sitemap.xml` is generated by `apps/storefront/src/app/sitemap.ts`; it includes home, `/products`, `/lookbook`, `/journal`, Medusa product handles, Sanity collection/lookbook/journal documents, legal pages, and generic public page slugs. If a dynamic source is temporarily unreachable, the route returns static routes plus any successful dynamic sources rather than 500ing.
 - `/robots.txt` is generated by `apps/storefront/src/app/robots.ts`; it allows `/` and disallows `/account/`, `/checkout/`, `/api/`, `/studio/`, `/preview-ui`, and `/preview-modules`, with a sitemap reference.
-- Open Graph images use `next/og` via the root `opengraph-image.tsx` / `twitter-image.tsx` defaults and route-level dynamic images for products, journal entries, lookbooks, and capsules. The visual system uses the launch brand palette (`#efe9df`, `#1a0a06`, `#c8321c`) with system font fallbacks inside `ImageResponse` to avoid extra font payload.
-- Structured data is generated server-side via `apps/storefront/src/lib/seo/jsonld.ts`: home emits `Organization` and `WebSite`; PLP emits `BreadcrumbList` and `ItemList`; PDP keeps Product JSON-LD and adds `BreadcrumbList`; journal entries emit `Article` and `BreadcrumbList`; lookbooks emit `CreativeWork` and `BreadcrumbList`; capsules emit `CollectionPage`, `BreadcrumbList`, and `ItemList`.
+- Open Graph images use `next/og` via the root `opengraph-image.tsx` / `twitter-image.tsx` defaults and route-level dynamic images for products, journal entries, lookbooks, and collections. The visual system uses the launch brand palette (`#efe9df`, `#1a0a06`, `#c8321c`) with system font fallbacks inside `ImageResponse` to avoid extra font payload.
+- Structured data is generated server-side via `apps/storefront/src/lib/seo/jsonld.ts`: home emits `Organization` and `WebSite`; PLP emits `BreadcrumbList` and `ItemList`; PDP keeps Product JSON-LD and adds `BreadcrumbList`; journal entries emit `Article` and `BreadcrumbList`; lookbooks emit `CreativeWork` and `BreadcrumbList`; collections emit `CollectionPage`, `BreadcrumbList`, and `ItemList`.
 - `/manifest.webmanifest` is generated by `apps/storefront/src/app/manifest.ts` with theme color `#1a0a06`, background `#efe9df`, and the production favicon/app icon set under `apps/storefront/public/`.
 - Root resource hints preconnect only to the critical Sanity/Mux media origins: `https://cdn.sanity.io`, `https://image.mux.com`, and `https://stream.mux.com`.
 - Fraunces and Inter Tight remain managed by `next/font/google` in the site layout. Do not add manual font preload links unless Lighthouse or field data proves LCP is font-bound; manual preloads can duplicate hashed `next/font` assets and compete with hero media.
@@ -2924,13 +2921,13 @@ vaïvae launches with a **single market** (US, USD, English). The architecture i
 
 When a second language is added:
 
-| Surface                             | Approach                                                                                                                                                                                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sanity content                      | `sanity-plugin-internationalized-array` for short shared fields (nav, labels, announcement bar); `@sanity/document-internationalization` for top-level locale fanout on `capsulePage`, `lookbook`, `journalArticle`, `legalPage`, `product` |
-| Medusa product fields               | Translation Module (deferred; not used at launch)                                                                                                                                                                                           |
-| Storefront routing                  | `[locale]` route segment becomes optional top-level (e.g. `/fr/products/[handle]`)                                                                                                                                                          |
-| Locale detection                    | Cloudflare geo + browser `Accept-Language`; user override saved to cookie                                                                                                                                                                   |
-| Date / number / currency formatting | `Intl` APIs (already in use, nothing to rewrite)                                                                                                                                                                                            |
+| Surface                             | Approach                                                                                                                                                                                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sanity content                      | `sanity-plugin-internationalized-array` for short shared fields (nav, labels, announcement bar); `@sanity/document-internationalization` for top-level locale fanout on `collection`, `lookbook`, `journalArticle`, `legalPage`, `product` |
+| Medusa product fields               | Translation Module (deferred; not used at launch)                                                                                                                                                                                          |
+| Storefront routing                  | `[locale]` route segment becomes optional top-level (e.g. `/fr/products/[handle]`)                                                                                                                                                         |
+| Locale detection                    | Cloudflare geo + browser `Accept-Language`; user override saved to cookie                                                                                                                                                                  |
+| Date / number / currency formatting | `Intl` APIs (already in use, nothing to rewrite)                                                                                                                                                                                           |
 
 #### 12.1.3 Right-to-Left
 
@@ -3260,12 +3257,12 @@ Scope optional but encouraged: `feat(checkout): ...`, `fix(medusa-sync): ...`.
 
 #### 14.3.1 GitHub Actions Workflows
 
-| Workflow         | Trigger                                  | Jobs                                                                                                     |
-| ---------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `ci.yml`         | PR + push to main + manual               | format check, lint, typecheck, unit coverage, storefront + Medusa build, PR gitleaks, Sentry source maps |
-| `lighthouse.yml` | Vercel preview deployment + manual       | `lighthouse-ci` against representative preview routes (`/`, `/products`, `/capsule`, `/journal`)         |
-| `e2e.yml`        | PR path-gated to storefront/E2E + manual | Playwright Chromium smoke run, with failure reports and traces uploaded as artifacts                     |
-| `gitleaks.yml`   | push to main + manual                    | Full-history `gitleaks` scan using `.gitleaks.toml`                                                      |
+| Workflow         | Trigger                                  | Jobs                                                                                                        |
+| ---------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `ci.yml`         | PR + push to main + manual               | format check, lint, typecheck, unit coverage, storefront + Medusa build, PR gitleaks, Sentry source maps    |
+| `lighthouse.yml` | Vercel preview deployment + manual       | `lighthouse-ci` against representative preview routes (`/`, `/products`, `/collections/[slug]`, `/journal`) |
+| `e2e.yml`        | PR path-gated to storefront/E2E + manual | Playwright Chromium smoke run, with failure reports and traces uploaded as artifacts                        |
+| `gitleaks.yml`   | push to main + manual                    | Full-history `gitleaks` scan using `.gitleaks.toml`                                                         |
 
 All workflows run on GitHub-hosted runners. Caches: pnpm store via `actions/setup-node`, Turborepo remote cache via `TURBO_TOKEN` / `TURBO_TEAM`, and Vercel/Medusa provider build caches in their deployment pipelines.
 
@@ -3511,7 +3508,7 @@ Adds:
 
 #### 15.3.4 Test Data
 
-- Each preview environment is seeded with a deterministic fixture set: 6 products (varying sizes/colors/stock), 1 capsule, 2 journal articles, 1 lookbook.
+- Each preview environment is seeded with a deterministic fixture set: 6 products (varying sizes/colors/stock), 1 collection, 2 journal articles, 1 lookbook.
 - Fixtures defined in `apps/medusa/src/seeds/test-fixtures.ts`.
 - Stripe test cards documented in `docs/testing/stripe-test-cards.md`.
 
@@ -3655,15 +3652,15 @@ Never combine deprecation + removal in a single deploy.
 
 #### 16.3.3 Common Mitigations
 
-| Symptom                        | First Action                                                                                                 |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| 5xx spike on storefront        | Vercel: promote previous deployment                                                                          |
-| 5xx spike on Medusa            | Medusa Cloud: redeploy previous deployment                                                                   |
-| Stripe webhook failures        | Check `STRIPE_WEBHOOK_SECRET` rotated; re-deliver from Stripe Dashboard                                      |
-| Sanity content not propagating | Verify Sanity webhook signed + Vercel `/api/revalidate` reachable; manual `revalidateTag` via admin endpoint |
-| Sync drift (Medusa↔Sanity)     | Run `POST /admin/sanity/resync-all` workflow                                                                 |
-| Inventory negative / oversold  | Pause sales channel in Medusa Admin; reconcile via stock-location adjustment                                 |
-| DDoS / bot wave                | Cloudflare "Under Attack Mode" on `vaivae.com` (temporary) and `api.vaivae.com`                              |
+| Symptom                        | First Action                                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| 5xx spike on storefront        | Vercel: promote previous deployment                                                                                             |
+| 5xx spike on Medusa            | Medusa Cloud: redeploy previous deployment                                                                                      |
+| Stripe webhook failures        | Check `STRIPE_WEBHOOK_SECRET` rotated; re-deliver from Stripe Dashboard                                                         |
+| Sanity content not propagating | Verify Sanity webhook signed + Vercel `/api/revalidate` reachable; manual `revalidateTag` via admin endpoint                    |
+| Sync drift (Medusa↔Sanity)     | Check `GET /admin/sanity/status/:productId`; run `POST /admin/sanity/resync/:productId` or bulk `POST /admin/sanity/resync-all` |
+| Inventory negative / oversold  | Pause sales channel in Medusa Admin; reconcile via stock-location adjustment                                                    |
+| DDoS / bot wave                | Cloudflare "Under Attack Mode" on `vaivae.com` (temporary) and `api.vaivae.com`                                                 |
 
 #### 16.3.4 Communications
 
@@ -4073,29 +4070,29 @@ This section tracks known risks to the platform and the mitigations in place. Se
 
 ### 19.1 Risk Register
 
-| #   | Risk                                                                                                    | Severity   | Owner                   | Mitigation                                                                                                                                                                                                                               |
-| --- | ------------------------------------------------------------------------------------------------------- | ---------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1  | ~~Cookie / GDPR vendor not selected before launch~~                                                     | **Closed** | Founder + lead dev      | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Termly Pro+ adopted as CMP + legal-doc generator. Implementation tracked in launch checklist.                              |
-| R2  | ~~GDPR posture not finalized~~                                                                          | **Closed** | Founder + legal advisor | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Apply GDPR-equivalent globally.                                                                                            |
-| R3  | ~~Data retention policy undefined~~                                                                     | **Closed** | Founder                 | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Default policy adopted (orders 7 years, customers until deletion + 3 years inactive, marketing 30 days post-unsubscribe).  |
-| R4  | ~~No off-provider backups~~                                                                             | **Closed** | Lead dev                | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** SimpleBackups operational from launch. Quarterly restore drills.                                                           |
-| R5  | **Shippo v2 fulfillment provider gap** ([§6.2.4](#624-shipping--fulfillment))                           | Medium     | Lead dev                | Phase 1: subscriber-driven label generation + flat-rate checkout. Phase 2: build proper v2 provider when live rates needed.                                                                                                              |
-| R6  | **Sanity Free dataset is public** ([§9.3](#93-cms-authentication-sanity), [§7.3.5](#735-roles--access)) | Medium     | Lead dev                | Upgrade to Growth before any embargoed content lands. Documented in launch checklist.                                                                                                                                                    |
-| R7  | **Medusa v2 community ecosystem still maturing**                                                        | Medium     | Lead dev                | Stay close to Medusa team; use only official providers; avoid abandoned community plugins; contribute fixes upstream when found. Community plugin dependencies (`@alphabite/medusa-wishlist`) reviewed quarterly for maintenance signal. |
-| R8  | **Single founder + lead developer for ops coverage**                                                    | Medium     | Founder                 | At launch, accept best-effort out-of-hours response. No SEV1 SLA. Monitor for incidents that require on-call rotation; introduce when justified.                                                                                         |
-| R9  | **Cross-system sync drift (Medusa↔Sanity)**                                                             | Medium     | Lead dev                | Idempotent subscribers keyed by deterministic Sanity `_id`, Medusa Cloud event retries for transient failures, manual smoke test, future `resync-all` workflow, weekly synthetic check.                                                  |
-| R10 | **Stripe webhook delivery failure**                                                                     | Medium     | Lead dev                | Stripe retries automatically; Medusa is idempotent; unprocessed events visible in Stripe Dashboard for manual replay; alert on > 5 webhook validation failures/hour.                                                                     |
-| R11 | **Vendor lock-in (Vercel, Medusa Cloud, Sanity)**                                                       | Low        | Founder                 | Code is portable: Next.js runs anywhere; Medusa OSS core can be self-hosted; Sanity supports full dataset export. Migration would take effort but is not blocked.                                                                        |
-| R12 | **AI-agent-generated code quality / consistency**                                                       | Medium     | Lead dev                | Strict TypeScript, Zod runtime validation, ESLint + Prettier in CI, mandatory PR review, ADR-driven decisions, documented patterns in this architecture doc, AI agents prompted with this doc as context.                                |
-| R13 | **Catalog / search performance degrades**                                                               | Low        | Lead dev                | Phase 2 search service trigger ([§18.3.1](#1831-triggers)). Native search sufficient at launch catalog size.                                                                                                                             |
-| R14 | **Bot traffic / scrape during drops**                                                                   | Medium     | Lead dev                | Cloudflare Bot Fight Mode + Turnstile + rate limits; Medusa cart reservations; consider Cloudflare Pro before high-profile drops.                                                                                                        |
-| R15 | **Cost overruns from variable services**                                                                | Low        | Founder                 | Spend alerts at Vercel / Medusa Cloud / Sanity; monthly invoice review; cost projections in [§17.2](#172-phase-projections).                                                                                                             |
-| R16 | **Fashion-specific gaps (preorders, deposits, complex returns)**                                        | Medium     | Founder + lead dev      | Out of Phase 1 scope. Acknowledged limitations of Medusa for fashion at scale. Re-evaluate in Phase 3 (Centra evaluation).                                                                                                               |
-| R17 | **Storefront / Sanity Studio coupling**                                                                 | Low        | Lead dev                | Studio bundled in storefront simplifies launch. If Studio breaks deploys, isolate by moving to subdomain (architectural change captured as future ADR).                                                                                  |
-| R18 | **CMS schema drift with frontend code**                                                                 | Medium     | Lead dev                | Sanity TypeGen runs in CI; broken queries fail builds; PRs touching schemas must update consumers.                                                                                                                                       |
-| R19 | **Email deliverability**                                                                                | Medium     | Lead dev                | Verified Resend domain; SPF, DKIM, DMARC; warm sender reputation; bounce/complaint handling; monitor deliverability dashboards.                                                                                                          |
-| R20 | **Single payment provider (Stripe)**                                                                    | Low        | Founder                 | Acceptable at launch. Add PayPal in Phase 2 if data shows cart abandonment for non-Stripe-preferred users.                                                                                                                               |
-| R21 | **Cloudflare misconfiguration**                                                                         | Low        | Lead dev                | DNS-only on Vercel domain; selective proxy on `api.vaivae.com`; webhook paths bypass cache; configuration in `docs/devops/cloudflare-config.md`.                                                                                         |
+| #   | Risk                                                                                                    | Severity   | Owner                   | Mitigation                                                                                                                                                                                                                                             |
+| --- | ------------------------------------------------------------------------------------------------------- | ---------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1  | ~~Cookie / GDPR vendor not selected before launch~~                                                     | **Closed** | Founder + lead dev      | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Termly Pro+ adopted as CMP + legal-doc generator. Implementation tracked in launch checklist.                                            |
+| R2  | ~~GDPR posture not finalized~~                                                                          | **Closed** | Founder + legal advisor | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Apply GDPR-equivalent globally.                                                                                                          |
+| R3  | ~~Data retention policy undefined~~                                                                     | **Closed** | Founder                 | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** Default policy adopted (orders 7 years, customers until deletion + 3 years inactive, marketing 30 days post-unsubscribe).                |
+| R4  | ~~No off-provider backups~~                                                                             | **Closed** | Lead dev                | **Closed by [ADR-015](#adr-015-compliance-foundation--termly-pro-global-gdpr-posture-off-provider-backups).** SimpleBackups operational from launch. Quarterly restore drills.                                                                         |
+| R5  | **Shippo v2 fulfillment provider gap** ([§6.2.4](#624-shipping--fulfillment))                           | Medium     | Lead dev                | Phase 1: subscriber-driven label generation + flat-rate checkout. Phase 2: build proper v2 provider when live rates needed.                                                                                                                            |
+| R6  | **Sanity Free dataset is public** ([§9.3](#93-cms-authentication-sanity), [§7.3.5](#735-roles--access)) | Medium     | Lead dev                | Upgrade to Growth before any embargoed content lands. Documented in launch checklist.                                                                                                                                                                  |
+| R7  | **Medusa v2 community ecosystem still maturing**                                                        | Medium     | Lead dev                | Stay close to Medusa team; use only official providers; avoid abandoned community plugins; contribute fixes upstream when found. Community plugin dependencies (`@alphabite/medusa-wishlist`) reviewed quarterly for maintenance signal.               |
+| R8  | **Single founder + lead developer for ops coverage**                                                    | Medium     | Founder                 | At launch, accept best-effort out-of-hours response. No SEV1 SLA. Monitor for incidents that require on-call rotation; introduce when justified.                                                                                                       |
+| R9  | **Cross-system sync drift (Medusa↔Sanity)**                                                             | Medium     | Lead dev                | Idempotent subscribers keyed by deterministic Sanity `_id`, Medusa Cloud event retries for transient failures, implemented live status route + product-detail Admin widget, single-product resync, bulk `resync-all` workflow, weekly synthetic check. |
+| R10 | **Stripe webhook delivery failure**                                                                     | Medium     | Lead dev                | Stripe retries automatically; Medusa is idempotent; unprocessed events visible in Stripe Dashboard for manual replay; alert on > 5 webhook validation failures/hour.                                                                                   |
+| R11 | **Vendor lock-in (Vercel, Medusa Cloud, Sanity)**                                                       | Low        | Founder                 | Code is portable: Next.js runs anywhere; Medusa OSS core can be self-hosted; Sanity supports full dataset export. Migration would take effort but is not blocked.                                                                                      |
+| R12 | **AI-agent-generated code quality / consistency**                                                       | Medium     | Lead dev                | Strict TypeScript, Zod runtime validation, ESLint + Prettier in CI, mandatory PR review, ADR-driven decisions, documented patterns in this architecture doc, AI agents prompted with this doc as context.                                              |
+| R13 | **Catalog / search performance degrades**                                                               | Low        | Lead dev                | Phase 2 search service trigger ([§18.3.1](#1831-triggers)). Native search sufficient at launch catalog size.                                                                                                                                           |
+| R14 | **Bot traffic / scrape during drops**                                                                   | Medium     | Lead dev                | Cloudflare Bot Fight Mode + Turnstile + rate limits; Medusa cart reservations; consider Cloudflare Pro before high-profile drops.                                                                                                                      |
+| R15 | **Cost overruns from variable services**                                                                | Low        | Founder                 | Spend alerts at Vercel / Medusa Cloud / Sanity; monthly invoice review; cost projections in [§17.2](#172-phase-projections).                                                                                                                           |
+| R16 | **Fashion-specific gaps (preorders, deposits, complex returns)**                                        | Medium     | Founder + lead dev      | Out of Phase 1 scope. Acknowledged limitations of Medusa for fashion at scale. Re-evaluate in Phase 3 (Centra evaluation).                                                                                                                             |
+| R17 | **Storefront / Sanity Studio coupling**                                                                 | Low        | Lead dev                | Studio bundled in storefront simplifies launch. If Studio breaks deploys, isolate by moving to subdomain (architectural change captured as future ADR).                                                                                                |
+| R18 | **CMS schema drift with frontend code**                                                                 | Medium     | Lead dev                | Sanity TypeGen runs in CI; broken queries fail builds; PRs touching schemas must update consumers.                                                                                                                                                     |
+| R19 | **Email deliverability**                                                                                | Medium     | Lead dev                | Verified Resend domain; SPF, DKIM, DMARC; warm sender reputation; bounce/complaint handling; monitor deliverability dashboards.                                                                                                                        |
+| R20 | **Single payment provider (Stripe)**                                                                    | Low        | Founder                 | Acceptable at launch. Add PayPal in Phase 2 if data shows cart abandonment for non-Stripe-preferred users.                                                                                                                                             |
+| R21 | **Cloudflare misconfiguration**                                                                         | Low        | Lead dev                | DNS-only on Vercel domain; selective proxy on `api.vaivae.com`; webhook paths bypass cache; configuration in `docs/devops/cloudflare-config.md`.                                                                                                       |
 
 ### 19.2 Risk Review Cadence
 
@@ -4148,6 +4145,8 @@ This is the canonical record of architectural decisions. Each entry captures **c
 | ADR-013 | Adopt Community Wishlist Plugin                                                | Accepted                                            |
 | ADR-014 | Adopt Official Medusa Plugins — Analytics, Loyalty                             | Accepted                                            |
 | ADR-015 | Compliance Foundation — Termly Pro+, Global GDPR Posture, Off-Provider Backups | Accepted                                            |
+| ADR-016 | Medusa Cloud Build and Config-Load Constraints                                 | Accepted                                            |
+| ADR-017 | Close the Medusa↔Sanity Operator Gap Rather Than Re-Architect                  | Accepted                                            |
 
 **Note (post-bootstrap remediation, 2026-05-09):** During Agent 1B registry remediation, the following clerical version corrections were applied: `@stripe/stripe-js` `8.0.0` -> `9.4.0`, `@stripe/react-stripe-js` `5.5.0` -> `6.3.0`, `@mux/mux-player-react` `3.10.0` -> `3.13.0`, and `klaviyo-api` `26.0.0` -> `22.0.1`. The manifest also documents `awilix@8.0.1` as a direct pin matching Medusa's `@medusajs/deps@2.14.2` and records that `@alphabite/medusa-wishlist@0.5.9` publishes exact Medusa `2.13.6` peer deps. These are registry-truth corrections, not architectural decision changes.
 
@@ -4252,7 +4251,7 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - Curated 10-12 page-builder modules with **per-page allowed sets** — no universal `pageBuilder`.
   - Workflow: Sanity built-in draft/publish + Comments/Tasks. **No workflow plugin.**
   - Coordinated drops via **Content Releases**; single-doc scheduling via Scheduled Drafts.
-  - Visual Editing wired for home, PDP, capsule, lookbook, journal, about/press/wholesale; stega cleaned from metadata.
+  - Visual Editing wired for home, PDP, collection, lookbook, journal, about/press/wholesale; stega cleaned from metadata.
   - Single-language launch with localization-friendly schema design (no `titleEn`-style fields).
   - Roles: Admin + Editor only at launch.
   - Sanity↔Medusa link via `medusaProductId` string (deterministic Sanity `_id === medusaProductId`); read-only mirror fields on `product`.
@@ -4395,61 +4394,105 @@ This is the canonical record of architectural decisions. Each entry captures **c
   - The `src/lib/env.ts` Zod validator still protects modules/routes/workflows at runtime — just not the config file itself.
   - `apps/medusa/package.json` deliberately diverges from the rest of the monorepo (no `catalog:`). This is documented above so it won't be "fixed" by a future cleanup PR.
 
+### ADR-017: Close the Medusa↔Sanity Operator Gap Rather Than Re-Architect
+
+- **Status:** Accepted (2026-05-23)
+- **Context:** Product operations required two UIs: Medusa Admin for commerce and Sanity Studio for editorial. The user asked whether product management should consolidate to a single source of truth after a confused incident where a Medusa Admin rename (`Terracotta - Sparkly Waist Contouring Set` → `La Caricia`) did not appear in the storefront listing because the Sanity mirror was stale. Investigation found:
+  1. The two-system boundary in [ADR-009](#adr-009-content-architecture) is sound and documented at the field level: every piece of data has exactly one source of truth. Commerce data is canonical in Medusa, editorial content is canonical in Sanity, joined by `medusaProductId`.
+  2. The operational pain came from undelivered work, not the architecture itself:
+     - A bug in `product-card.tsx` preferred Sanity over Medusa for `title` and `handle`, contrary to ADR-009. When the Sanity mirror drifted, the listing showed stale data.
+     - Page-builder enrichment keyed Medusa lookups by Sanity handle, defeating the source-of-truth rule for the same reason.
+     - The promised resync admin routes (`POST /admin/sanity/resync`, `POST /admin/sanity/resync-all`) were documented in this file but never implemented.
+     - The promised Medusa Admin product widget was documented but never built.
+     - Collections were hardcoded as a single static route, blocking operators from launching a new seasonal collection without engineering.
+  3. The Medusa→Sanity subscriber sync was registered, working code, but likely deployed after the May 15 rename event. The subscriber-export fix landed May 11; Medusa Cloud may not have redeployed before the rename. This produced silent drift that the missing recovery tools could not repair.
+- **Decision:** Honor [ADR-009](#adr-009-content-architecture). Keep Medusa as the commerce source of truth and Sanity as the editorial source of truth, joined by `medusaProductId` with one-way mirror sync. Close the operational gaps that made the architecture feel broken to operators. Specifically:
+  1. Fix the title/handle precedence bug in product cards and any other surface that incorrectly preferred Sanity over Medusa for canonical fields.
+  2. Switch page-builder Medusa enrichment to key by `medusaProductId` instead of Sanity handle, making the canonical join robust against handle drift.
+  3. Build `POST /admin/sanity/resync/:productId`, `POST /admin/sanity/resync-all`, and `GET /admin/sanity/status/:productId` admin routes. Drift status is computed by live comparison; no new persistence is introduced.
+  4. Make bulk resync non-blocking via the Medusa v2 workflow engine (`IWorkflowEngineService.run` with `throwOnError: false`), returning `202` with `transactionId`.
+  5. Build the Medusa Admin product-detail widget with live drift status, a "Resync now" action, and an "Open in Sanity Studio" deep link.
+  6. Add a Sanity Studio document action for product documents: "Open in Medusa Admin", building the URL from `NEXT_PUBLIC_MEDUSA_BACKEND_URL`.
+  7. Convert the static `/collections/summer-fall-26` page to a Sanity-managed `collection` document type served by dynamic `/collections/[slug]`. Navigation, footer, sitemap, and revalidation are driven by Sanity so operators can launch a new collection by creating a Sanity document.
+- **Alternatives considered:**
+  - _Alternative A — consolidate product management to Medusa only, using product `metadata` as a JSON bag for editorial content:_ rejected. Medusa Admin lacks CMS-grade rich-text editing, structured references, image transforms, draft/preview workflows, and a page builder. Recreating those in Medusa Admin would consume significant engineering effort and produce inferior tools to what Sanity already provides. Lookbooks and journal entries would still require a CMS, so Sanity would remain anyway. This explicitly conflicts with ADR-009.
+  - _Alternative B — reverse the direction so Sanity becomes master and syncs to Medusa for commerce operations:_ rejected. Sanity is not designed for commerce semantics such as regional pricing, tax categories, inventory locations, sales channels, fulfillment, and payment-provider rules. Replicating those concepts in Studio would be expensive and never feature-equivalent with Medusa. This conflicts with ADR-009's rule that Sanity never writes back to Medusa.
+  - _Alternative C — build a custom unified admin UI that proxies both Medusa and Sanity:_ rejected for Phase 1. It is significant engineering effort relative to the marginal UX gain over the Medusa Admin widget pattern. The widget achieves the "one primary UI, with bridging affordances" outcome with much less work and stays compatible with both vendors' future updates. Revisit only if a future audit shows the widget pattern is insufficient.
+  - _Alternative D — keep the status quo with no architectural change, no new tooling, and manual drift management:_ rejected. The operator was already experiencing real pain; the La Caricia incident was a symptom. The widget, resync routes, and dynamic collections deliver concrete UX wins for approximately 1-2 days of focused work.
+- **Consequences:**
+  - Positive: the two-system data architecture is preserved. Editorial gets a real CMS, commerce gets a real commerce platform, and neither system is forced to be both.
+  - Positive: operators see one primary UI per task. Medusa Admin remains the product CRUD surface with widget hooks to Studio; Studio remains the editorial enrichment surface with a one-click jump to Medusa Admin.
+  - Positive: mirror drift is detectable through the product-detail widget and `GET /admin/sanity/status/:productId`, and recoverable through single-product resync or bulk `resync-all`.
+  - Positive: collections are operator-managed. A new seasonal collection can launch by creating a Sanity `collection` document rather than shipping a new route.
+  - Positive: ADR-009 is no longer aspirational; the storefront code now enforces its source-of-truth rules for canonical product fields.
+  - Negative / accepted trade-off: drift is detected but not prevented at the architectural level. A renamed product still requires either the subscriber to fire or an operator to click resync. For rare events that miss the event bus, the widget shows drift on the next product-page visit. This is acceptable for Phase 1 catalog scale (≤100 products). At larger scale, a scheduled drift-detection job may warrant a future ADR.
+  - Negative / accepted trade-off: sync metadata such as last-synced-at and error history is not persisted. Status is computed live by comparing Medusa to Sanity, so the widget cannot show sync history. If operators need an audit log, add a sync-events module in a future ADR.
+  - Negative / accepted trade-off: the single-product resync route calls the sync helper directly rather than through a workflow. This matches the existing subscriber call pattern; revisit if workflow-level retry or observability becomes necessary for single-product syncs.
+- **Supersedes / depends on:** Depends on [ADR-009](#adr-009-content-architecture). This ADR does not supersede ADR-009; it operationalizes it.
+- **References to implementation commits (main, May 2026):**
+  - `8186436` — fix(storefront): prefer Medusa over Sanity for product title and handle precedence
+  - `88a7258` — feat(medusa): add admin resync routes and bulk sync workflow for Sanity mirror
+  - `6211612` — feat(storefront): add "Open in Medusa Admin" Sanity Studio action for product documents
+  - `b893571` — fix(repo): async bulk resync and id-based product enrichment
+  - `2fd1a3b` — feat(medusa): add product-detail Sanity sync widget with status, resync, and Studio deep link
+  - `6179b66` — feat(storefront): convert collections to Sanity-managed documents with dynamic [slug] route
+  - `50cac0b` — fix(storefront): remove hardcoded collection URL fallback and migrate Sanity Presentation to collection docs
+
 ---
 
 ## 21. Glossary
 
-| Term                              | Definition                                                                                                                                                                                                                  |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ADR**                           | Architecture Decision Record — a short document capturing a significant architectural decision, its context, and consequences. See [§20](#20-decision-log-adrs).                                                            |
-| **App Router**                    | Next.js's modern routing system based on the `app/` directory, supporting React Server Components, layouts, route groups, and parallel/intercepting routes.                                                                 |
-| **ARIA**                          | Accessible Rich Internet Applications. W3C spec providing semantic attributes for assistive technology.                                                                                                                     |
-| **Capsule**                       | A seasonal or themed product collection, typically tied to a campaign. In vaïvae's vocabulary, a capsule corresponds to a Sanity `capsulePage` document and a curated set of Medusa products (often a `ProductCollection`). |
-| **CDN**                           | Content Delivery Network. Vercel and Cloudflare provide CDN edges for the storefront; Sanity's API CDN caches GROQ responses.                                                                                               |
-| **Content Lake**                  | Sanity's hosted content backend storing all documents and assets.                                                                                                                                                           |
-| **Content Releases**              | Sanity feature for bundling document changes that should publish atomically (e.g. capsule launches).                                                                                                                        |
-| **Core Web Vitals**               | Google's user-experience metrics: LCP (loading), INP (interactivity), CLS (layout stability). Targets in [§11.1.1](#1111-core-web-vitals-targets-p75).                                                                      |
-| **CSP**                           | Content Security Policy. Browser-enforced rules limiting which scripts, styles, and resources can load.                                                                                                                     |
-| **DDP**                           | Delivered Duty Paid. International shipping model where the merchant pays import duties up front. Future capability.                                                                                                        |
-| **DPA**                           | Data Processing Agreement. Contract between data controller (vaïvae) and processor (vendor) required by GDPR.                                                                                                               |
-| **DSR**                           | Data Subject Request. A user's request to access, rectify, or delete their personal data.                                                                                                                                   |
-| **ESP**                           | Email Service Provider. Resend (transactional) at launch; Klaviyo (marketing) in Phase 2.                                                                                                                                   |
-| **GMV**                           | Gross Merchandise Value. Total dollar value of orders placed. Used by some commerce platforms for tier pricing (notably BigCommerce).                                                                                       |
-| **GROQ**                          | Sanity's query language for the Content Lake. Used via `defineQuery` from `next-sanity`.                                                                                                                                    |
-| **HSTS**                          | HTTP Strict Transport Security. Browser-enforced HTTPS-only access.                                                                                                                                                         |
-| **INP**                           | Interaction to Next Paint. A Core Web Vital measuring input responsiveness. Target < 200 ms at p75.                                                                                                                         |
-| **ISR**                           | Incremental Static Regeneration. Next.js feature allowing static pages to be revalidated on demand or on a schedule.                                                                                                        |
-| **JWT**                           | JSON Web Token. Token format used for customer auth sessions, stored in HttpOnly cookies.                                                                                                                                   |
-| **LCP**                           | Largest Contentful Paint. A Core Web Vital measuring perceived loading speed. Target < 2.5 s at p75.                                                                                                                        |
-| **Medusa**                        | Open-source headless commerce framework built in TypeScript. v2 is the current generation. See [§6](#6-commerce-backend-medusa).                                                                                            |
-| **Medusa Cloud**                  | Managed hosting for Medusa v2 backends. Provides Postgres, Redis, S3, autoscaling, GitHub deploys, preview environments.                                                                                                    |
-| **Module Link**                   | Medusa v2 mechanism for connecting models across modules without direct ORM joins.                                                                                                                                          |
-| **Notification Provider**         | Medusa Notification Module Provider — a custom or built-in implementation that sends notifications (email, SMS, push) on a defined channel.                                                                                 |
-| **Page Builder Module**           | A reusable section type editors compose into pages. vaïvae ships 10-12 brand-safe modules; see [§7.2](#72-page-builder-modules).                                                                                            |
-| **PCI DSS**                       | Payment Card Industry Data Security Standard. SAQ A is the simplest compliance track for merchants who outsource card handling entirely. See [§10.1](#101-pci--payments).                                                   |
-| **PII**                           | Personally Identifiable Information. Emails, names, addresses, phone numbers, IP addresses, etc. Scrubbed from logs and analytics.                                                                                          |
-| **PITR**                          | Point-In-Time Recovery. Database feature allowing restoration to any moment within the retention window. Provided by Medusa Cloud.                                                                                          |
-| **Portable Text**                 | Sanity's structured rich-text format. Renderable to React via `@portabletext/react`.                                                                                                                                        |
-| **Preview Environment**           | A short-lived deployment per pull request, for review and stakeholder validation. Vercel + Medusa Cloud both provide PR previews.                                                                                           |
-| **Publishable Key**               | Medusa v2 API key, browser-safe, scoped to a Sales Channel. Required on every Store API request.                                                                                                                            |
-| **React Server Components (RSC)** | React's server-rendered components introduced in Next.js App Router. Default in vaïvae's storefront; client components are opt-in.                                                                                          |
-| **Region (Medusa)**               | A market context defining currency, tax behavior, and country availability. vaïvae uses one region (US/USD) at launch.                                                                                                      |
-| **Revalidation Tag**              | Next.js cache tag passed to `revalidateTag()` to invalidate ISR pages. Used by Medusa and Sanity webhooks.                                                                                                                  |
-| **RPO / RTO**                     | Recovery Point Objective (max data loss tolerated) / Recovery Time Objective (max time to restore service). vaïvae targets: RPO ≤ 24h, RTO ≤ 4h.                                                                            |
-| **Sales Channel (Medusa)**        | A scope defining product availability and stock-location linkage. vaïvae uses one channel (`storefront`) at launch.                                                                                                         |
-| **Sanity**                        | Headless CMS used for editorial content. See [§7](#7-content-architecture-sanity).                                                                                                                                          |
-| **Server Action**                 | Next.js mechanism for server-side mutations called from React components, replacing many traditional API routes.                                                                                                            |
-| **SEV1 / SEV2 / etc.**            | Incident severity levels. SEV1 = site down or checkout broken. See [§16.3.1](#1631-severity-levels).                                                                                                                        |
-| **Stega**                         | Sanity's steganography mechanism for embedding source-document references into rendered text, enabling click-to-edit visual editing. Must be cleaned from metadata, JSON-LD, and analytics.                                 |
-| **Stock Location (Medusa)**       | A physical location holding inventory. vaïvae uses one (3PL or HQ) at launch.                                                                                                                                               |
-| **Storefront**                    | The customer-facing Next.js app at `vaivae.com`. See [§5](#5-frontend-architecture).                                                                                                                                        |
-| **Subscriber**                    | Medusa v2 mechanism for asynchronous, at-least-once side effects on emitted events. See [§6.3.1](#631-subscribers).                                                                                                         |
-| **Tag-based Revalidation**        | Next.js cache invalidation by tag (`revalidateTag("product:{id}")`) rather than by time or path.                                                                                                                            |
-| **Turborepo**                     | Monorepo build orchestrator from Vercel. Used to coordinate `apps/storefront` and `apps/medusa` builds with caching.                                                                                                        |
-| **Variable**                      | A WOFF2 font format that supports multiple weights / styles in a single file via axes. Used to minimize font payload.                                                                                                       |
-| **WCAG 2.1 AA**                   | Web Content Accessibility Guidelines, level AA. Compliance target for storefront. See [§11.5](#115-accessibility-wcag-aa).                                                                                                  |
-| **Webhook**                       | An HTTP callback fired by one system to notify another of an event (e.g. Stripe payment_intent.succeeded → Medusa). All vaïvae webhooks are signed and signature-validated.                                                 |
-| **Workflow (Medusa)**             | A composable, durable, retryable sequence of steps used for custom commerce operations. See [§6.3.2](#632-workflows).                                                                                                       |
+| Term                              | Definition                                                                                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ADR**                           | Architecture Decision Record — a short document capturing a significant architectural decision, its context, and consequences. See [§20](#20-decision-log-adrs).                                                                |
+| **App Router**                    | Next.js's modern routing system based on the `app/` directory, supporting React Server Components, layouts, route groups, and parallel/intercepting routes.                                                                     |
+| **ARIA**                          | Accessible Rich Internet Applications. W3C spec providing semantic attributes for assistive technology.                                                                                                                         |
+| **Capsule**                       | A seasonal or themed product collection, typically tied to a campaign. In vaïvae's vocabulary, a capsule is authored as a Sanity `collection` document and may curate Medusa products through product rails or editorial links. |
+| **CDN**                           | Content Delivery Network. Vercel and Cloudflare provide CDN edges for the storefront; Sanity's API CDN caches GROQ responses.                                                                                                   |
+| **Content Lake**                  | Sanity's hosted content backend storing all documents and assets.                                                                                                                                                               |
+| **Content Releases**              | Sanity feature for bundling document changes that should publish atomically (e.g. capsule launches).                                                                                                                            |
+| **Core Web Vitals**               | Google's user-experience metrics: LCP (loading), INP (interactivity), CLS (layout stability). Targets in [§11.1.1](#1111-core-web-vitals-targets-p75).                                                                          |
+| **CSP**                           | Content Security Policy. Browser-enforced rules limiting which scripts, styles, and resources can load.                                                                                                                         |
+| **DDP**                           | Delivered Duty Paid. International shipping model where the merchant pays import duties up front. Future capability.                                                                                                            |
+| **DPA**                           | Data Processing Agreement. Contract between data controller (vaïvae) and processor (vendor) required by GDPR.                                                                                                                   |
+| **DSR**                           | Data Subject Request. A user's request to access, rectify, or delete their personal data.                                                                                                                                       |
+| **ESP**                           | Email Service Provider. Resend (transactional) at launch; Klaviyo (marketing) in Phase 2.                                                                                                                                       |
+| **GMV**                           | Gross Merchandise Value. Total dollar value of orders placed. Used by some commerce platforms for tier pricing (notably BigCommerce).                                                                                           |
+| **GROQ**                          | Sanity's query language for the Content Lake. Used via `defineQuery` from `next-sanity`.                                                                                                                                        |
+| **HSTS**                          | HTTP Strict Transport Security. Browser-enforced HTTPS-only access.                                                                                                                                                             |
+| **INP**                           | Interaction to Next Paint. A Core Web Vital measuring input responsiveness. Target < 200 ms at p75.                                                                                                                             |
+| **ISR**                           | Incremental Static Regeneration. Next.js feature allowing static pages to be revalidated on demand or on a schedule.                                                                                                            |
+| **JWT**                           | JSON Web Token. Token format used for customer auth sessions, stored in HttpOnly cookies.                                                                                                                                       |
+| **LCP**                           | Largest Contentful Paint. A Core Web Vital measuring perceived loading speed. Target < 2.5 s at p75.                                                                                                                            |
+| **Medusa**                        | Open-source headless commerce framework built in TypeScript. v2 is the current generation. See [§6](#6-commerce-backend-medusa).                                                                                                |
+| **Medusa Cloud**                  | Managed hosting for Medusa v2 backends. Provides Postgres, Redis, S3, autoscaling, GitHub deploys, preview environments.                                                                                                        |
+| **Module Link**                   | Medusa v2 mechanism for connecting models across modules without direct ORM joins.                                                                                                                                              |
+| **Notification Provider**         | Medusa Notification Module Provider — a custom or built-in implementation that sends notifications (email, SMS, push) on a defined channel.                                                                                     |
+| **Page Builder Module**           | A reusable section type editors compose into pages. vaïvae ships 10-12 brand-safe modules; see [§7.2](#72-page-builder-modules).                                                                                                |
+| **PCI DSS**                       | Payment Card Industry Data Security Standard. SAQ A is the simplest compliance track for merchants who outsource card handling entirely. See [§10.1](#101-pci--payments).                                                       |
+| **PII**                           | Personally Identifiable Information. Emails, names, addresses, phone numbers, IP addresses, etc. Scrubbed from logs and analytics.                                                                                              |
+| **PITR**                          | Point-In-Time Recovery. Database feature allowing restoration to any moment within the retention window. Provided by Medusa Cloud.                                                                                              |
+| **Portable Text**                 | Sanity's structured rich-text format. Renderable to React via `@portabletext/react`.                                                                                                                                            |
+| **Preview Environment**           | A short-lived deployment per pull request, for review and stakeholder validation. Vercel + Medusa Cloud both provide PR previews.                                                                                               |
+| **Publishable Key**               | Medusa v2 API key, browser-safe, scoped to a Sales Channel. Required on every Store API request.                                                                                                                                |
+| **React Server Components (RSC)** | React's server-rendered components introduced in Next.js App Router. Default in vaïvae's storefront; client components are opt-in.                                                                                              |
+| **Region (Medusa)**               | A market context defining currency, tax behavior, and country availability. vaïvae uses one region (US/USD) at launch.                                                                                                          |
+| **Revalidation Tag**              | Next.js cache tag passed to `revalidateTag()` to invalidate ISR pages. Used by Medusa and Sanity webhooks.                                                                                                                      |
+| **RPO / RTO**                     | Recovery Point Objective (max data loss tolerated) / Recovery Time Objective (max time to restore service). vaïvae targets: RPO ≤ 24h, RTO ≤ 4h.                                                                                |
+| **Sales Channel (Medusa)**        | A scope defining product availability and stock-location linkage. vaïvae uses one channel (`storefront`) at launch.                                                                                                             |
+| **Sanity**                        | Headless CMS used for editorial content. See [§7](#7-content-architecture-sanity).                                                                                                                                              |
+| **Server Action**                 | Next.js mechanism for server-side mutations called from React components, replacing many traditional API routes.                                                                                                                |
+| **SEV1 / SEV2 / etc.**            | Incident severity levels. SEV1 = site down or checkout broken. See [§16.3.1](#1631-severity-levels).                                                                                                                            |
+| **Stega**                         | Sanity's steganography mechanism for embedding source-document references into rendered text, enabling click-to-edit visual editing. Must be cleaned from metadata, JSON-LD, and analytics.                                     |
+| **Stock Location (Medusa)**       | A physical location holding inventory. vaïvae uses one (3PL or HQ) at launch.                                                                                                                                                   |
+| **Storefront**                    | The customer-facing Next.js app at `vaivae.com`. See [§5](#5-frontend-architecture).                                                                                                                                            |
+| **Subscriber**                    | Medusa v2 mechanism for asynchronous, at-least-once side effects on emitted events. See [§6.3.1](#631-subscribers).                                                                                                             |
+| **Tag-based Revalidation**        | Next.js cache invalidation by tag (`revalidateTag("product:{id}")`) rather than by time or path.                                                                                                                                |
+| **Turborepo**                     | Monorepo build orchestrator from Vercel. Used to coordinate `apps/storefront` and `apps/medusa` builds with caching.                                                                                                            |
+| **Variable**                      | A WOFF2 font format that supports multiple weights / styles in a single file via axes. Used to minimize font payload.                                                                                                           |
+| **WCAG 2.1 AA**                   | Web Content Accessibility Guidelines, level AA. Compliance target for storefront. See [§11.5](#115-accessibility-wcag-aa).                                                                                                      |
+| **Webhook**                       | An HTTP callback fired by one system to notify another of an event (e.g. Stripe payment_intent.succeeded → Medusa). All vaïvae webhooks are signed and signature-validated.                                                     |
+| **Workflow (Medusa)**             | A composable, durable, retryable sequence of steps used for custom commerce operations. See [§6.3.2](#632-workflows).                                                                                                           |
 
 ---
 
@@ -4462,7 +4505,7 @@ Launch content is seeded by two operator-run scripts. They are authored to be id
 | Surface          | Script                                       | Invocation                                     | Notes                                                                                                                                                                                                              |
 | ---------------- | -------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Medusa commerce  | `apps/medusa/src/scripts/seed.ts`            | `pnpm --filter @vaivae/medusa db:seed`         | Creates the US/USD region, Storefront sales channel, stock location, manual fulfillment setup, shipping options, Drop 01 product category, deterministic Drop 01 products, variants, prices, and inventory levels. |
-| Sanity editorial | `apps/storefront/src/scripts/sanity-seed.ts` | `pnpm --filter @vaivae/storefront sanity:seed` | Creates launch singletons, materials, color swatches, size guides, capsule, lookbooks, journal entries, legal placeholders, and product editorial overlays. Requires `SANITY_WRITE_TOKEN`.                         |
+| Sanity editorial | `apps/storefront/src/scripts/sanity-seed.ts` | `pnpm --filter @vaivae/storefront sanity:seed` | Creates launch singletons, materials, color swatches, size guides, collection, lookbooks, journal entries, legal placeholders, and product editorial overlays. Requires `SANITY_WRITE_TOKEN`.                      |
 | Shared fixture   | `apps/medusa/src/scripts/drop-01.ts`         | Imported by both scripts                       | Defines the canonical Drop 01 product, material, color, size-guide, and editorial seed data. Sanity product `_id` values match deterministic Medusa product IDs.                                                   |
 
 ### 22.2 Drop 01 Catalog

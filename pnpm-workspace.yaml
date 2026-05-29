@@ -3,6 +3,12 @@ packages:
   - "packages/*"
   - "!apps/medusa/.medusa/**"
 
+hoistPattern:
+  - "*"
+  # Keep storefront React 19 and Medusa Admin React 18 types isolated.
+  - "!@types/react"
+  - "!@types/react-dom"
+
 allowBuilds:
   "@medusajs/telemetry": true
   "@sentry/cli": true
@@ -16,7 +22,7 @@ allowBuilds:
 # Catalogs centralize shared dependency versions.
 # When a package depends on `react` it can reference `catalog:` instead of pinning the version twice.
 catalog:
-  # Runtime — keep `react` and `react-dom` aligned across the monorepo
+  # Storefront runtime — Medusa Admin pins React 18 in apps/medusa/package.json
   react: 19.2.6
   react-dom: 19.2.6
   "@types/react": 19.2.14
@@ -44,3 +50,8 @@ catalog:
 
 patchedDependencies:
   "@medusajs/promotion@2.14.2": patches/@medusajs__promotion@2.14.2.patch
+
+packageExtensions:
+  "@alphabite/medusa-wishlist@0.5.9":
+    dependencies:
+      "@tanstack/react-query": 5.64.2

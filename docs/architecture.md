@@ -459,7 +459,7 @@ A separate **staging** environment is deferred until business operations require
 - **Renovate or Dependabot** opens reviewable upgrade PRs; humans approve.
 - **Major version bumps** (e.g. Next 16 → 17) require a new ADR and explicit team approval.
 - **Patch and minor bumps** are routine; CI must remain green.
-- **Versions are aligned across the monorepo** where shared (e.g. `react` and `react-dom`, all `@medusajs/*` packages).
+- **Versions are aligned within each runtime** where shared (e.g. `react` and `react-dom` must match inside each app; all `@medusajs/*` packages remain lockstep). The storefront uses React 19, while Medusa Admin uses React 18 to match `@medusajs/dashboard@2.14.2`.
 
 #### 3.5.2 Runtime Baseline
 
@@ -599,6 +599,10 @@ A separate **staging** environment is deferred until business operations require
 | `@medusajs/js-sdk`            | `2.14.2` | dep  | Direct pin required for custom Admin widgets to make authenticated Admin API calls under pnpm's strict module resolution.                                                                       |
 | `@medusajs/ui`                | `4.1.9`  | dep  | Direct pin matching `@medusajs/dashboard@2.14.2` for custom Admin widgets under pnpm's strict module resolution.                                                                                |
 | `@tanstack/react-query`       | `5.64.2` | dep  | Direct pin matching `@medusajs/dashboard@2.14.2` for custom Admin widget queries and mutations under pnpm's strict module resolution.                                                           |
+| `react`                       | `18.3.1` | dep  | Required by `@medusajs/dashboard@2.14.2`; do not use the storefront React 19 catalog here or Admin widgets get a separate React Query context.                                                  |
+| `react-dom`                   | `18.3.1` | dep  | Same as `react`.                                                                                                                                                                                |
+| `@types/react`                | `18.3.1` | dev  | Match the Medusa Admin React major.                                                                                                                                                             |
+| `@types/react-dom`            | `18.3.1` | dev  | Match the Medusa Admin React major.                                                                                                                                                             |
 | `@medusajs/draft-order`       | `2.14.2` | dev  | Default Admin plugin import; direct pin required by the Admin Vite bundle under pnpm's strict module resolution.                                                                                |
 | `@medusajs/payment-stripe`    | `2.14.2` | dep  | Bundled in `@medusajs/medusa`; pinning explicitly is a safety net.                                                                                                                              |
 | `@medusajs/analytics-posthog` | `2.14.2` | dep  | Server-side PostHog event capture (per [ADR-014](#adr-014-adopt-official-medusa-plugins--analytics-loyalty)).                                                                                   |
@@ -610,7 +614,7 @@ A separate **staging** environment is deferred until business operations require
 
 | Package                             | Version | Type         | Notes                                                                                                                                                                       |
 | ----------------------------------- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@alphabite/medusa-wishlist`        | `0.5.9` | dep          | Wishlist module (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)). Published; peer deps pin Medusa `2.13.6`, so keep fallback / fork path if 2.14.2 issues surface. |
+| `@alphabite/medusa-wishlist`        | `0.5.9` | dep          | Wishlist module (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)). Published; peer deps pin Medusa `2.13.6`, so keep fallback / fork path if 2.14.2 issues surface. Its Admin bundle imports `@tanstack/react-query` without declaring it, so `pnpm-workspace.yaml` adds a package extension to keep builds deterministic. |
 | `@stackd-solutions/medusa-wishlist` | `0.1.6` | — (fallback) | Documented fallback if `@alphabite/medusa-wishlist` v2.14 compatibility issues arise; peers allow Medusa `^2.13.5`.                                                         |
 
 ##### Custom Module Dependencies
@@ -657,6 +661,8 @@ A separate **staging** environment is deferred until business operations require
 | `@commitlint/cli`                  | `21.0.0` | dev    |                                                                                                                     |
 | `@commitlint/config-conventional`  | `21.0.0` | dev    |                                                                                                                     |
 | `tsx`                              | `4.21.0` | dev    | TS scripts and seeds.                                                                                               |
+| `@types/react`                     | `19.2.14`| dev    | Root type anchor so Next/Sanity packages without local React type peers resolve to the storefront React 19 types.    |
+| `@types/react-dom`                 | `19.2.3` | dev    | Same as `@types/react`; Medusa Admin overrides to local React 18 types in `tsconfig.admin.json`.                     |
 
 #### 3.5.6 TypeScript Strictness
 
@@ -759,6 +765,7 @@ These are the **specific gotchas** AI agents must know about, written explicitly
 15. **Medusa Cloud auto-configures Redis** for Caching, Event Bus, Workflow Engine, and Locking on Launch+ plans. Do **not** add explicit module config in `medusa-config.ts` for these on Cloud.
 16. **Sentry source-map upload + Turbo cache** can produce a cache hit that skips upload. Either disable cache for release builds or run source-map upload as a separate uncached step ([§14.3.4](#1434-migration-handling)).
 17. **The Sanity Studio bundle** is large — keep `SanityLive` and Visual Editing components **out of** the `/studio` layout. Sanity's docs warn that mixing them causes unexpected reloads.
+18. **React type hoisting is intentionally constrained** — `pnpm-workspace.yaml` excludes `@types/react` and `@types/react-dom` from pnpm's hidden hoist so storefront dependencies resolve React 19 types from the root, while Medusa Admin resolves React 18 types through `apps/medusa/tsconfig.admin.json`. Removing this reintroduces cross-runtime JSX type errors.
 
 #### 3.5.12 Upgrade Cadence
 

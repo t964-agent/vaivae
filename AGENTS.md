@@ -64,7 +64,7 @@ vaivae/
 ├── pnpm-workspace.yaml    pnpm + catalog versions
 ├── turbo.json             Turborepo task graph
 ├── tsconfig.base.json     Shared TypeScript baseline
-├── .npmrc                 pnpm config (save-exact, engine-strict)
+├── .npmrc                 npm/pnpm registry config; pnpm 11 install settings live in pnpm-workspace.yaml
 ├── .nvmrc                 Node 24.15.0
 └── .gitignore
 ```
@@ -82,7 +82,7 @@ These are non-negotiable. If a task seems to require breaking one, **stop and as
 1. **Use exact versions.** No `^`, no `~`, no `latest`. Match what is in `apps/*/package.json` and the `catalog:` references in `pnpm-workspace.yaml`.
 2. **Do not upgrade dependencies on your own initiative.** Renovate (or a human) handles upgrades. If you genuinely need a newer version, write an ADR.
 3. **Every `@medusajs/*` package must be the same version.** Currently `2.14.2`. Lockstep. Mismatched versions cause silent runtime errors.
-4. **`react` and `react-dom` must always match.** Use `catalog:react` references.
+4. **`react` and `react-dom` must always match inside each app.** Storefront/shared packages use `catalog:react`; Medusa Admin pins React `18.3.1` to match `@medusajs/dashboard@2.14.2`. The root pins React 19 type packages and `pnpm-workspace.yaml` excludes React types from hidden hoisting so storefront and Admin typechecks do not mix React majors.
 
 ### 4.2 Excluded packages — do not install
 

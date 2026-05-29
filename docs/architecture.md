@@ -612,10 +612,10 @@ A separate **staging** environment is deferred until business operations require
 
 ##### Community Plugins
 
-| Package                             | Version | Type         | Notes                                                                                                                                                                       |
-| ----------------------------------- | ------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Package                             | Version | Type         | Notes                                                                                                                                                                                                                                                                                                                              |
+| ----------------------------------- | ------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@alphabite/medusa-wishlist`        | `0.5.9` | dep          | Wishlist module (per [ADR-013](#adr-013-adopt-community-wishlist-plugin)). Published; peer deps pin Medusa `2.13.6`, so keep fallback / fork path if 2.14.2 issues surface. Its Admin bundle imports `@tanstack/react-query` without declaring it, so `pnpm-workspace.yaml` adds a package extension to keep builds deterministic. |
-| `@stackd-solutions/medusa-wishlist` | `0.1.6` | — (fallback) | Documented fallback if `@alphabite/medusa-wishlist` v2.14 compatibility issues arise; peers allow Medusa `^2.13.5`.                                                         |
+| `@stackd-solutions/medusa-wishlist` | `0.1.6` | — (fallback) | Documented fallback if `@alphabite/medusa-wishlist` v2.14 compatibility issues arise; peers allow Medusa `^2.13.5`.                                                                                                                                                                                                                |
 
 ##### Custom Module Dependencies
 
@@ -646,23 +646,23 @@ A separate **staging** environment is deferred until business operations require
 
 #### 3.5.5 Monorepo Tooling — Root
 
-| Package                            | Version  | Type   | Notes                                                                                                               |
-| ---------------------------------- | -------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
-| `turbo`                            | `2.9.12` | dev    | Use `tasks` (not legacy `pipeline`).                                                                                |
-| `eslint`                           | `9.39.4` | dev    | Flat config. **ESLint 10.3.0 exists but several plugins still pin to 9.** Stay on 9 until plugin matrix catches up. |
-| `eslint-config-next`               | `16.2.6` | dev    | Match Next version.                                                                                                 |
-| `eslint-config-prettier`           | `10.1.8` | dev    |                                                                                                                     |
-| `@typescript-eslint/parser`        | `8.59.2` | dev    |                                                                                                                     |
-| `@typescript-eslint/eslint-plugin` | `8.59.2` | dev    |                                                                                                                     |
-| `prettier`                         | `3.8.3`  | dev    |                                                                                                                     |
-| `husky`                            | `9.1.7`  | dev    |                                                                                                                     |
-| `lint-staged`                      | `17.0.3` | dev    | Requires Node `>=22.22.1`.                                                                                          |
-| `gitleaks`                         | `8.30.1` | binary | Pre-commit secret scanning; not an npm package. Also run in CI.                                                     |
-| `@commitlint/cli`                  | `21.0.0` | dev    |                                                                                                                     |
-| `@commitlint/config-conventional`  | `21.0.0` | dev    |                                                                                                                     |
-| `tsx`                              | `4.21.0` | dev    | TS scripts and seeds.                                                                                               |
-| `@types/react`                     | `19.2.14`| dev    | Root type anchor so Next/Sanity packages without local React type peers resolve to the storefront React 19 types.    |
-| `@types/react-dom`                 | `19.2.3` | dev    | Same as `@types/react`; Medusa Admin overrides to local React 18 types in `tsconfig.admin.json`.                     |
+| Package                            | Version   | Type   | Notes                                                                                                               |
+| ---------------------------------- | --------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `turbo`                            | `2.9.12`  | dev    | Use `tasks` (not legacy `pipeline`).                                                                                |
+| `eslint`                           | `9.39.4`  | dev    | Flat config. **ESLint 10.3.0 exists but several plugins still pin to 9.** Stay on 9 until plugin matrix catches up. |
+| `eslint-config-next`               | `16.2.6`  | dev    | Match Next version.                                                                                                 |
+| `eslint-config-prettier`           | `10.1.8`  | dev    |                                                                                                                     |
+| `@typescript-eslint/parser`        | `8.59.2`  | dev    |                                                                                                                     |
+| `@typescript-eslint/eslint-plugin` | `8.59.2`  | dev    |                                                                                                                     |
+| `prettier`                         | `3.8.3`   | dev    |                                                                                                                     |
+| `husky`                            | `9.1.7`   | dev    |                                                                                                                     |
+| `lint-staged`                      | `17.0.3`  | dev    | Requires Node `>=22.22.1`.                                                                                          |
+| `gitleaks`                         | `8.30.1`  | binary | Pre-commit secret scanning; not an npm package. Also run in CI.                                                     |
+| `@commitlint/cli`                  | `21.0.0`  | dev    |                                                                                                                     |
+| `@commitlint/config-conventional`  | `21.0.0`  | dev    |                                                                                                                     |
+| `tsx`                              | `4.21.0`  | dev    | TS scripts and seeds.                                                                                               |
+| `@types/react`                     | `19.2.14` | dev    | Root type anchor so Next/Sanity packages without local React type peers resolve to the storefront React 19 types.   |
+| `@types/react-dom`                 | `19.2.3`  | dev    | Same as `@types/react`; Medusa Admin overrides to local React 18 types in `tsconfig.admin.json`.                    |
 
 #### 3.5.6 TypeScript Strictness
 
